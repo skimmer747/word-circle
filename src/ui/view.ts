@@ -400,7 +400,11 @@ export class View {
   placeClock(layout: Layout): void {
     const card = this.clockPopup.querySelector<HTMLElement>('.clock-card');
     const close = this.clockPopup.querySelector<HTMLElement>('.next');
-    if (card) place(card, layout.clockCard);
+    if (card) {
+      place(card, layout.clockCard);
+      // Text sizes in the stylesheet are multiples of 1% of the card's height.
+      card.style.setProperty('--u', `${layout.clockCard.h / 100}px`);
+    }
     if (close) place(close, layout.closeButton);
   }
 

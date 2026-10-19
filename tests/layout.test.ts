@@ -136,13 +136,17 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
       expect(clockButton.y + clockButton.h).toBeLessThanOrEqual(bar.y);
     });
 
-    it('centers the clock pop-up with a big Close button clear of the safe zones', () => {
+    it('makes the clock pop-up fill almost the whole screen, with a big Close button clear of the safe zones', () => {
       const { clockCard, closeButton } = layout;
+      expect(clockCard.x).toBeGreaterThanOrEqual(0);
       expect(clockCard.y).toBeGreaterThanOrEqual(0);
+      expect(clockCard.x + clockCard.w).toBeLessThanOrEqual(width);
       expect(clockCard.y + clockCard.h).toBeLessThanOrEqual(height);
-      expect(Math.abs(clockCard.x + clockCard.w / 2 - width / 2)).toBeLessThan(1);
+      expect(clockCard.w).toBeGreaterThanOrEqual(width - 40);
+      expect(clockCard.h).toBeGreaterThanOrEqual(height - 40);
       expect(inPlayArea(closeButton, layout)).toBe(true);
-      expect(closeButton.h).toBeGreaterThanOrEqual(80);
+      expect(closeButton.h).toBeGreaterThanOrEqual(96);
+      expect(closeButton.w).toBeGreaterThanOrEqual(340);
       expect(closeButton.y + closeButton.h).toBeLessThanOrEqual(clockCard.y + clockCard.h);
     });
 

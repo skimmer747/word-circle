@@ -516,68 +516,85 @@ body {
   display: block;
 }
 
+/* The clock card fills almost the screen. Sizes use --u (1% of the card's height, set by the view)
+   so the text is as big as each iPad allows. The bottom padding leaves room for the Close button. */
 .clock-card {
+  --u: 7.4px;
   position: absolute;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 32px;
-  border-radius: 28px;
+  padding: calc(var(--u) * 3) 48px 148px;
+  border-radius: 32px;
   background: #fff;
-  border: 6px solid var(--navy);
+  border: 8px solid var(--navy);
   animation: card-in 400ms ease-out;
 }
 
 .clock-time {
-  font-size: 108px;
+  font-size: calc(var(--u) * 22);
   line-height: 1;
   color: var(--navy);
   font-variant-numeric: tabular-nums;
 }
 
 .clock-part {
-  margin-top: 8px;
-  font-size: 44px;
+  margin-top: calc(var(--u) * 1);
+  font-size: calc(var(--u) * 8.5);
   line-height: 1.1;
 }
 
 .clock-date {
-  margin: 6px 0 14px;
-  font-size: 34px;
+  margin: calc(var(--u) * 0.8) 0 calc(var(--u) * 1.8);
+  font-size: calc(var(--u) * 6.8);
+  line-height: 1.15;
   color: var(--label);
 }
 
 .clock-events {
   box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  padding-top: 12px;
-  border-top: 4px solid var(--bg);
+  padding-top: calc(var(--u) * 1.6);
+  border-top: 5px solid var(--bg);
 }
 
 .clock-event {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 8px;
-  font-size: 30px;
+  gap: calc(var(--u) * 1.8);
+  margin-bottom: calc(var(--u) * 1);
+  padding: calc(var(--u) * 0.3) calc(var(--u) * 1.6);
+  border: 4px solid transparent;
+  border-radius: 18px;
+  font-size: calc(var(--u) * 5.6);
   line-height: 1.2;
 }
 
 .clock-event svg {
   flex: none;
-  width: 36px;
-  height: 36px;
+  width: calc(var(--u) * 5.6);
+  height: calc(var(--u) * 5.6);
   color: var(--select);
 }
 
 .clock-event.now {
-  padding: 4px 12px;
-  border-radius: 14px;
   background: #fdf0e2;
-  border: 3px solid var(--select);
+  border-color: var(--select);
 }
 
 .next.close {
-  border-color: var(--navy);
+  border: 6px solid var(--navy);
+  font-size: 46px;
+}
+
+.next.close svg {
+  width: 48px;
+  height: 48px;
 }

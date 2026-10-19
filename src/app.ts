@@ -25,6 +25,8 @@ const GOOD_MS = 1200;
 const CELEBRATION_MS = 15_000;
 /** The clock pop-up closes by itself after this long. */
 const CLOCK_OPEN_MS = 60_000;
+/** With the clock's very large text, three events fit on every iPad. */
+const CLOCK_MAX_EVENTS = 3;
 /** How often to check the online schedule for changes. */
 const SCHEDULE_REFRESH_MS = 5 * 60_000;
 
@@ -108,7 +110,7 @@ export class App {
   private openClock(): void {
     if (this.busy || this.tracer.isTracing || this.clockOpen || !this.layout) return;
     this.clockOpen = true;
-    this.view.showClock(clockFace(new Date()), upcomingLines(this.schedule, new Date()), this.layout);
+    this.view.showClock(clockFace(new Date()), upcomingLines(this.schedule, new Date(), CLOCK_MAX_EVENTS), this.layout);
     this.clockTick = window.setInterval(() => this.updateClock(), 1000);
     this.clockAutoClose = window.setTimeout(() => this.closeClock(), CLOCK_OPEN_MS);
     this.updateTouchTargets();
@@ -117,7 +119,7 @@ export class App {
 
   private updateClock(): void {
     const now = new Date();
-    this.view.updateClock(clockFace(now), upcomingLines(this.schedule, now));
+    this.view.updateClock(clockFace(now), upcomingLines(this.schedule, now, CLOCK_MAX_EVENTS));
   }
 
   private closeClock(): void {

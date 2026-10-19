@@ -37,8 +37,8 @@ const NEXT_HEIGHT = 88;
 const CARD_PADDING = 24;
 const CLOCK_SIZE = 72;
 const CLOCK_GAP = 12;
-const CLOCK_CARD_WIDTH = 620;
-const CLOCK_CARD_MAX_HEIGHT = 600;
+const CLOSE_WIDTH = 360;
+const CLOSE_HEIGHT = 100;
 
 export interface Rect {
   x: number;
@@ -160,18 +160,13 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
     h: NEXT_HEIGHT,
   };
 
-  const clockCardHeight = Math.min(CLOCK_CARD_MAX_HEIGHT, height - 2 * MARGIN);
-  const clockCard: Rect = {
-    x: width / 2 - CLOCK_CARD_WIDTH / 2,
-    y: (height - clockCardHeight) / 2,
-    w: CLOCK_CARD_WIDTH,
-    h: clockCardHeight,
-  };
+  // The clock fills almost the whole screen so its text can be as big as possible.
+  const clockCard: Rect = { x: MARGIN, y: MARGIN, w: width - 2 * MARGIN, h: height - 2 * MARGIN };
   const closeButton: Rect = {
-    x: width / 2 - NEXT_WIDTH / 2,
-    y: clockCard.y + clockCard.h - CARD_PADDING - NEXT_HEIGHT,
-    w: NEXT_WIDTH,
-    h: NEXT_HEIGHT,
+    x: width / 2 - CLOSE_WIDTH / 2,
+    y: clockCard.y + clockCard.h - CARD_PADDING - CLOSE_HEIGHT,
+    w: CLOSE_WIDTH,
+    h: CLOSE_HEIGHT,
   };
 
   return {
