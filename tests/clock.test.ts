@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clockFace, upcomingLines } from '../src/clock/clock';
+import { clockFace, upcomingEvents } from '../src/clock/clock';
 import { parseSchedule } from '../src/clock/schedule';
 
 // Monday, October 19, 2026 (local time).
@@ -20,7 +20,10 @@ describe('clockFace', () => {
   });
 });
 
-describe('upcomingLines', () => {
+/** Just the countdown lines. */
+const countdowns = (...args: Parameters<typeof upcomingEvents>) => upcomingEvents(...args).map((event) => event.text);
+
+describe('upcomingEvents', () => {
   const events = parseSchedule(
     [
       'every day 8:00 AM Breakfast',
@@ -36,7 +39,7 @@ describe('upcomingLines', () => {
   );
 
   it('counts down to the rest of today, soonest first, then the coming week', () => {
-    expect(upcomingLines(events, at(10, 30))).toEqual([
+    expect(countdowns(events, at(10, 30))).toEqual([
       'Visit from Ann in 30 minutes',
       'Lunch in 1 hour 30 minutes',
       'Supper in 6 hours 30 minutes',
@@ -45,17 +48,17 @@ describe('upcomingLines', () => {
   });
 
   it('shows no more than the limit', () => {
-    expect(upcomingLines(events, at(6, 0), 2)).toEqual(['Breakfast in 2 hours', 'Visit from Ann in 5 hours']);
+    expect(countdowns(events, at(6, 0), 2)).toEqual(['Breakfast in 2 hours', 'Visit from Ann in 5 hours']);
   });
 
   it('says it is time from 5 minutes before until 30 minutes after', () => {
-    expect(upcomingLines(events, at(16, 56))[0]).toBe('Time for Supper');
-    expect(upcomingLines(events, at(17, 30))[0]).toBe('Time for Supper');
-    expect(upcomingLines(events, at(17, 31))[0]).toBe('Bingo in 1 hour 29 minutes');
+    expect(countdowns(events, at(16, 56))[0]).toBe('Time for Supper');
+    expect(countdowns(events, at(17, 30))[0]).toBe('Time for Supper');
+    expect(countdowns(events, at(17, 31))[0]).toBe('Bingo in 1 hour 29 minutes');
   });
 
   it('counts down to one-off events coming up this week', () => {
-    expect(upcomingLines(events, at(20, 0))).toEqual([
+    expect(countdowns(events, at(20, 0))).toEqual([
       'Hair appointment in 13 hours',
       'Doctor visit in 2 days and 18 hours',
     ]);
@@ -63,25 +66,54 @@ describe('upcomingLines', () => {
 
   it('says days and hours, to the nearest hour, once an event is a day or more away', () => {
     const doctor = parseSchedule('2026-10-22 2:00 PM Doctor visit');
-    expect(upcomingLines(doctor, at(13, 20))).toEqual(['Doctor visit in 3 days and 1 hour']);
-    expect(upcomingLines(doctor, at(13, 40))).toEqual(['Doctor visit in 3 days']);
-    expect(upcomingLines(doctor, at(14, 29))).toEqual(['Doctor visit in 3 days']);
-    expect(upcomingLines(doctor, at(14, 31))).toEqual(['Doctor visit in 2 days and 23 hours']);
-    expect(upcomingLines(doctor, at(13, 0, 21))).toEqual(['Doctor visit in 1 day and 1 hour']);
-    expect(upcomingLines(doctor, at(14, 0, 21))).toEqual(['Doctor visit in 1 day']);
-    expect(upcomingLines(doctor, at(14, 30, 21))).toEqual(['Doctor visit in 23 hours 30 minutes']);
+    expect(countdowns(doctor, at(13, 20))).toEqual(['Doctor visit in 3 days and 1 hour']);
+    expect(countdowns(doctor, at(13, 40))).toEqual(['Doctor visit in 3 days']);
+    expect(countdowns(doctor, at(14, 29))).toEqual(['Doctor visit in 3 days']);
+    expect(countdowns(doctor, at(14, 31))).toEqual(['Doctor visit in 2 days and 23 hours']);
+    expect(countdowns(doctor, at(13, 0, 21))).toEqual(['Doctor visit in 1 day and 1 hour']);
+    expect(countdowns(doctor, at(14, 0, 21))).toEqual(['Doctor visit in 1 day']);
+    expect(countdowns(doctor, at(14, 30, 21))).toEqual(['Doctor visit in 23 hours 30 minutes']);
   });
 
   it('counts minutes up so it never says zero', () => {
-    expect(upcomingLines(parseSchedule('every day 9:00 AM Pills'), new Date(2026, 9, 19, 8, 0, 30))).toEqual([
+    expect(countdowns(parseSchedule('every day 9:00 AM Pills'), new Date(2026, 9, 19, 8, 0, 30))).toEqual([
       'Pills in 1 hour',
     ]);
-    expect(upcomingLines(parseSchedule('every day 9:00 AM Pills'), new Date(2026, 9, 19, 8, 54, 10))).toEqual([
+    expect(countdowns(parseSchedule('every day 9:00 AM Pills'), new Date(2026, 9, 19, 8, 54, 10))).toEqual([
       'Pills in 6 minutes',
     ]);
   });
 
   it('is empty when nothing is coming up', () => {
-    expect(upcomingLines([], at(10))).toEqual([]);
+    expect(countdowns([], at(10))).toEqual([]);
+  });
+});
+
+describe('when each event is', () => {
+  const events = parseSchedule(
+    [
+      'every day 6:00 PM Supper',
+      '2026-10-20 11:00 AM Jermaine',
+      '2026-10-21 7:00 PM RuthAnne gets home',
+      '2026-10-26 9:30 AM Doctor visit',
+    ].join('\n'),
+  );
+
+  it('says the day and time under each countdown: today, tomorrow, then the date', () => {
+    expect(upcomingEvents(events, at(17, 30))).toEqual([
+      { text: 'Supper in 30 minutes', when: 'Today at 6:00 PM', now: false },
+      { text: 'Jermaine in 17 hours 30 minutes', when: 'Tomorrow, Tuesday, October 20 at 11:00 AM', now: false },
+      { text: 'RuthAnne gets home in 2 days and 2 hours', when: 'Wednesday, October 21 at 7:00 PM', now: false },
+      { text: 'Doctor visit in 6 days and 16 hours', when: 'Monday, October 26 at 9:30 AM', now: false },
+    ]);
+  });
+
+  it('marks the event it is time for', () => {
+    expect(upcomingEvents(events, at(18, 10))[0]).toEqual({ text: 'Time for Supper', when: 'Today at 6:00 PM', now: true });
+  });
+
+  it('says tomorrow across the end of a month', () => {
+    const halloween = parseSchedule('2026-11-01 10:00 AM Church');
+    expect(upcomingEvents(halloween, new Date(2026, 9, 31, 20, 0))[0].when).toBe('Tomorrow, Sunday, November 1 at 10:00 AM');
   });
 });

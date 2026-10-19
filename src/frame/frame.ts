@@ -1,4 +1,4 @@
-import { clockFace, upcomingLines } from '../clock/clock';
+import { clockFace, upcomingEvents } from '../clock/clock';
 import { cachedSchedule, refreshSchedule } from '../clock/loader';
 import type { ScheduledEvent } from '../clock/schedule';
 import { LetterTracer, type ButtonGeometry, type PointerInput, type TileGeometry } from '../input/touch';
@@ -215,7 +215,7 @@ export class Frame implements FrameHost {
   private openClock(): void {
     if (this.blocked() || !this.layout) return;
     this.clockOpen = true;
-    this.view.showClock(clockFace(new Date()), upcomingLines(this.schedule, new Date(), CLOCK_MAX_EVENTS), this.layout);
+    this.view.showClock(clockFace(new Date()), upcomingEvents(this.schedule, new Date(), CLOCK_MAX_EVENTS), this.layout);
     this.clockTick = window.setInterval(() => this.updateClock(), 1000);
     this.keepClockOpen();
     this.updateTouchTargets();
@@ -230,7 +230,7 @@ export class Frame implements FrameHost {
 
   private updateClock(): void {
     const now = new Date();
-    this.view.updateClock(clockFace(now), upcomingLines(this.schedule, now, CLOCK_MAX_EVENTS));
+    this.view.updateClock(clockFace(now), upcomingEvents(this.schedule, now, CLOCK_MAX_EVENTS));
   }
 
   private closeClock(): void {

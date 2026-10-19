@@ -73,20 +73,42 @@ function happensOn(event: ScheduledEvent, day: Date): boolean {
   }
 }
 
+/** One line of the clock's list, with when it is underneath. */
+export interface UpcomingEvent {
+  /** "Supper in 4 hours 30 minutes" or "Time for Supper" */
+  text: string;
+  /** "Today at 6:00 PM", "Tomorrow, Tuesday, October 20 at 11:00 AM" or "Wednesday, October 21 at 7:00 PM" */
+  when: string;
+  /** True around its start, while the line says "Time for …". */
+  now: boolean;
+}
+
+function formatWhen(day: Date, ahead: number, minutes: number): string {
+  const time = formatTime(minutes);
+  if (ahead === 0) return `Today at ${time}`;
+  const date = `${DAY_NAMES[day.getDay()]}, ${MONTH_NAMES[day.getMonth()]} ${day.getDate()}`;
+  return ahead === 1 ? `Tomorrow, ${date} at ${time}` : `${date} at ${time}`;
+}
+
 /**
  * What's coming up, soonest first: countdowns for the rest of today ("Supper in 4 hours 30 minutes",
- * or "Time for Supper" around its start), then one-off events in the next week ("Doctor visit in 2 days and 7 hours").
+ * or "Time for Supper" around its start), then one-off events in the next week ("Doctor visit in 2 days and 7 hours"),
+ * each with its day and time.
  */
-export function upcomingLines(events: readonly ScheduledEvent[], now: Date, max = 4): string[] {
-  const lines: Array<{ at: number; text: string }> = [];
+export function upcomingEvents(events: readonly ScheduledEvent[], now: Date, max = 4): UpcomingEvent[] {
+  const lines: Array<{ at: number; line: UpcomingEvent }> = [];
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   for (const event of events) {
     if (happensOn(event, today)) {
       const at = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, event.minutes);
       const wait = (at.getTime() - now.getTime()) / 60_000;
-      if (wait >= -TIME_FOR_AFTER && wait <= TIME_FOR_BEFORE) lines.push({ at: at.getTime(), text: `Time for ${event.name}` });
-      else if (wait > TIME_FOR_BEFORE) lines.push({ at: at.getTime(), text: `${event.name} in ${formatWait(Math.ceil(wait))}` });
+      const when = formatWhen(today, 0, event.minutes);
+      if (wait >= -TIME_FOR_AFTER && wait <= TIME_FOR_BEFORE) {
+        lines.push({ at: at.getTime(), line: { text: `Time for ${event.name}`, when, now: true } });
+      } else if (wait > TIME_FOR_BEFORE) {
+        lines.push({ at: at.getTime(), line: { text: `${event.name} in ${formatWait(Math.ceil(wait))}`, when, now: false } });
+      }
     }
     if (event.repeat.kind !== 'date') continue;
     for (let ahead = 1; ahead <= WEEK_AHEAD_DAYS; ahead++) {
@@ -94,11 +116,12 @@ export function upcomingLines(events: readonly ScheduledEvent[], now: Date, max 
       if (!happensOn(event, day)) continue;
       const at = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 0, event.minutes);
       const wait = Math.ceil((at.getTime() - now.getTime()) / 60_000);
-      lines.push({ at: at.getTime(), text: `${event.name} in ${formatWait(wait)}` });
+      const when = formatWhen(day, ahead, event.minutes);
+      lines.push({ at: at.getTime(), line: { text: `${event.name} in ${formatWait(wait)}`, when, now: false } });
     }
   }
   return lines
     .sort((a, b) => a.at - b.at)
     .slice(0, max)
-    .map((line) => line.text);
+    .map(({ line }) => line);
 }

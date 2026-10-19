@@ -17,6 +17,10 @@
   --present: #b8860b;
   --absent: #9aa6b2;
   --daily-fill: #fff4d6;
+  /* Light fills behind the colored borders, so right / wrong spot / not in the word are easy to tell apart. */
+  --right-fill: #cdeccf;
+  --present-fill: #f6e09c;
+  --absent-fill: #dde2e8;
 }
 
 html,
@@ -574,7 +578,8 @@ body {
 /* Scrolled by dragging a finger on the card (through the touch tracer, which skips the safe zones).
    A fade at the top or bottom shows there are more countdowns that way; the divider line stays. */
 .clock-events {
-  --fade: calc(var(--u) * 9);
+  /* Just a soft edge: the ▲▲ / ▼▼ arrows are the main sign there is more. */
+  --fade: calc(var(--u) * 4);
   box-sizing: border-box;
   flex: 1;
   min-height: 0;
@@ -585,6 +590,14 @@ body {
   width: 100%;
   padding-top: calc(var(--u) * 1.6);
   border-top: 5px solid var(--bg);
+}
+
+.clock-rows {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  max-width: 100%;
 }
 
 .clock-events.more-below {
@@ -641,7 +654,7 @@ body {
   align-items: center;
   gap: 0.3em;
   max-width: 100%;
-  margin-bottom: calc(var(--u) * 1);
+  margin-bottom: calc(var(--u) * 1.6);
   padding: 0.05em 0.3em;
   border: 4px solid transparent;
   border-radius: 18px;
@@ -649,6 +662,18 @@ body {
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.clock-lines {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* The day and time under each countdown: a little smaller, in dark blue. */
+.clock-when {
+  font-size: 0.8em;
+  color: var(--navy);
 }
 
 .clock-event svg {
@@ -831,14 +856,17 @@ body {
 
 .pic-guess .right {
   border-color: var(--found);
+  background: var(--right-fill);
 }
 
 .pic-guess .present {
   border-color: var(--present);
+  background: var(--present-fill);
 }
 
 .pic-guess .absent {
   border-color: var(--absent);
+  background: var(--absent-fill);
 }
 
 /* Word Guess's "Well done!" card also shows her word, so its title and lines are a little smaller. */
@@ -861,7 +889,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: #fff;
+  background: var(--right-fill);
   border: 5px solid var(--found);
   font-size: calc(var(--u) * 5.6);
   color: var(--ink);
@@ -922,14 +950,17 @@ body {
 
 .square.right {
   border: 5px solid var(--found);
+  background: var(--right-fill);
 }
 
 .square.present {
   border: 5px solid var(--present);
+  background: var(--present-fill);
 }
 
 .square.absent {
   border: 5px solid var(--absent);
+  background: var(--absent-fill);
 }
 
 .square.pop {
@@ -962,14 +993,17 @@ body {
 
 .key.right {
   border: 5px solid var(--found);
+  background: var(--right-fill);
 }
 
 .key.present {
   border: 5px solid var(--present);
+  background: var(--present-fill);
 }
 
 .key.absent {
   border: 3px solid var(--absent);
+  background: var(--absent-fill);
 }
 
 .key.gone {

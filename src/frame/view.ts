@@ -1,4 +1,4 @@
-import type { ClockFace } from '../clock/clock';
+import type { ClockFace, UpcomingEvent } from '../clock/clock';
 import { el, place } from '../ui/dom';
 import { fitFontScale } from '../ui/fit';
 import { ARROW_ICON, CHECK_ICON, CLOCK_ICON, CLOSE_ICON, EVENT_ICON, GAMES_ICON, SHARE_ICON } from '../ui/icons';
@@ -183,14 +183,15 @@ export class FrameView {
   }
 
   /** The big clock pop-up. Its Close button is tapped through the touch tracker. */
-  showClock(face: ClockFace, events: readonly string[], layout: FrameLayout): void {
+  showClock(face: ClockFace, events: readonly UpcomingEvent[], layout: FrameLayout): void {
     this.clockPopup.replaceChildren();
     el('div', 'celebrate-dim', this.clockPopup);
     const card = el('div', 'clock-card', this.clockPopup);
     el('div', 'clock-time', card);
     el('div', 'clock-part', card);
     el('div', 'clock-date', card);
-    el('div', 'clock-events', card);
+    // The list scrolls; its rows sit in one block so their icons and text line up on the left.
+    el('div', 'clock-rows', el('div', 'clock-events', card));
     // Arrows in the card's side margins, beside the list, showing there are more countdowns that way.
     el('div', 'clock-more up', card).innerHTML = MORE_UP_ICON + MORE_UP_ICON;
     el('div', 'clock-more down', card).innerHTML = MORE_DOWN_ICON + MORE_DOWN_ICON;
@@ -204,7 +205,7 @@ export class FrameView {
   }
 
   /** Refreshes the time and countdowns while the pop-up is open. */
-  updateClock(face: ClockFace, events: readonly string[]): void {
+  updateClock(face: ClockFace, events: readonly UpcomingEvent[]): void {
     const set = (selector: string, text: string) => {
       const node = this.clockPopup.querySelector(selector);
       if (node && node.textContent !== text) node.textContent = text;
@@ -213,19 +214,24 @@ export class FrameView {
     set('.clock-part', face.part);
     set('.clock-date', face.date);
     const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
-    if (!list) return;
-    const current = [...list.children].map((row) => row.textContent).join('\n');
-    if (current === events.join('\n')) {
+    const rows = list?.querySelector<HTMLElement>('.clock-rows');
+    if (!list || !rows) return;
+    const key = (event: UpcomingEvent) => `${event.text}\n${event.when}`;
+    const current = [...rows.children].map((row) => (row as HTMLElement).dataset.key).join('\n\n');
+    if (current === events.map(key).join('\n\n')) {
       this.showClockScrollFades(list);
       return;
     }
     list.style.display = events.length === 0 ? 'none' : '';
-    list.replaceChildren(
-      ...events.map((text) => {
+    rows.replaceChildren(
+      ...events.map((event) => {
+        // The countdown, with its day and time on a smaller line underneath.
         const row = document.createElement('div');
-        row.className = text.startsWith('Time for ') ? 'clock-event now' : 'clock-event';
-        row.innerHTML = `${EVENT_ICON}<span></span>`;
-        row.querySelector('span')!.textContent = text;
+        row.className = event.now ? 'clock-event now' : 'clock-event';
+        row.dataset.key = key(event);
+        row.innerHTML = `${EVENT_ICON}<div class="clock-lines"><span class="clock-what"></span><span class="clock-when"></span></div>`;
+        row.querySelector('.clock-what')!.textContent = event.text;
+        row.querySelector('.clock-when')!.textContent = event.when;
         return row;
       }),
     );
@@ -267,7 +273,7 @@ export class FrameView {
   private fitClockEvents(): void {
     const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
     if (!list) return;
-    const rows = [...list.children] as HTMLElement[];
+    const rows = [...list.querySelectorAll<HTMLElement>('.clock-event')];
     rows.forEach((row) => (row.style.fontSize = ''));
     for (const row of rows) {
       // Room for the text and padding: the list's width less the row's own border, and 1px for rounding.
