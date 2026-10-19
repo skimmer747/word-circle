@@ -27,12 +27,15 @@ export interface TracerCallbacks {
 /** A word may start slightly outside a tile's drawn edge. */
 export const START_HIT_FACTOR = 1.15;
 const MIN_TRACE_LENGTH = 3;
+/** Distance between checks along the line between two touch samples (Safari merges samples when busy). */
+const SAMPLE_SPACING = 10;
 
 /** Turns finger movement into letter selections, ignoring the safe zones and extra fingers. */
 export class LetterTracer {
   private geometry: TracerGeometry = { screenWidth: 0, safeZoneWidth: 0, tiles: [] };
   private activeId: number | null = null;
   private selected: number[] = [];
+  private last = { x: 0, y: 0 };
   private enabled = true;
 
   constructor(private readonly callbacks: TracerCallbacks) {}
@@ -83,10 +86,21 @@ export class LetterTracer {
     if (tile === null) return;
     this.activeId = id;
     this.selected = [tile];
+    this.last = { x, y };
     this.callbacks.letterAdded(tile);
   }
 
+  /** Checks every point along the line from the previous sample, so no crossed letter is skipped. */
   private onMove({ x, y }: PointerInput): void {
+    const from = this.last;
+    const steps = Math.max(1, Math.ceil(Math.hypot(x - from.x, y - from.y) / SAMPLE_SPACING));
+    for (let i = 1; i <= steps; i++) {
+      this.visit(from.x + ((x - from.x) * i) / steps, from.y + ((y - from.y) * i) / steps);
+    }
+    this.last = { x, y };
+  }
+
+  private visit(x: number, y: number): void {
     const tile = this.tileAt(x, y, 1);
     if (tile === null) return;
     const count = this.selected.length;

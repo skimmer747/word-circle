@@ -114,10 +114,27 @@ describe('LetterTracer', () => {
     const { tracer, events, send, at } = setup();
     send('down', 1, ...at(0));
     send('move', 1, ...at(1));
+    send('move', 1, ...at(3));
+    send('move', 1, ...at(0));
+    expect(events).toEqual(['add 0', 'add 1', 'add 3']);
+    expect(tracer.selection).toEqual([0, 1, 3]);
+  });
+
+  it('adds a letter the finger crossed between two samples', () => {
+    const { events, send, at } = setup();
+    send('down', 1, ...at(0));
+    send('move', 1, ...at(2));
+    send('up', 1, ...at(2));
+    expect(events).toEqual(['add 0', 'add 1', 'add 2', 'submit 0,1,2']);
+  });
+
+  it('backtracks across letters the finger crossed between two samples', () => {
+    const { tracer, events, send, at } = setup();
+    send('down', 1, ...at(0));
     send('move', 1, ...at(2));
     send('move', 1, ...at(0));
-    expect(events).toEqual(['add 0', 'add 1', 'add 2']);
-    expect(tracer.selection).toEqual([0, 1, 2]);
+    expect(events).toEqual(['add 0', 'add 1', 'add 2', 'remove 2', 'remove 1']);
+    expect(tracer.selection).toEqual([0]);
   });
 
   it('does not repeat a letter while the finger stays on it', () => {
