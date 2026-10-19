@@ -1,7 +1,7 @@
 # Word Circle — Design
 
 **Date:** 2026-10-19
-**Status:** Approved in brainstorming, awaiting written-spec review
+**Status:** Built. Since 2026-10-19 the site also has a second game, Word Guess, and a Games button beside the clock; see `2026-10-19-word-guess-design.md`. That spec also describes the shared frame Word Circle now runs in.
 
 ## Purpose
 
@@ -119,7 +119,7 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 - **Sound:** none.
 - **Celebration and stats** (only ever good news; no clock is shown while she plays):
   - **New record! 1 min 52 sec**: only when she beats her best time for that level (Easy, Medium and Hard each have their own; her first puzzle in a level counts). Orange highlight with a trophy. Puzzles finished with hints still count.
-  - **5 days in a row**: days (local calendar) on which she finished at least one puzzle; shown from day 2. A missed day quietly starts the count over; nothing ever says a streak was lost.
+  - **5 days in a row**: days (local calendar) on which she finished at least one puzzle or Word Guess word (shared by both games, saved in `word-games:v1`); shown from day 2. A missed day quietly starts the count over; nothing ever says a streak was lost.
   - **3 puzzles today**: always shown.
   - **Puzzle number 48**: always shown; at milestones (10, 25, 50, 100, 250, 500, 750, 1,000, then every 500) it reads "Puzzle number 50!" with the orange highlight.
   - **Play time** counts only active time: it pauses while the iPad sleeps or the app is closed, and any stretch without touches counts for at most one minute, so putting the iPad down doesn't spoil a record. The time is saved with each level's progress.
@@ -130,7 +130,7 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 
 ## 3b. Clock and schedule
 
-- **Clock button:** a 72 px white square with a dark-blue clock icon at the top right of the right column (Extra words narrows to make room). Tapped through the per-finger tracker like every button.
+- **Clock button:** a 72 px white square with a dark-blue clock icon at the top right of the right column, with the **Games** button just left of it (Extra words narrows to make room for both: about 220 px wide on the smallest iPad). Both belong to the shared frame, so they sit in the same place in every game. Tapped through the per-finger tracker like every button.
 - **Clock pop-up:** a card that fills almost the whole screen (16 px margin, dark-blue border); every text size is a fraction of the card height so it is as big as each iPad allows:
   - the time ("10:30 AM", 22% of the card height: about 160–220 px), the part of day ("in the morning" 5–11, "in the afternoon" 12–4, "in the evening" 5–8, "at night" 9–4), and the day and date ("Monday, October 19"); updated every second;
   - up to 3 upcoming events (about 40–55 px), soonest first: countdowns for the rest of today ("Supper in 4 hours 30 minutes", minutes rounded up), "Time for Supper" (orange highlight) from 5 minutes before until 30 minutes after, then one-off events in the next 7 days, also as countdowns ("Doctor visit in 20 hours 30 minutes"; a day or more away, days and hours to the nearest hour: "Doctor visit in 2 days and 7 hours"). Each event stays on one line: a long one shrinks to fit (down to 60%), and an event that still has no room is left off rather than cut off. With nothing coming up, only the time and date show;
@@ -176,23 +176,32 @@ Puzzles are generated offline by a Node script on the Mac and shipped inside the
 ```
 index.html
 src/
-  main.ts              entry point: font, styles, puzzles, starts App
-  app.ts               controller: wires rules, touch, layout and view together
+  main.ts              entry point: font, styles, data, starts the frame with both games
   pwa.ts               service worker registration and update timing
+  frame/               what every game shares (see the Word Guess spec): touch wiring, clock, Games pop-up,
+                       "Well done!" card, updates, which game is showing, days in a row
   shared/
     random.ts          seeded random + shuffle (shared with the puzzle script)
-  game/                pure rules, no DOM
+    days.ts            calendar days, days in a row, milestones
+    store.ts           the storage interface
+  circle/              Word Circle
     types.ts           Puzzle, Progress types
     state.ts           tryWord → answer | alreadyFound | bonus | notAWord; hint(); isComplete()
-    storage.ts         load/save progress (storage interface, localStorage impl)
-  input/
-    touch.ts           normalized pointer events → letter/word events (rules in §2)
-  ui/
-    layout.ts          pure geometry from screen size (§1 sizing)
+    stats.ts           records and counts for the "Well done!" card
+    storage.ts         load/save progress (localStorage)
+    timer.ts           active play time
+    layout.ts          pure geometry from the frame's layout (§1 sizing)
     ring.ts            circle letter order (shuffle)
     view.ts            draws slots, tiles, line, bar, buttons; glides, pulses, wiggle, messages
+    celebration.ts     the lines of good news
+    screen.ts          controller: wires rules, layout and view together
+  guess/               Word Guess (see its spec)
+  input/
+    touch.ts           normalized pointer events → letter/word events (rules in §2)
+  ui/                  shared DOM helpers, icons, text fitting
   data/
     puzzles.json       generated puzzles (bundled, so they're precached with the app)
+    guess-words.json   Word Guess's answers and accepted guesses
   styles.css
 public/
   icon.svg + generated PNG icons (incl. 180×180 apple-touch-icon)
@@ -211,7 +220,7 @@ docs/
 .github/workflows/deploy.yml
 ```
 
-Each module has one job and a small interface: `game/` knows nothing about the screen, `input/touch.ts` knows nothing about words, `ui/layout.ts` is pure math. The `game/` module is what carries over unchanged to a future native app.
+Each module has one job and a small interface: the rules (`circle/state.ts`, `guess/rules.ts`) know nothing about the screen, `input/touch.ts` knows nothing about words, the layouts are pure math. The rules are what carry over unchanged to a future native app.
 
 **Offline and updates:** a service worker (vite-plugin-pwa / Workbox) precaches every file, including the font and puzzles. A new version installs in the background and is applied only on a fresh launch or right after a "Well done!" (a reload there restores the next puzzle from saved progress), never in the middle of a puzzle.
 

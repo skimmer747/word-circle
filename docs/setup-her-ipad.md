@@ -29,9 +29,21 @@ Guided Access keeps the iPad inside Word Circle, so swipes from the edges can't 
 To leave Guided Access later, press the top button three times, enter your passcode, and tap **End**.
 On an iPad with a round Home button, triple-click the Home button instead.
 
+## 4. Check that sharing works (for the daily Wordle)
+
+After she finishes today's Wordle in **Word Guess**, the **Share** button sends her result by text, in Wordle's own format. Try it once yourself, with Guided Access on:
+
+1. Tap **Games**, then **Word Guess**. The first word each day is **Today's Wordle**.
+2. Solve it (Hint helps), then tap **Share** on the "Well done!" card.
+3. The iPad's share sheet should open. Tap **Messages** or a family member's face, then send.
+
+This hasn't been tried on a real iPad with Guided Access yet. If the share sheet doesn't open, or Messages won't send while Guided Access is on, end Guided Access (top button three times, passcode, **End**), try Share again, then start Guided Access again. Let Claude know either way, so it can look for another approach if needed.
+The **Share today's Wordle** button in the left column works for the rest of that day too, for when someone is there to help.
+
 ## Updates
 
-New versions arrive by themselves whenever the iPad has Wi-Fi. They're applied right after she finishes a puzzle, never in the middle of one.
+New versions arrive by themselves whenever the iPad has Wi-Fi. They're applied right after she finishes a puzzle or word, never in the middle of one.
+The daily Wordle word arrives each morning the same way.
 
 ## If something looks wrong
 
