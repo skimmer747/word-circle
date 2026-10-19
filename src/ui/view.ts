@@ -332,23 +332,44 @@ export class View {
     el('div', 'celebrate-dim', this.celebrate);
     const card = el('div', 'card', this.celebrate);
     el('div', 'card-title', card).textContent = 'Well done!';
+    const rows = el('div', 'card-rows', card);
     for (const [kind, icon, text, highlight] of celebrationRows(celebration)) {
-      const row = el('div', `card-row ${kind}${highlight ? ' highlight' : ''}`, card);
+      const row = el('div', `card-row ${kind}${highlight ? ' highlight' : ''}`, rows);
       row.innerHTML = `${icon}<span></span>`;
       row.querySelector('span')!.textContent = text;
     }
     const next = el('button', 'next', this.celebrate);
     next.type = 'button';
     next.innerHTML = `<span>Next puzzle</span>${ARROW_ICON}`;
-    this.placeCelebration(layout);
+    // Visible first, so the rows can be measured when they're fitted.
     this.celebrate.classList.add('visible');
+    this.placeCelebration(layout);
   }
 
   placeCelebration(layout: Layout): void {
     const card = this.celebrate.querySelector<HTMLElement>('.card');
     const next = this.celebrate.querySelector<HTMLElement>('.next');
-    if (card) place(card, layout.celebration);
+    if (card) {
+      place(card, layout.celebration);
+      // Text sizes in the stylesheet are multiples of 1% of the card's height.
+      card.style.setProperty('--u', `${layout.celebration.h / 100}px`);
+    }
     if (next) place(next, layout.nextButton);
+    this.fitCelebrationRows();
+  }
+
+  /** Shrinks the stat rows together if the widest is too wide for one line, so their icons stay lined up. */
+  private fitCelebrationRows(): void {
+    const card = this.celebrate.querySelector<HTMLElement>('.card');
+    const list = this.celebrate.querySelector<HTMLElement>('.card-rows');
+    if (!card || !list) return;
+    list.style.fontSize = '';
+    const cardStyle = getComputedStyle(card);
+    const room = card.clientWidth - parseFloat(cardStyle.paddingLeft) - parseFloat(cardStyle.paddingRight) - 1;
+    const rows = [...list.children] as HTMLElement[];
+    const widest = Math.max(0, ...rows.map((row) => row.scrollWidth + (row.offsetWidth - row.clientWidth)));
+    const scale = fitFontScale(widest, room);
+    if (scale < 1) list.style.fontSize = `${parseFloat(getComputedStyle(list).fontSize) * scale}px`;
   }
 
   hideCelebration(): void {
@@ -368,9 +389,10 @@ export class View {
     const close = el('button', 'next close', this.clockPopup);
     close.type = 'button';
     close.innerHTML = `${CLOSE_ICON}<span>Close</span>`;
+    // Visible first, so the event lines can be measured when they're fitted.
+    this.clockPopup.classList.add('visible');
     this.updateClock(face, events);
     this.placeClock(layout);
-    this.clockPopup.classList.add('visible');
   }
 
   /** Refreshes the time and countdowns while the pop-up is open. */

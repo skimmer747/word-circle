@@ -390,16 +390,19 @@ body {
   background: rgba(216, 234, 247, 0.85);
 }
 
+/* The "Well done!" card fills almost the screen, like the clock. Sizes use --u (1% of the card's height,
+   set by the view). The bottom padding leaves room for the Next puzzle button. */
 .card {
+  --u: 7.4px;
   position: absolute;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 28px;
-  border-radius: 28px;
+  padding: calc(var(--u) * 3) 48px 148px;
+  border-radius: 32px;
   background: #fff;
-  border: 6px solid var(--found);
+  border: 8px solid var(--found);
   animation: card-in 500ms ease-out;
 }
 
@@ -415,31 +418,41 @@ body {
 }
 
 .card-title {
-  margin: 0 0 16px;
-  font-size: 64px;
+  margin: 0 0 calc(var(--u) * 3);
+  font-size: calc(var(--u) * 14);
   line-height: 1.1;
   color: var(--found-ink);
 }
 
+/* The rows are as wide as the widest one, centered, so their icons line up. The view shrinks them
+   together if the widest is too wide for one line (icon and spacing scale with it). */
+.card-rows {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  max-width: 100%;
+  font-size: calc(var(--u) * 7.5);
+}
+
 .card-row {
   box-sizing: border-box;
-  width: 100%;
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 8px;
-  padding: 8px 14px;
-  border: 3px solid transparent;
-  border-radius: 14px;
-  font-size: 30px;
+  gap: 0.4em;
+  margin-bottom: calc(var(--u) * 1.4);
+  padding: 0.12em 0.45em;
+  border: 4px solid transparent;
+  border-radius: 18px;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
   color: var(--ink);
 }
 
 .card-row svg {
   flex: none;
-  width: 38px;
-  height: 38px;
+  width: 1.1em;
+  height: 1.1em;
 }
 
 .card-row.highlight {
@@ -473,17 +486,17 @@ body {
   padding: 0;
   border-radius: 20px;
   background: #fff;
-  border: 5px solid var(--found);
+  border: 6px solid var(--found);
   color: var(--ink);
   font: inherit;
-  font-size: 36px;
+  font-size: 46px;
   -webkit-appearance: none;
   appearance: none;
 }
 
 .next svg {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
 }
 
 .clock-button {
@@ -595,11 +608,5 @@ body {
 }
 
 .next.close {
-  border: 6px solid var(--navy);
-  font-size: 46px;
-}
-
-.next.close svg {
-  width: 48px;
-  height: 48px;
+  border-color: var(--navy);
 }

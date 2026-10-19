@@ -116,13 +116,18 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
       }
     });
 
-    it('centers the celebration card on screen with a big Next button clear of the safe zones', () => {
+    it('fills almost the whole screen with the celebration card, with a big Next button clear of the safe zones', () => {
       const { celebration, nextButton } = layout;
+      expect(celebration.x).toBeGreaterThanOrEqual(0);
       expect(celebration.y).toBeGreaterThanOrEqual(0);
+      expect(celebration.x + celebration.w).toBeLessThanOrEqual(width);
       expect(celebration.y + celebration.h).toBeLessThanOrEqual(height);
-      expect(Math.abs(celebration.x + celebration.w / 2 - width / 2)).toBeLessThan(1);
+      expect(celebration.w).toBeGreaterThanOrEqual(width - 40);
+      expect(celebration.h).toBeGreaterThanOrEqual(height - 40);
       expect(inPlayArea(nextButton, layout)).toBe(true);
-      expect(nextButton.h).toBeGreaterThanOrEqual(80);
+      expect(nextButton.h).toBeGreaterThanOrEqual(96);
+      expect(nextButton.w).toBeGreaterThanOrEqual(400);
+      expect(Math.abs(nextButton.x + nextButton.w / 2 - width / 2)).toBeLessThan(1);
       expect(nextButton.y + nextButton.h).toBeLessThanOrEqual(celebration.y + celebration.h);
     });
 

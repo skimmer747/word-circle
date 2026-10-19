@@ -30,10 +30,8 @@ const LEVEL_MAX_WIDTH = 120;
 const LEVEL_GAP = 8;
 const LEVELS_BOTTOM_GAP = 16;
 const LEVEL_COUNT = 3;
-const CARD_WIDTH = 520;
-const CARD_MAX_HEIGHT = 520;
-const NEXT_WIDTH = 300;
-const NEXT_HEIGHT = 88;
+const NEXT_WIDTH = 420;
+const NEXT_HEIGHT = 100;
 const CARD_PADDING = 24;
 const CLOCK_SIZE = 72;
 const CLOCK_GAP = 12;
@@ -151,8 +149,8 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
     return { x: leftCenter - w / 2, y: blockTop + i * (slotSize + ROW_GAP), w, h: slotSize };
   });
 
-  const cardHeight = Math.min(CARD_MAX_HEIGHT, height - 2 * MARGIN);
-  const celebration: Rect = { x: width / 2 - CARD_WIDTH / 2, y: (height - cardHeight) / 2, w: CARD_WIDTH, h: cardHeight };
+  // The "Well done!" card and the clock fill almost the whole screen so their text can be as big as possible.
+  const celebration: Rect = { x: MARGIN, y: MARGIN, w: width - 2 * MARGIN, h: height - 2 * MARGIN };
   const nextButton: Rect = {
     x: width / 2 - NEXT_WIDTH / 2,
     y: celebration.y + celebration.h - CARD_PADDING - NEXT_HEIGHT,
@@ -160,8 +158,7 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
     h: NEXT_HEIGHT,
   };
 
-  // The clock fills almost the whole screen so its text can be as big as possible.
-  const clockCard: Rect = { x: MARGIN, y: MARGIN, w: width - 2 * MARGIN, h: height - 2 * MARGIN };
+  const clockCard: Rect = { ...celebration };
   const closeButton: Rect = {
     x: width / 2 - CLOSE_WIDTH / 2,
     y: clockCard.y + clockCard.h - CARD_PADDING - CLOSE_HEIGHT,
