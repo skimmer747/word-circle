@@ -3703,3 +3703,69 @@ git commit -m "feat: remember which game is on screen and the shared days in a r
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
+
+### Task 17a (added at Checkpoint 2): Word Guess skip list — done
+
+The owner chose to keep 68 touchy words out of Word Guess's answers without touching Word Circle: `words/guess-skip.txt` (read like the blocklist), passed to `buildGuessWords` as `skip` (never an answer, still accepted) and checked by `validateGuessWords`. 1,851 answers remain.
+
+---
+
+## Stage 3, part 2 — the screens
+
+(Written just before building, by the owner's choice; the full code for each task is in its commit.)
+
+### Task 18: Frame layout — Games button, Share/Next word pair, Games pop-up cards
+
+**Files:** `src/frame/layout.ts`, `tests/frame-layout.test.ts`, `tests/circle-layout.test.ts`
+
+- `computeFrameLayout(width, height, gameCount = 2)` adds:
+  - `gamesButton`: 72 × 72, 12 px left of the clock, same row; `corner` now covers both buttons.
+  - `shareButton` (290 × 100) and `nextWordButton` (400 × 100): side by side, 24 px apart, centered on the play area, on the Next button's row.
+  - `gameCards`: one per game, each `min(360, (play.w − gaps) / n)` wide, 24 px apart, centered on the play area, from 20% to 76% down the card.
+- Tests first (every iPad size): the Games button sits just left of the clock at the same size; `corner` spans both; Share and Next word are inside the play area, at least 96 px tall, don't overlap, and Next word is at least 360 px wide; there are two game cards, each at least 300 × 360, inside the play area, below the title (≥ card.y + 100) and at least 16 px above Close, not overlapping. Word Circle: Extra words stays at least 200 px wide.
+
+### Task 19: Word Guess layout
+
+**Files:** `src/guess/layout.ts`, `tests/guess-layout.test.ts`
+
+- `computeGuessLayout(frame)` returns `rows` (6 board rows), `squareSize`, `squareGap` (8), `squareFont` (62%), `keys` (`{ id: 'key:q' … 'key:enter', 'key:back', rect }`), `keyFont` (55% of key height), `hintButton`, `allLettersButton`, `dailyButton`.
+  - Keys: height `clamp(9% of screen height, 64, 84)`, width `(play.w − 9 × 8) / 10`; rows of 10, 9 (offset half a key) and Enter + 7 + Back (Enter and Back 1.5 keys wide), filling the bottom of the play area.
+  - Board: squares `floor(min(110, fit by height above the keyboard less 24 px, fit by width between a 110 px left column + 24 px and the corner − 16 px))`; centered in the play area when it fits, otherwise pushed left of the corner.
+  - Left column: from the play area's left edge to 24 px left of the board; Hint and All letters 96 px tall, 16 px apart; the daily button below them, up to 180 px tall.
+- Tests first (every iPad size): everything in the play area; the 28 keys in Wordle's order; keys at least 64 tall and 60 wide, Enter and Back over 1.4 keys wide; keyboard spans the play area with no overlaps; squares 70–110 px; the board clear of the keys, the left buttons and the corner, at least 16 px above the keyboard; left buttons at least 110 wide and 90 tall, stacked, clear of the keys.
+
+### Task 20: Frame view, games interface and frame controller — Games button and pop-up, Share on the card
+
+**Files:** `src/frame/view.ts`, `src/frame/games.ts`, `src/frame/frame.ts`, `src/styles.css`, `src/circle/screen.ts`, `src/main.ts`
+
+- `CelebrationCard` gains `word?` (shown in green squares under the title, with a smaller title and lines: class `card with-word`) and `share?: () => Promise<void>` (a Share button beside Next; the card's timer stops while sharing and restarts after).
+- `FrameView`: Games button (grid icon + "Games") in the corner; `showGames(entries, current, layout)`, `placeGames`, `hideGames` for the "Pick a game" pop-up (a big card per game with a small picture, its name and an optional note; the current one with a purple border and check; Close). `--u` set on the pop-up.
+- `GameScreen` gains `title`, `buttonPressed?`, `buttonReleased?`, `note?()`; `FrameHost` gains `updateTargets(targets)` and `recordPlayDay()`.
+- `Frame`: takes the Word Circle stats as the seed for `loadSavedFrame`; opens the saved game; pauses the others; Games pop-up (blocked like the clock; closes itself after 60 s; tapping a card switches games: pause the old one, save `current`, redraw sliding in, resume the new one); routes `share`; forwards presses to the game; `recordPlayDay()` updates and saves the shared days in a row.
+- Word Circle: `title = 'Word Circle'`; its card shows the shared days in a row (`host.recordPlayDay()`).
+- Styles: Games button, pop-up, game cards and pictures, card word squares, Share button, new icon colors, and the `--present`, `--absent`, `--daily-fill` colors.
+
+### Task 21: Word Guess view
+
+**Files:** `src/guess/view.ts`, `src/styles.css`
+
+- `GuessView(layer)`: `render(layout, state, animateIn)` draws the six rows of squares, the keyboard, Hint, All letters and the daily button; `setRow`, `popSquare`, `wiggleRow`, `reveal(row, squares)` (one square every 250 ms), `slideUp(rows)` (rows glide up one, the oldest fades away upward, a fresh row fades in; 500 ms), `setKeys(states, allLetters)` (green/gold borders; letters not in the word hidden unless All letters is on, then gray), `setPressed`, `setHintPulse`, `setAllLetters` (purple border thickens, check icon), `setDaily('none' | 'label' | 'share')`.
+- Styles as in the spec's color table.
+
+### Task 22: Word Guess screen and wiring
+
+**Files:** `src/guess/screen.ts`, `src/main.ts`
+
+- `GuessScreen(words, store, { fetchDaily, share, now? })` implements `GameScreen`: loads `word-guess:v1`; reads the cached daily words and swaps today's in if her word is untouched; fetches `daily-word.txt` at start, every 5 minutes and when the app comes back, swapping today's word in only if her word is untouched (redrawing if she's on Word Guess).
+- Keys type, Back erases, Enter checks (wiggle on incomplete or unknown words; otherwise reveal, update keys and touch targets, then carry letters down or slide the rows up after the sixth guess); Hint fills a square and may finish the word; All letters toggles; the pressed look follows the touch tracker.
+- Finishing: records the word, the shared days in a row, the next word (via `finishWord`, so today's Wordle comes next when it's waiting), then the "Well done!" card with her word, `guessLines`, Next word, and Share on today's Wordle (60 s instead of 15 s); afterwards redraws with the next word.
+- `note()`: "Today's Wordle is ready" until she finishes it. The daily button: "Today's Wordle" label while she's on it; "Share today's Wordle" for the rest of that day once she's finished it (when sharing is possible).
+- `main.ts`: both games, `fetchDaily` for `daily-word.txt`, and `share` = `navigator.share({ text })` when the iPad has it.
+
+### Task 23: Check in the browser
+
+At 1024×768, 1133×744, 1180×820 and 1366×1024 on `127.0.0.1`: the Games button and pop-up; switching games both ways; typing, Back, a non-word wiggle, a guess coloring in and keys hiding, carried-down letters, All letters, Hint; seven or more guesses sliding the rows; finishing a word and its card; reopening the app in the last game; Word Circle unchanged except Extra words being narrower. Console free of errors.
+
+## Checkpoint 3 (stop here)
+
+Show the owner Word Guess and the Games pop-up and ask them to play it in the browser.
