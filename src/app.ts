@@ -8,7 +8,7 @@ import {
   type SavedGame,
   type StartPoint,
 } from './game/storage';
-import type { Level, PuzzleSet } from './game/types';
+import { LEVELS, type Level, type PuzzleSet } from './game/types';
 import { LetterTracer, type PointerInput } from './input/touch';
 import { computeLayout } from './ui/layout';
 import { identityOrder, shuffleRing } from './ui/ring';
@@ -42,17 +42,20 @@ export class App {
     private readonly store: KeyValueStore,
     private readonly updates: Updates,
   ) {
-    this.view = new View(root, {
-      onShuffle: () => this.shuffle(),
-      onHint: () => this.hint(),
-      onLevel: (level) => this.chooseLevel(level),
-    });
+    this.view = new View(root);
     this.tracer = new LetterTracer({
       letterAdded: () => this.showSelection(),
       letterRemoved: () => this.showSelection(),
       selectionCleared: () => this.view.showSelection([]),
       wordSubmitted: (tiles) => void this.submit(tiles),
+      buttonTapped: (id) => this.buttonTapped(id),
     });
+  }
+
+  private buttonTapped(id: string): void {
+    if (id === 'shuffle') this.shuffle();
+    else if (id === 'hint') this.hint();
+    else if (id.startsWith('level:')) this.chooseLevel(id.slice('level:'.length) as Level);
   }
 
   start(): void {
@@ -87,7 +90,7 @@ export class App {
   private listen(): void {
     const forward = (type: PointerInput['type']) => (event: PointerEvent) => {
       if (type === 'down') this.interacted = true;
-      this.tracer.handle({ type, id: event.pointerId, x: event.clientX, y: event.clientY });
+      this.tracer.handle({ type, id: event.pointerId, x: event.clientX, y: event.clientY, time: event.timeStamp });
     };
     window.addEventListener('pointerdown', forward('down'));
     window.addEventListener('pointermove', forward('move'));
@@ -123,7 +126,17 @@ export class App {
       letterCount: puzzle.letters.length,
       wordLengths: puzzle.words.map((w) => w.length),
     });
-    this.tracer.setGeometry({ screenWidth: width, safeZoneWidth: layout.safeZoneWidth, tiles: layout.tiles });
+    this.tracer.setGeometry({
+      screenWidth: width,
+      safeZoneLeft: layout.safeZoneLeft,
+      safeZoneRight: layout.safeZoneRight,
+      tiles: layout.tiles,
+      buttons: [
+        { id: 'shuffle', ...layout.shuffleButton },
+        { id: 'hint', ...layout.hintButton },
+        ...LEVELS.map((level, i) => ({ id: `level:${level}`, ...layout.levels[i] })),
+      ],
+    });
     this.view.render(
       puzzle,
       layout,

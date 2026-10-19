@@ -3,6 +3,8 @@ export interface PointerInput {
   id: number;
   x: number;
   y: number;
+  /** Event time in ms; used to ignore a thumb that rests on a button and lifts much later. */
+  time?: number;
 }
 
 export interface TileGeometry {
@@ -11,10 +13,20 @@ export interface TileGeometry {
   r: number;
 }
 
+export interface ButtonGeometry {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface TracerGeometry {
   screenWidth: number;
-  safeZoneWidth: number;
+  safeZoneLeft: number;
+  safeZoneRight: number;
   tiles: TileGeometry[];
+  buttons: ButtonGeometry[];
 }
 
 export interface TracerCallbacks {
@@ -22,6 +34,7 @@ export interface TracerCallbacks {
   letterRemoved(tile: number): void;
   wordSubmitted(tiles: number[]): void;
   selectionCleared(): void;
+  buttonTapped(id: string): void;
 }
 
 /** A word may start slightly outside a tile's drawn edge. */
@@ -29,13 +42,25 @@ export const START_HIT_FACTOR = 1.15;
 const MIN_TRACE_LENGTH = 3;
 /** Distance between checks along the line between two touch samples (Safari merges samples when busy). */
 const SAMPLE_SPACING = 10;
+/** A press longer than this is a resting thumb, not a tap. */
+const MAX_TAP_MS = 2000;
 
-/** Turns finger movement into letter selections, ignoring the safe zones and extra fingers. */
+interface Press {
+  button: string;
+  time?: number;
+}
+
+/**
+ * Turns finger movement into letter selections and button taps, ignoring the safe zones.
+ * Every finger is tracked separately, so a resting thumb never blocks another finger
+ * (iPadOS drops ordinary click events while another finger is on the screen).
+ */
 export class LetterTracer {
-  private geometry: TracerGeometry = { screenWidth: 0, safeZoneWidth: 0, tiles: [] };
+  private geometry: TracerGeometry = { screenWidth: 0, safeZoneLeft: 0, safeZoneRight: 0, tiles: [], buttons: [] };
   private activeId: number | null = null;
   private selected: number[] = [];
   private last = { x: 0, y: 0 };
+  private readonly presses = new Map<number, Press>();
   private enabled = true;
 
   constructor(private readonly callbacks: TracerCallbacks) {}
@@ -59,8 +84,8 @@ export class LetterTracer {
   }
 
   isInSafeZone(x: number): boolean {
-    const { screenWidth, safeZoneWidth } = this.geometry;
-    return x < safeZoneWidth || x > screenWidth - safeZoneWidth;
+    const { screenWidth, safeZoneLeft, safeZoneRight } = this.geometry;
+    return x < safeZoneLeft || x > screenWidth - safeZoneRight;
   }
 
   handle(input: PointerInput): void {
@@ -80,8 +105,13 @@ export class LetterTracer {
     }
   }
 
-  private onDown({ id, x, y }: PointerInput): void {
+  private onDown({ id, x, y, time }: PointerInput): void {
     if (!this.enabled || this.activeId !== null || this.isInSafeZone(x)) return;
+    const button = this.buttonAt(x, y);
+    if (button !== null) {
+      this.presses.set(id, { button, time });
+      return;
+    }
     const tile = this.tileAt(x, y, START_HIT_FACTOR);
     if (tile === null) return;
     this.activeId = id;
@@ -114,7 +144,14 @@ export class LetterTracer {
     this.callbacks.letterAdded(tile);
   }
 
-  private onEnd({ id }: PointerInput, submit: boolean): void {
+  private onEnd({ id, x, y, time }: PointerInput, submit: boolean): void {
+    const press = this.presses.get(id);
+    if (press) {
+      this.presses.delete(id);
+      const quick = press.time === undefined || time === undefined || time - press.time <= MAX_TAP_MS;
+      if (submit && quick && this.buttonAt(x, y) === press.button) this.callbacks.buttonTapped(press.button);
+      return;
+    }
     if (id !== this.activeId) return;
     const tiles = this.selected;
     this.reset();
@@ -125,6 +162,12 @@ export class LetterTracer {
   private reset(): void {
     this.activeId = null;
     this.selected = [];
+    this.presses.clear();
+  }
+
+  private buttonAt(x: number, y: number): string | null {
+    const button = this.geometry.buttons.find((b) => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h);
+    return button ? button.id : null;
   }
 
   private tileAt(x: number, y: number, factor: number): number | null {

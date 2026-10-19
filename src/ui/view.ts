@@ -15,12 +15,6 @@ export interface ScreenState {
   level: Level;
 }
 
-export interface ViewHandlers {
-  onShuffle(): void;
-  onHint(): void;
-  onLevel(level: Level): void;
-}
-
 const LEVEL_LABELS: Record<Level, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -78,10 +72,8 @@ export class View {
   private barTimer = 0;
   private readonly rotate: HTMLElement;
 
-  constructor(
-    private readonly root: HTMLElement,
-    private readonly handlers: ViewHandlers,
-  ) {
+  /** Buttons are drawn here but tapped through the touch tracer, which works with a resting thumb. */
+  constructor(private readonly root: HTMLElement) {
     this.rotate = el('div', 'rotate', root);
     this.rotate.innerHTML = `${SIDEWAYS_IPAD}<div>Please turn the iPad sideways</div>`;
   }
@@ -104,13 +96,12 @@ export class View {
       button.type = 'button';
       button.innerHTML = `${level === state.level ? CHECK_ICON : ''}<span>${LEVEL_LABELS[level]}</span>`;
       place(button, layout.levels[i]);
-      button.addEventListener('click', () => this.handlers.onLevel(level));
     });
 
     this.rows = puzzle.words.map((word, i) => this.buildRow(board, word, layout.rows[i]));
     state.rows.forEach((row, i) => this.setRow(i, row));
-    this.buildButton(board, 'shuffle', 'Shuffle', SHUFFLE_ICON, layout.shuffleButton, () => this.handlers.onShuffle());
-    this.hintButton = this.buildButton(board, 'hint', 'Hint', HINT_ICON, layout.hintButton, () => this.handlers.onHint());
+    this.buildButton(board, 'shuffle', 'Shuffle', SHUFFLE_ICON, layout.shuffleButton);
+    this.hintButton = this.buildButton(board, 'hint', 'Hint', HINT_ICON, layout.hintButton);
 
     this.extras = el('div', 'extras', board);
     place(this.extras, layout.extras);
@@ -318,19 +309,11 @@ export class View {
     });
   }
 
-  private buildButton(
-    board: HTMLElement,
-    kind: string,
-    label: string,
-    icon: string,
-    rect: Rect,
-    onClick: () => void,
-  ): HTMLButtonElement {
+  private buildButton(board: HTMLElement, kind: string, label: string, icon: string, rect: Rect): HTMLButtonElement {
     const button = el('button', `button ${kind}`, board);
     button.type = 'button';
     button.innerHTML = `${icon}<span>${label}</span>`;
     place(button, rect);
-    button.addEventListener('click', onClick);
     return button;
   }
 

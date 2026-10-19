@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { computeLayout, SAFE_ZONE_WIDTH, type Circle, type Layout, type Rect } from '../src/ui/layout';
+import {
+  computeLayout,
+  SAFE_ZONE_LEFT_MIN,
+  SAFE_ZONE_LEFT_TARGET,
+  SAFE_ZONE_RIGHT,
+  type Circle,
+  type Layout,
+  type Rect,
+} from '../src/ui/layout';
 
 const SCREENS: Array<[number, number]> = [
   [1024, 768],
@@ -22,8 +30,8 @@ const circleRect = (c: Circle): Rect => ({ x: c.x - c.r, y: c.y - c.r, w: c.r * 
 
 function inPlayArea(rect: Rect, layout: Layout): boolean {
   return (
-    rect.x >= SAFE_ZONE_WIDTH &&
-    rect.x + rect.w <= layout.width - SAFE_ZONE_WIDTH &&
+    rect.x >= layout.safeZoneLeft &&
+    rect.x + rect.w <= layout.width - layout.safeZoneRight &&
     rect.y >= 0 &&
     rect.y + rect.h <= layout.height
   );
@@ -45,6 +53,13 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
         ...layout.tiles.map(circleRect),
       ];
       for (const rect of rects) expect(inPlayArea(rect, layout), JSON.stringify(rect)).toBe(true);
+    });
+
+    it('gives her left thumb a wider safe zone where the screen has room', () => {
+      expect(layout.safeZoneRight).toBe(SAFE_ZONE_RIGHT);
+      expect(layout.safeZoneLeft).toBeGreaterThanOrEqual(SAFE_ZONE_LEFT_MIN);
+      expect(layout.safeZoneLeft).toBeLessThanOrEqual(SAFE_ZONE_LEFT_TARGET);
+      if (width >= 1133) expect(layout.safeZoneLeft).toBe(SAFE_ZONE_LEFT_TARGET);
     });
 
     it('makes letter tiles at least 110 px across', () => {

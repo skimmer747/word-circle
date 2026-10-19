@@ -1,5 +1,11 @@
-/** Width of each thumb safe zone on the left and right edges (about an inch). */
-export const SAFE_ZONE_WIDTH = 130;
+/** Right-edge thumb safe zone (about an inch). */
+export const SAFE_ZONE_RIGHT = 130;
+/** Her left thumb rests on the screen, so the left safe zone grows to about 1.5 inches where there's room... */
+export const SAFE_ZONE_LEFT_TARGET = 200;
+/** ...and never shrinks below an inch. */
+export const SAFE_ZONE_LEFT_MIN = 130;
+/** Play-area width needed for a Hard puzzle at the smallest allowed tile and slot sizes. */
+const MIN_PLAY_WIDTH = 760;
 
 const MARGIN = 16;
 const COLUMN_GAP = 24;
@@ -48,7 +54,8 @@ export interface LayoutInput {
 export interface Layout {
   width: number;
   height: number;
-  safeZoneWidth: number;
+  safeZoneLeft: number;
+  safeZoneRight: number;
   /** Easy, Medium and Hard buttons at the top left. */
   levels: Rect[];
   /** "Extra words" list at the top right. */
@@ -69,8 +76,12 @@ export interface Layout {
 }
 
 export function computeLayout({ width, height, letterCount, wordLengths }: LayoutInput): Layout {
-  const playLeft = SAFE_ZONE_WIDTH + MARGIN;
-  const playRight = width - SAFE_ZONE_WIDTH - MARGIN;
+  const safeZoneLeft = Math.min(
+    SAFE_ZONE_LEFT_TARGET,
+    Math.max(SAFE_ZONE_LEFT_MIN, width - SAFE_ZONE_RIGHT - MIN_PLAY_WIDTH),
+  );
+  const playLeft = safeZoneLeft + MARGIN;
+  const playRight = width - SAFE_ZONE_RIGHT - MARGIN;
   const columnsWidth = playRight - playLeft - COLUMN_GAP;
   const leftWidth = columnsWidth * LEFT_SHARE;
   const rightWidth = columnsWidth - leftWidth;
@@ -126,7 +137,8 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
   return {
     width,
     height,
-    safeZoneWidth: SAFE_ZONE_WIDTH,
+    safeZoneLeft,
+    safeZoneRight: SAFE_ZONE_RIGHT,
     levels,
     extras,
     bar,

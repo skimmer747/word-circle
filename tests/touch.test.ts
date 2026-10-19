@@ -3,12 +3,17 @@ import { LetterTracer, type PointerInput, type TracerGeometry } from '../src/inp
 
 const GEOMETRY: TracerGeometry = {
   screenWidth: 1180,
-  safeZoneWidth: 130,
+  safeZoneLeft: 200,
+  safeZoneRight: 130,
   tiles: [
     { x: 600, y: 300, r: 50 },
     { x: 720, y: 300, r: 50 },
     { x: 840, y: 300, r: 50 },
     { x: 720, y: 450, r: 50 },
+  ],
+  buttons: [
+    { id: 'shuffle', x: 220, y: 700, w: 100, h: 90 },
+    { id: 'hint', x: 340, y: 700, w: 100, h: 90 },
   ],
 };
 
@@ -19,12 +24,105 @@ function setup() {
     letterRemoved: (tile) => events.push(`remove ${tile}`),
     wordSubmitted: (tiles) => events.push(`submit ${tiles.join(',')}`),
     selectionCleared: () => events.push('clear'),
+    buttonTapped: (id) => events.push(`tap ${id}`),
   });
   tracer.setGeometry(GEOMETRY);
-  const send = (type: PointerInput['type'], id: number, x: number, y: number) => tracer.handle({ type, id, x, y });
+  const send = (type: PointerInput['type'], id: number, x: number, y: number, time?: number) =>
+    tracer.handle({ type, id, x, y, time });
   const at = (i: number) => [GEOMETRY.tiles[i].x, GEOMETRY.tiles[i].y] as const;
-  return { tracer, events, send, at };
+  const hint = [390, 745] as const;
+  const shuffle = [270, 745] as const;
+  return { tracer, events, send, at, hint, shuffle };
 }
+
+describe('button taps', () => {
+  it('taps a button', () => {
+    const { events, send, hint } = setup();
+    send('down', 1, ...hint);
+    send('up', 1, ...hint);
+    expect(events).toEqual(['tap hint']);
+  });
+
+  it('taps a button while her thumb rests in the safe zone', () => {
+    const { events, send, hint } = setup();
+    send('down', 1, 60, 600);
+    send('down', 2, ...hint);
+    send('up', 2, ...hint);
+    expect(events).toEqual(['tap hint']);
+  });
+
+  it('taps a button while another finger rests elsewhere on the screen', () => {
+    const { events, send, shuffle } = setup();
+    send('down', 1, 500, 600);
+    send('down', 2, ...shuffle);
+    send('up', 2, ...shuffle);
+    expect(events).toEqual(['tap shuffle']);
+  });
+
+  it('does not tap when the finger slides off the button before lifting', () => {
+    const { events, send, hint } = setup();
+    send('down', 1, ...hint);
+    send('move', 1, 600, 600);
+    send('up', 1, 600, 600);
+    expect(events).toEqual([]);
+  });
+
+  it('does not tap when the press ends on a different button', () => {
+    const { events, send, hint, shuffle } = setup();
+    send('down', 1, ...hint);
+    send('up', 1, ...shuffle);
+    expect(events).toEqual([]);
+  });
+
+  it('does not tap when a resting thumb lifts off a button long after landing', () => {
+    const { events, send, hint } = setup();
+    send('down', 1, ...hint, 1000);
+    send('up', 1, ...hint, 4000);
+    expect(events).toEqual([]);
+  });
+
+  it('taps when the press is a normal length', () => {
+    const { events, send, hint } = setup();
+    send('down', 1, ...hint, 1000);
+    send('up', 1, ...hint, 1600);
+    expect(events).toEqual(['tap hint']);
+  });
+
+  it('ignores a press that starts in the safe zone and slides onto a button', () => {
+    const { events, send, hint } = setup();
+    send('down', 1, 150, 745);
+    send('move', 1, ...hint);
+    send('up', 1, ...hint);
+    expect(events).toEqual([]);
+  });
+
+  it('ignores buttons while a word is being traced', () => {
+    const { events, send, at, hint } = setup();
+    send('down', 1, ...at(0));
+    send('down', 2, ...hint);
+    send('up', 2, ...hint);
+    send('move', 1, ...at(1));
+    expect(events).toEqual(['add 0', 'add 1']);
+  });
+
+  it('does not tap when the touch is cancelled or the tracer is disabled', () => {
+    const { tracer, events, send, hint } = setup();
+    send('down', 1, ...hint);
+    send('cancel', 1, ...hint);
+    tracer.setEnabled(false);
+    send('down', 2, ...hint);
+    send('up', 2, ...hint);
+    expect(events).toEqual([]);
+  });
+
+  it('uses separate widths for the left and right safe zones', () => {
+    const { tracer } = setup();
+    expect(tracer.isInSafeZone(199)).toBe(true);
+    expect(tracer.isInSafeZone(201)).toBe(false);
+    expect(tracer.isInSafeZone(1049)).toBe(false);
+    expect(tracer.isInSafeZone(1051)).toBe(true);
+  });
+});
 
 describe('LetterTracer', () => {
   it('traces a word across three letters and submits it on lift', () => {

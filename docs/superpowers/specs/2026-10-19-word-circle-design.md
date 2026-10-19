@@ -35,7 +35,7 @@ Layout "B": word slots on the left, letter circle on the right. Landscape only.
 └──────┴──────────────────────┴───────────────────────────┴──────┘
 ```
 
-- **Safe zones:** a band on the left and right edges, `SAFE_ZONE_WIDTH = 130` CSS px each (about one inch on a standard iPad), full screen height. Rendered as plain background (invisible). Nothing is ever drawn in them.
+- **Safe zones:** a band on the left and right edges, full screen height, rendered as plain background (invisible); nothing is ever drawn in them. The right band is 130 CSS px (about one inch on a standard iPad). Her left thumb rests on the screen, so the left band is 200 CSS px (about 1.5 inches) wherever the screen has room, shrinking toward 130 only on the narrowest iPads (it is `screen width − 130 − 760`, clamped to 130–200; 760 px is what a Hard puzzle needs at minimum sizes).
 - **Play area:** the space between the safe zones, split roughly 45% left column / 55% right column.
 - **Left column:**
   - **Level buttons** at the top: three small buttons, **Easy**, **Medium** and **Hard** (48 px tall, at most 120 px wide). The current level has a thick purple border and a check mark.
@@ -80,14 +80,15 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 
 1. **Safe-zone filter.** A pointer whose `down` is inside either safe zone is added to an *ignored* set and ignored for its entire life, even if it later moves into the play area. Removed from the set on `up`/`cancel`.
 2. **One active finger.** At most one pointer is *active*. A `down` while another pointer is active is ignored for that pointer's life.
-3. **Start only on a letter.** A `down` outside the safe zones becomes active only if it lands on a tile (hit radius = tile radius × 1.15). A `down` on empty background or a button area does nothing to the word. (Buttons are handled separately by normal tap handling and also ignore pointers that started in a safe zone.)
+3. **Start only on a letter.** A `down` outside the safe zones becomes active only if it lands on a tile (hit radius = tile radius × 1.15). A `down` on empty background does nothing.
+3a. **Buttons go through the same tracker.** iPadOS drops ordinary `click` events while another finger is on the screen, so a resting thumb would block Shuffle, Hint and the level buttons. Instead, a `down` on a button (outside the safe zones, while no word is being traced) is remembered for that pointer, and its `up` taps the button only if it ends on the same button within 2 seconds (a longer press is a thumb coming to rest, not a tap). Each pointer is tracked separately, so other fingers resting anywhere don't matter; `cancel` never taps.
 4. **Adding letters.** While active, moving into a tile (hit radius = drawn tile radius) that is not already selected appends it.
 5. **Backtracking.** Moving into the *second-to-last* selected tile removes the last selected tile. Moving into any other already-selected tile does nothing.
 6. **Wandering.** Moving outside the circle (or into a safe zone) does not end the word.
 7. **Submitting.** `up` on the active pointer submits the word if it has ≥ 3 letters; otherwise the selection clears silently.
 8. **Interruptions.** `cancel` on the active pointer clears the selection without submitting.
 
-**Output events** from the touch module: `letterAdded(tileIndex)`, `letterRemoved(tileIndex)`, `wordSubmitted(tileIndices)`, `selectionCleared()`.
+**Output events** from the touch module: `letterAdded(tileIndex)`, `letterRemoved(tileIndex)`, `wordSubmitted(tileIndices)`, `selectionCleared()`, `buttonTapped(id)`.
 
 **Browser behavior disabled:** pinch and double-tap zoom (`user-scalable=no`, `touch-action: none`, `gesturestart` prevented), text selection (`user-select: none`), long-press callout (`-webkit-touch-callout: none`), pull-to-refresh and rubber-band scrolling (`overscroll-behavior: none`, fixed full-screen layout).
 
