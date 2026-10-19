@@ -1,5 +1,5 @@
 import { registerSW } from 'virtual:pwa-register';
-import type { Updates } from './app';
+import type { Updates } from './frame/frame';
 
 const UPDATE_CHECK_MS = 60 * 60 * 1000;
 

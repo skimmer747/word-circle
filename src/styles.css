@@ -38,6 +38,8 @@ body {
 }
 
 #app,
+.game-layer,
+.corner,
 .board {
   position: absolute;
   inset: 0;
