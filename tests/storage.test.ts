@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  OLD_STORAGE_KEY,
   STORAGE_KEY,
-  loadProgress,
+  loadSavedGame,
   nextIndex,
   resolveStart,
-  saveProgress,
+  saveSavedGame,
   type KeyValueStore,
+  type SavedGame,
 } from '../src/game/storage';
 import type { Progress, Puzzle } from '../src/game/types';
 
@@ -28,34 +30,46 @@ const PROGRESS: Progress = {
   revealed: { fig: [0] },
   bonusFound: ['jig'],
 };
+const FRESH: SavedGame = { level: 'medium', levels: {} };
 
-describe('saving and loading progress', () => {
-  it('round-trips progress', () => {
+describe('saving and loading the game', () => {
+  it('starts on Medium with nothing saved', () => {
+    expect(loadSavedGame(new MemoryStore())).toEqual(FRESH);
+  });
+
+  it('round-trips the current level and each level’s progress', () => {
     const store = new MemoryStore();
-    saveProgress(store, PROGRESS);
-    expect(loadProgress(store)).toEqual(PROGRESS);
+    const game: SavedGame = { level: 'hard', levels: { hard: PROGRESS, easy: { ...PROGRESS, puzzleIndex: 0 } } };
+    saveSavedGame(store, game);
+    expect(loadSavedGame(store)).toEqual(game);
   });
 
-  it('returns null when nothing is saved', () => {
-    expect(loadProgress(new MemoryStore())).toBeNull();
+  it('moves progress saved before levels existed into Medium', () => {
+    const store = new MemoryStore();
+    store.setItem(OLD_STORAGE_KEY, JSON.stringify({ puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: {} }));
+    expect(loadSavedGame(store)).toEqual({
+      level: 'medium',
+      levels: { medium: { puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: {}, bonusFound: [] } },
+    });
   });
 
-  it('returns null for corrupt or malformed data', () => {
+  it('prefers the newer save when both exist', () => {
+    const store = new MemoryStore();
+    store.setItem(OLD_STORAGE_KEY, JSON.stringify(PROGRESS));
+    saveSavedGame(store, { level: 'easy', levels: {} });
+    expect(loadSavedGame(store)).toEqual({ level: 'easy', levels: {} });
+  });
+
+  it('starts fresh from corrupt or malformed data', () => {
     const store = new MemoryStore();
     store.setItem(STORAGE_KEY, '{not json');
-    expect(loadProgress(store)).toBeNull();
-    store.setItem(STORAGE_KEY, JSON.stringify({ puzzleIndex: -1, puzzleId: 'x', found: [], revealed: {} }));
-    expect(loadProgress(store)).toBeNull();
-    store.setItem(STORAGE_KEY, JSON.stringify({ puzzleIndex: 0, puzzleId: 'x', found: [3], revealed: {} }));
-    expect(loadProgress(store)).toBeNull();
-    store.setItem(STORAGE_KEY, JSON.stringify({ puzzleIndex: 0, puzzleId: 'x', found: [], revealed: {}, bonusFound: [3] }));
-    expect(loadProgress(store)).toBeNull();
-  });
-
-  it('loads saves from before extra words were tracked', () => {
-    const store = new MemoryStore();
-    store.setItem(STORAGE_KEY, JSON.stringify({ puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: {} }));
-    expect(loadProgress(store)).toEqual({ puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: {}, bonusFound: [] });
+    expect(loadSavedGame(store)).toEqual(FRESH);
+    store.setItem(STORAGE_KEY, JSON.stringify({ level: 'expert', levels: {} }));
+    expect(loadSavedGame(store)).toEqual(FRESH);
+    store.setItem(STORAGE_KEY, JSON.stringify({ level: 'easy', levels: { easy: { ...PROGRESS, found: [3] } } }));
+    expect(loadSavedGame(store)).toEqual(FRESH);
+    store.setItem(STORAGE_KEY, JSON.stringify({ level: 'easy', levels: { easy: { ...PROGRESS, bonusFound: [3] } } }));
+    expect(loadSavedGame(store)).toEqual(FRESH);
   });
 
   it('keeps playing when storage refuses to save', () => {
@@ -65,13 +79,13 @@ describe('saving and loading progress', () => {
         throw new Error('QuotaExceededError');
       },
     };
-    expect(() => saveProgress(store, PROGRESS)).not.toThrow();
+    expect(() => saveSavedGame(store, FRESH)).not.toThrow();
   });
 });
 
 describe('resolveStart', () => {
   it('starts at the first puzzle with nothing saved', () => {
-    expect(resolveStart(PUZZLES, null)).toEqual({ index: 0, found: [], revealed: {}, bonusFound: [] });
+    expect(resolveStart(PUZZLES, undefined)).toEqual({ index: 0, found: [], revealed: {}, bonusFound: [] });
   });
 
   it('restores the saved puzzle when it still matches', () => {

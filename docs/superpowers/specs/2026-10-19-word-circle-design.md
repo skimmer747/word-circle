@@ -37,33 +37,38 @@ Layout "B": word slots on the left, letter circle on the right. Landscape only.
 
 - **Safe zones:** a band on the left and right edges, `SAFE_ZONE_WIDTH = 130` CSS px each (about one inch on a standard iPad), full screen height. Rendered as plain background (invisible). Nothing is ever drawn in them.
 - **Play area:** the space between the safe zones, split roughly 45% left column / 55% right column.
-- **Left column:** one row per answer word, sorted by length then alphabetically (as Word Cookies does). Below the rows, two buttons side by side: **Shuffle** and **Hint**, each with an icon *and* a word label.
+- **Left column:**
+  - **Level buttons** at the top: three small buttons, **Easy**, **Medium** and **Hard** (48 px tall, at most 120 px wide). The current level has a thick purple border and a check mark.
+  - One row per answer word, sorted by length then alphabetically (as Word Cookies does).
+  - At the bottom, two buttons side by side: **Shuffle** and **Hint**, each with an icon *and* a word label.
 - **Right column:**
-  - **Extra words** at the top: an "Extra words" label over navy-outlined chips, one per extra word found in this puzzle, oldest first. Room for two rows; when more are found, the oldest chips drop off screen (all stay saved). Hidden until the first extra word is found.
-  - **Current-word bar** below it: a dark navy pill showing the letters selected so far in large type. Hidden when nothing is selected.
-  - **Letter circle** below it: a pale circular backing with 5 or 6 letter tiles evenly spaced around a ring.
+  - **Extra words** at the top: an "Extra words" label over blue-outlined chips, one per extra word found in this puzzle, oldest first. Room for two rows; when more are found, the oldest chips drop off screen (all stay saved). Hidden until the first extra word is found.
+  - **Current-word bar** below it: a white pill with an orange border showing the letters selected so far in large type. Hidden when nothing is selected.
+  - **Letter circle** below it: a pale yellow circular backing with 4, 5 or 6 letter tiles evenly spaced around a ring.
 - **Sizing** (computed from screen size by a pure layout function):
   - Circle diameter = the largest that fits the right column width and the height remaining under the current-word bar.
-  - Tile diameter ≈ 30% of circle diameter for 5 letters, ≈ 27% for 6, never below 110 CSS px. Letter glyph ≈ 60% of tile diameter.
+  - Tile diameter ≈ 34% of circle diameter for 4 letters, ≈ 30% for 5, ≈ 27% for 6, never below 110 CSS px. Letter glyph ≈ 60% of tile diameter.
   - Word slots: square, sized to fit the longest word and the number of rows in the left column; between 48 and 72 CSS px.
-  - Buttons at least 90 CSS px tall.
+  - Shuffle and Hint at least 90 CSS px tall.
 - **Font:** Atkinson Hyperlegible Bold (Braille Institute, SIL Open Font License), bundled locally.
-- **Colors:**
+- **Colors ("Sky"):** every letter is dark (black, dark blue or dark green) on white; color lives in the background, borders, the circle and the swipe line.
 
   | Element | Color |
   |---|---|
-  | Background | cream `#FBF5E6` |
-  | Circle backing | `#EFE6CF` |
-  | Letter tile (idle) | white `#FFFFFF`, 4px border `#141414`, letter `#141414` |
-  | Letter tile (selected) | navy `#1B3A6B` fill, white letter |
-  | Connecting line | navy `#1B3A6B`, 14px, round caps |
-  | Current-word bar | navy `#1B3A6B`, white letters |
-  | Empty word slot | white, 3px border `#6B6B6B` |
-  | Hinted letter in slot | navy `#1B3A6B` letter on white slot |
-  | Found word slot | green `#2F6B2F` fill, white letter |
-  | Buttons | white, 3px border `#141414`, text `#141414` |
+  | Background | pale sky blue `#D8EAF7` |
+  | Circle backing | soft yellow `#FBE3A0` |
+  | Letter tile (idle) | white, 4px dark blue border `#1B3A6B`, letter `#141414` |
+  | Letter tile (selected) | white, orange `#E07B24` border plus 6px orange ring, letter stays `#141414` |
+  | Connecting line | orange `#E07B24`, 14px, round caps |
+  | Current-word bar | white, 4px orange border, letters `#141414` |
+  | Empty word slot | white, 3px border `#7A8CA0` |
+  | Hinted letter in slot | dark blue `#1B3A6B` letter on white slot |
+  | Found word slot | white, 4px green border `#2E9E4F`, dark green letter `#1F6B35` |
+  | Shuffle / Hint | white, 4px purple `#6A4FB3` / gold `#B8860B` border and icon, text `#141414` |
+  | Level buttons | white, 2px gray border, text `#141414`; current level 4px purple border + check |
+  | "Good!" / "Well done!" | white bubble, green border, dark green text |
 
-  Navy and green differ strongly in brightness, so found vs. selected is distinguishable without color vision.
+  Orange stands out for aging eyes (blue and purple get harder to tell apart with age), so her selection is the most visible thing on screen.
 - **Nothing else on screen:** no score, coins, level number, puzzle counter, menu, or settings icon.
 - **Portrait:** if the iPad is somehow in portrait, show only a large "Please turn the iPad sideways" message with a simple picture. (Rotation Lock should prevent this.)
 
@@ -94,7 +99,8 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 
 | Situation | What she sees | Timing |
 |---|---|---|
-| Opens the app | The puzzle she was on, with found words and hinted letters still filled in. No title screen. | — |
+| Opens the app | The level and puzzle she was on, with found words and hinted letters still filled in. No title screen. | — |
+| Taps Easy, Medium or Hard | That level's puzzle slides in right away, at the place she left it in that level. Nothing is lost by switching; ignored while she's tracing a word or during "Well done!" | 500 ms |
 | Finds an answer word | Word glides from the current-word bar into its slot; slot turns green; large "Good!" appears | glide 600 ms, message 1200 ms |
 | Word already found | That word's slot gently pulses twice | ~800 ms |
 | Real word not in the slots (new) | "Good word!" in the current-word bar, then fades; the word pops in as a chip under "Extra words" | 1200 ms |
@@ -110,7 +116,7 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 - **Hints are free and unlimited.**
 - **Motion:** slow and smooth; no flashing, no shaking of the whole screen.
 - **Sound:** none.
-- **Saving:** progress is written to `localStorage` after every found word, extra word, hint, and puzzle change. Key `word-circle:v1`, value `{ puzzleIndex, puzzleId, found: string[], revealed: { [word]: number[] }, bonusFound: string[] }` (saves without `bonusFound` load as an empty list). On load, if the saved `puzzleId` doesn't match the puzzle at `puzzleIndex` (puzzles were regenerated), start that index fresh. Home Screen web apps keep their storage (not subject to Safari's 7-day eviction).
+- **Saving:** progress is written to `localStorage` after every found word, extra word, hint, level change and puzzle change. Key `word-circle:v2`, value `{ level, levels: { easy?, medium?, hard? } }` where each level's entry is `{ puzzleIndex, puzzleId, found: string[], revealed: { [word]: number[] }, bonusFound: string[] }`. A save from before levels existed (key `word-circle:v1`) is moved into Medium; saves without `bonusFound` load it as an empty list. On load, if a level's saved `puzzleId` doesn't match the puzzle at `puzzleIndex` (puzzles were regenerated), that level starts that index fresh. New players start on Medium. Home Screen web apps keep their storage (not subject to Safari's 7-day eviction).
 - **End of list:** after the last puzzle, wrap around to puzzle 0.
 
 ## 4. Puzzles and words
@@ -118,20 +124,29 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 Puzzles are generated offline by a Node script on the Mac and shipped inside the app as `puzzles.json`.
 
 - **Source:** SCOWL (Spell Checker Oriented Word Lists), en_US, with its license notice included in the repo.
-  - **Answer words:** SCOWL size ≤ 35 (common words), plain dictionary words only: no plurals or other endings (-s, -ed, -ing, -er, -est). A word is dropped if AGID (the Automatically Generated Inflection Database, `words/agid/infl.txt`) lists it only as an ending of another word, so "notes", "posed", "spoken" and "laxer" are out while "news" and "spoke" stay. Plurals and endings still count as extra words.
+  - **Answer words:** SCOWL size ≤ 35 (common words), plain dictionary words only: no plurals or other endings (-s, -ed, -ing, -er, -est). A word is dropped if AGID (the Automatically Generated Inflection Database, `words/agid/infl.txt`) lists it only as an ending of another word, so "notes", "posed", "spoken" and "laxer" are out while "news" and "spoke" stay. Uncertain AGID entries (marked `?`, e.g. "cars N?") don't count as dictionary words, and -ing forms of verbs ("making", "asking") count as endings even when AGID also lists them as nouns. Slips can be added to `words/not-plain.txt`. Plurals and endings still count as extra words.
   - **Accepted ("Good word!") words:** SCOWL size ≤ 60.
   - Both: lowercase `a–z` only (no capitals/proper nouns, apostrophes, or accents), length 3–6, not on the never-use list.
 - **Never-use list:** `words/blocklist.txt`, one word per line, seeded with offensive words, slurs and upsetting ones (death, illness, violence). Editable by the owner; re-run the script to apply. SCOWL's own offensive and profane lists (`words/scowl/misc`) are always excluded as well.
-- **Generation:**
-  1. Candidate base words: answer words of length 5 or 6.
+- **Levels:**
+
+  | Level | Letters | Words in slots | Target puzzles | Build fails below |
+  |---|---|---|---|---|
+  | Easy | 4 | 3–4 | 700 | 500 |
+  | Medium | 5 | 4–6 | 1,400 | 1,000 |
+  | Hard | 6 | 6 | 1,000 | 800 |
+
+  Easy draws on the same common-word list (the very most common words alone give only ~240 puzzles) but, like every level, prefers the most common words first.
+- **Generation (per level):**
+  1. Candidate base words: answer words with the level's letter count, most common first.
   2. For each, find all answer words formable from its letters (as a multiset; repeated letters allowed if the base has them). The base word is always included.
-  3. Keep the candidate only if it has **at least 4** such words. If it has **more than 6**, keep the base word plus the 5 most common others (lowest SCOWL size, then preferring a mix of lengths); the rest become bonus words.
+  3. Keep the candidate only if it has at least the level's minimum number of such words. If it has more than the maximum, keep the base word plus the most common others (lowest SCOWL size, then preferring a mix of lengths); the rest become bonus words.
   4. **Bonus words** for a puzzle = every accepted word formable from its letters that isn't an answer word.
   5. One puzzle per distinct letter set (e.g. STONE/NOTES/ONSET produce one puzzle).
-  6. Letter order on the circle is shuffled (seeded) so no answer word that uses every letter is spelled out clockwise.
-- **Mix and count:** about 75% five-letter and 25% six-letter puzzles, target 1,500 puzzles (if fewer than 800 valid puzzles can be made, the generator fails so the word-list thresholds can be revisited), shuffled with a fixed seed so builds are reproducible and similar puzzles don't come back to back.
-- **Output format:** `src/data/puzzles.json` (bundled into the app) = `[{ id, letters: string[], words: string[], bonus: string[] }]`, where `id` is the sorted letter set, `words` is in slot display order.
-- **Review page:** the script also writes `docs/puzzle-sample.html` showing 60 puzzles (letters, answer words, bonus words) for the owner to look over before she sees them.
+  6. Letter order on the circle is shuffled (seeded) so no answer word that uses every letter is spelled out clockwise. Letter sets where every arrangement spells an answer (e.g. LOOP/POOL/POLO) are skipped.
+  7. Each level's puzzles are shuffled with a fixed seed so builds are reproducible and similar puzzles don't come back to back.
+- **Output format:** `src/data/puzzles.json` (bundled into the app) = `{ easy: Puzzle[], medium: Puzzle[], hard: Puzzle[] }`, each `Puzzle` = `{ id, letters: string[], words: string[], bonus: string[] }`, where `id` is the sorted letter set and `words` is in slot display order.
+- **Review page:** the script also writes `docs/puzzle-sample.html` showing the first 20 puzzles of each level (letters, answer words, bonus words) for the owner to look over before she sees them.
 
 ## 5. Build, delivery, and testing
 

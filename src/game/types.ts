@@ -1,3 +1,9 @@
+export const LEVELS = ['easy', 'medium', 'hard'] as const;
+export type Level = (typeof LEVELS)[number];
+
+/** Each level's puzzles, in play order. */
+export type PuzzleSet = Record<Level, Puzzle[]>;
+
 export interface Puzzle {
   /** Sorted letters, e.g. "enost". Unique per puzzle. */
   id: string;

@@ -2,7 +2,7 @@ import '@fontsource/atkinson-hyperlegible/700.css';
 import './styles.css';
 import { App } from './app';
 import puzzleData from './data/puzzles.json';
-import type { Puzzle } from './game/types';
+import type { PuzzleSet } from './game/types';
 import { setupUpdates } from './pwa';
 
 const root = document.getElementById('app');
@@ -10,5 +10,5 @@ if (!root) throw new Error('Missing #app element');
 
 let app: App | undefined;
 const updates = setupUpdates(() => app?.interacted ?? false);
-app = new App(root, puzzleData as Puzzle[], window.localStorage, updates);
+app = new App(root, puzzleData as PuzzleSet, window.localStorage, updates);
 app.start();

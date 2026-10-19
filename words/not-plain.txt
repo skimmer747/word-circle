@@ -1,0 +1,6 @@
+# Plurals and other endings that slip past the inflection database (words/agid), one per line.
+# These never go in the word slots but still count as extra words. Lines starting with # are ignored.
+# After editing, run: npm run puzzles
+blogs
+taxis
+weeds

@@ -19,6 +19,11 @@ const MAX_SLOT = 72;
 const BUTTON_HEIGHT = 96;
 const BUTTON_GAP = 16;
 const BUTTONS_TOP_GAP = 32;
+const LEVEL_HEIGHT = 48;
+const LEVEL_MAX_WIDTH = 120;
+const LEVEL_GAP = 8;
+const LEVELS_BOTTOM_GAP = 16;
+const LEVEL_COUNT = 3;
 
 export interface Rect {
   x: number;
@@ -44,6 +49,8 @@ export interface Layout {
   width: number;
   height: number;
   safeZoneWidth: number;
+  /** Easy, Medium and Hard buttons at the top left. */
+  levels: Rect[];
   /** "Extra words" list at the top right. */
   extras: Rect;
   /** Current-word bar above the circle. */
@@ -79,7 +86,7 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
   const diameter = Math.min(rightWidth, circleSpace);
   const backing: Circle = { x: rightCenter, y: circleTop + circleSpace / 2, r: diameter / 2 };
 
-  const tileShare = letterCount <= 5 ? 0.3 : 0.27;
+  const tileShare = letterCount <= 4 ? 0.34 : letterCount === 5 ? 0.3 : 0.27;
   const tileR = Math.max(diameter * tileShare, MIN_TILE_DIAMETER) / 2;
   const ringR = backing.r - tileR - BACKING_PADDING;
   const tiles: Circle[] = Array.from({ length: letterCount }, (_, i) => {
@@ -92,15 +99,25 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
   const shuffleButton: Rect = { x: playLeft, y: buttonsY, w: buttonWidth, h: BUTTON_HEIGHT };
   const hintButton: Rect = { x: playLeft + buttonWidth + BUTTON_GAP, y: buttonsY, w: buttonWidth, h: BUTTON_HEIGHT };
 
+  const leftCenter = playLeft + leftWidth / 2;
+  const levelWidth = Math.min(LEVEL_MAX_WIDTH, (leftWidth - (LEVEL_COUNT - 1) * LEVEL_GAP) / LEVEL_COUNT);
+  const levelsLeft = leftCenter - (LEVEL_COUNT * levelWidth + (LEVEL_COUNT - 1) * LEVEL_GAP) / 2;
+  const levels: Rect[] = Array.from({ length: LEVEL_COUNT }, (_, i) => ({
+    x: levelsLeft + i * (levelWidth + LEVEL_GAP),
+    y: MARGIN,
+    w: levelWidth,
+    h: LEVEL_HEIGHT,
+  }));
+
   const rowCount = wordLengths.length;
   const longest = Math.max(...wordLengths);
-  const slotsSpace = buttonsY - BUTTONS_TOP_GAP - MARGIN;
+  const slotsTop = MARGIN + LEVEL_HEIGHT + LEVELS_BOTTOM_GAP;
+  const slotsSpace = buttonsY - BUTTONS_TOP_GAP - slotsTop;
   const byWidth = (leftWidth - (longest - 1) * SLOT_GAP) / longest;
   const byHeight = (slotsSpace - (rowCount - 1) * ROW_GAP) / rowCount;
   const slotSize = Math.min(MAX_SLOT, Math.max(MIN_SLOT, Math.floor(Math.min(byWidth, byHeight))));
   const blockHeight = rowCount * slotSize + (rowCount - 1) * ROW_GAP;
-  const blockTop = MARGIN + (slotsSpace - blockHeight) / 2;
-  const leftCenter = playLeft + leftWidth / 2;
+  const blockTop = slotsTop + (slotsSpace - blockHeight) / 2;
   const rows: Rect[] = wordLengths.map((length, i) => {
     const w = length * slotSize + (length - 1) * SLOT_GAP;
     return { x: leftCenter - w / 2, y: blockTop + i * (slotSize + ROW_GAP), w, h: slotSize };
@@ -110,6 +127,7 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
     width,
     height,
     safeZoneWidth: SAFE_ZONE_WIDTH,
+    levels,
     extras,
     bar,
     backing,

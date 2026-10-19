@@ -1,4 +1,4 @@
-import type { Puzzle } from '../game/types';
+import { LEVELS, type Level, type Puzzle } from '../game/types';
 import type { Layout, Rect } from './layout';
 
 export interface RowState {
@@ -6,10 +6,22 @@ export interface RowState {
   revealed: number[];
 }
 
+/** Everything about the current puzzle that the screen shows. */
+export interface ScreenState {
+  /** ringOrder[slot] is the letter index shown in that ring slot. */
+  ringOrder: readonly number[];
+  rows: readonly RowState[];
+  extras: readonly string[];
+  level: Level;
+}
+
 export interface ViewHandlers {
   onShuffle(): void;
   onHint(): void;
+  onLevel(level: Level): void;
 }
+
+const LEVEL_LABELS: Record<Level, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const FLY_MS = 600;
@@ -23,6 +35,7 @@ const ICON_ATTRS =
   'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
 const SHUFFLE_ICON = `<svg ${ICON_ATTRS}><path d="M18 4l3 3l-3 3"/><path d="M18 20l3 -3l-3 -3"/><path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5"/><path d="M21 7h-5a4.978 4.978 0 0 0 -3 1m-4 8a4.984 4.984 0 0 1 -3 1h-3"/></svg>`;
 const HINT_ICON = `<svg ${ICON_ATTRS}><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"/><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"/><path d="M9.7 17l4.6 0"/></svg>`;
+const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10 -10"/></svg>`;
 const SIDEWAYS_IPAD = `<svg width="240" height="170" viewBox="0 0 240 170" aria-hidden="true"><rect x="10" y="10" width="220" height="150" rx="18" fill="#fff" stroke="#141414" stroke-width="8"/><circle cx="208" cy="85" r="6" fill="#141414"/></svg>`;
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, parent: HTMLElement): HTMLElementTagNameMap[K] {
@@ -73,18 +86,11 @@ export class View {
     this.rotate.innerHTML = `${SIDEWAYS_IPAD}<div>Please turn the iPad sideways</div>`;
   }
 
-  /** Builds the whole screen. ringOrder[slot] is the letter index shown in that ring slot. */
-  render(
-    puzzle: Puzzle,
-    layout: Layout,
-    ringOrder: readonly number[],
-    rows: readonly RowState[],
-    extras: readonly string[],
-    animateIn: boolean,
-  ): void {
+  /** Builds the whole screen. */
+  render(puzzle: Puzzle, layout: Layout, state: ScreenState, animateIn: boolean): void {
     this.puzzle = puzzle;
     this.layout = layout;
-    this.ringOrder = [...ringOrder];
+    this.ringOrder = [...state.ringOrder];
     window.clearTimeout(this.barTimer);
     this.messageToken++;
     this.board?.remove();
@@ -93,16 +99,24 @@ export class View {
     this.root.insertBefore(board, this.rotate);
     this.board = board;
 
+    LEVELS.forEach((level, i) => {
+      const button = el('button', level === state.level ? 'level on' : 'level', board);
+      button.type = 'button';
+      button.innerHTML = `${level === state.level ? CHECK_ICON : ''}<span>${LEVEL_LABELS[level]}</span>`;
+      place(button, layout.levels[i]);
+      button.addEventListener('click', () => this.handlers.onLevel(level));
+    });
+
     this.rows = puzzle.words.map((word, i) => this.buildRow(board, word, layout.rows[i]));
-    rows.forEach((state, i) => this.setRow(i, state));
-    this.buildButton(board, 'Shuffle', SHUFFLE_ICON, layout.shuffleButton, () => this.handlers.onShuffle());
-    this.hintButton = this.buildButton(board, 'Hint', HINT_ICON, layout.hintButton, () => this.handlers.onHint());
+    state.rows.forEach((row, i) => this.setRow(i, row));
+    this.buildButton(board, 'shuffle', 'Shuffle', SHUFFLE_ICON, layout.shuffleButton, () => this.handlers.onShuffle());
+    this.hintButton = this.buildButton(board, 'hint', 'Hint', HINT_ICON, layout.hintButton, () => this.handlers.onHint());
 
     this.extras = el('div', 'extras', board);
     place(this.extras, layout.extras);
     el('div', 'extras-label', this.extras).textContent = 'Extra words';
     this.chips = el('div', 'chips', this.extras);
-    this.setExtras(extras);
+    this.setExtras(state.extras);
 
     const { backing } = layout;
     place(el('div', 'backing', board), {
@@ -304,8 +318,15 @@ export class View {
     });
   }
 
-  private buildButton(board: HTMLElement, label: string, icon: string, rect: Rect, onClick: () => void): HTMLButtonElement {
-    const button = el('button', 'button', board);
+  private buildButton(
+    board: HTMLElement,
+    kind: string,
+    label: string,
+    icon: string,
+    rect: Rect,
+    onClick: () => void,
+  ): HTMLButtonElement {
+    const button = el('button', `button ${kind}`, board);
     button.type = 'button';
     button.innerHTML = `${icon}<span>${label}</span>`;
     place(button, rect);

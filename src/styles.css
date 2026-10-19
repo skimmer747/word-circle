@@ -1,10 +1,18 @@
+/* Sky colors. Every letter is dark (black, dark blue or dark green) on white. */
 :root {
-  --bg: #fbf5e6;
+  --bg: #d8eaf7;
   --ink: #141414;
   --navy: #1b3a6b;
-  --green: #2f6b2f;
-  --slot-border: #6b6b6b;
-  --backing: #efe6cf;
+  --backing: #fbe3a0;
+  --select: #e07b24;
+  --found: #2e9e4f;
+  --found-ink: #1f6b35;
+  --slot-border: #7a8ca0;
+  --shuffle: #6a4fb3;
+  --hint: #b8860b;
+  --level: #6a4fb3;
+  --chip: #3d7cc9;
+  --label: #2c3e57;
 }
 
 html,
@@ -57,9 +65,8 @@ body {
 }
 
 .slot.found {
-  background: var(--green);
-  border-color: var(--green);
-  color: #fff;
+  border: 4px solid var(--found);
+  color: var(--found-ink);
 }
 
 .slot.pulse {
@@ -83,12 +90,28 @@ body {
   padding: 0;
   border-radius: 18px;
   background: #fff;
-  border: 3px solid var(--ink);
+  border: 4px solid var(--ink);
   color: var(--ink);
   font: inherit;
   font-size: 30px;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.button.shuffle {
+  border-color: var(--shuffle);
+}
+
+.button.shuffle svg {
+  color: var(--shuffle);
+}
+
+.button.hint {
+  border-color: var(--hint);
+}
+
+.button.hint svg {
+  color: var(--hint);
 }
 
 .button svg {
@@ -111,6 +134,34 @@ body {
   }
 }
 
+.level {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  border-radius: 14px;
+  background: #fff;
+  border: 2px solid #555;
+  color: var(--ink);
+  font: inherit;
+  font-size: 20px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.level.on {
+  border: 4px solid var(--level);
+}
+
+.level svg {
+  width: 20px;
+  height: 20px;
+  color: var(--level);
+}
+
 .extras {
   position: absolute;
   box-sizing: border-box;
@@ -128,7 +179,7 @@ body {
   margin-bottom: 6px;
   font-size: 22px;
   line-height: 28px;
-  color: #5a5444;
+  color: var(--label);
 }
 
 .chips {
@@ -151,7 +202,7 @@ body {
   align-items: center;
   border-radius: 10px;
   background: #fff;
-  border: 3px solid var(--navy);
+  border: 3px solid var(--chip);
   color: var(--navy);
   font-size: 26px;
   letter-spacing: 0.04em;
@@ -194,7 +245,7 @@ body {
 
 .lines polyline {
   fill: none;
-  stroke: var(--navy);
+  stroke: var(--select);
   stroke-width: 14;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -210,14 +261,14 @@ body {
   justify-content: center;
   border-radius: 50%;
   background: #fff;
-  border: 4px solid var(--ink);
+  border: 4px solid var(--navy);
+  color: var(--ink);
   transition: transform 500ms ease-in-out;
 }
 
 .tile.selected {
-  background: var(--navy);
-  border-color: var(--navy);
-  color: #fff;
+  border-color: var(--select);
+  box-shadow: 0 0 0 6px var(--select);
 }
 
 .bar {
@@ -229,8 +280,9 @@ body {
   letter-spacing: 0.08em;
   white-space: nowrap;
   border-radius: 999px;
-  background: var(--navy);
-  color: #fff;
+  background: #fff;
+  border: 4px solid var(--select);
+  color: var(--ink);
   opacity: 0;
   transition: opacity 300ms ease;
   pointer-events: none;
@@ -268,19 +320,22 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: var(--navy);
-  color: #fff;
+  background: #fff;
+  border: 3px solid var(--select);
+  color: var(--ink);
   pointer-events: none;
   transition:
     transform 600ms ease-in-out,
     width 600ms ease-in-out,
     height 600ms ease-in-out,
     font-size 600ms ease-in-out,
-    background-color 600ms ease-in-out;
+    border-color 600ms ease-in-out,
+    color 600ms ease-in-out;
 }
 
 .flyer.landing {
-  background: var(--green);
+  border: 4px solid var(--found);
+  color: var(--found-ink);
 }
 
 .message {
@@ -289,9 +344,9 @@ body {
   padding: 12px 44px;
   white-space: nowrap;
   border-radius: 28px;
-  background: var(--bg);
-  border: 4px solid var(--navy);
-  color: var(--navy);
+  background: #fff;
+  border: 5px solid var(--found);
+  color: var(--found-ink);
   opacity: 0;
   transition: opacity 300ms ease;
   pointer-events: none;

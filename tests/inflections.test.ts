@@ -2,6 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { parseInflectedForms } from '../scripts/inflections';
 
 const SAMPLE = [
+  'make V: made | making | makes',
+  'making N: makings',
+  'king N: kings',
+  'car N: cars',
+  'cars N?: carses',
+  'fine N: fines',
+  'fines V?: finessed | finessing | finesses',
+  'news V?: newsed | newsing | newses',
   'lax A: laxer | laxest',
   'lax N?: laxes, laces< 1',
   'news N: newses',
@@ -28,6 +36,18 @@ describe('parseInflectedForms', () => {
     for (const word of ['note', 'lax', 'news', 'run', 'speak', 'spoke', 'stone']) {
       expect(inflected.has(word), word).toBe(false);
     }
+  });
+
+  it('does not trust uncertain entries (marked "?") as dictionary words', () => {
+    expect(inflected.has('cars')).toBe(true);
+    expect(inflected.has('fines')).toBe(true);
+    expect(inflected.has('news')).toBe(false);
+  });
+
+  it('treats -ing forms of verbs as endings even when also listed as nouns', () => {
+    expect(inflected.has('making')).toBe(true);
+    expect(inflected.has('running')).toBe(true);
+    expect(inflected.has('king')).toBe(false);
   });
 
   it('ignores variant numbers, notes and markers', () => {

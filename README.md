@@ -27,8 +27,9 @@ npm run build
 
 ## Changing the words
 
-1. Add any word she shouldn't see to `words/blocklist.txt` (one per line).
-2. Run `npm run puzzles`. This rebuilds `src/data/puzzles.json` and `docs/puzzle-sample.html`.
+1. Add any word she shouldn't see to `words/blocklist.txt` (one per line). It won't appear anywhere, not even as an extra word.
+   If a plural or other word ending shows up in the word slots, add it to `words/not-plain.txt` instead; it will still count as an extra word.
+2. Run `npm run puzzles`. This rebuilds all three levels in `src/data/puzzles.json` and the sample page `docs/puzzle-sample.html`.
 3. Look over `docs/puzzle-sample.html`, then commit and push. GitHub Pages republishes automatically, and her iPad picks up the change after her next finished puzzle.
 
 Regenerating puzzles can change their order, so she may start a fresh puzzle at her current position.

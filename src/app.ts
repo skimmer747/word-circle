@@ -1,6 +1,14 @@
 import { Game } from './game/state';
-import { loadProgress, nextIndex, resolveStart, saveProgress, type KeyValueStore } from './game/storage';
-import type { Puzzle } from './game/types';
+import {
+  loadSavedGame,
+  nextIndex,
+  resolveStart,
+  saveSavedGame,
+  type KeyValueStore,
+  type SavedGame,
+  type StartPoint,
+} from './game/storage';
+import type { Level, PuzzleSet } from './game/types';
 import { LetterTracer, type PointerInput } from './input/touch';
 import { computeLayout } from './ui/layout';
 import { identityOrder, shuffleRing } from './ui/ring';
@@ -18,6 +26,8 @@ export interface Updates {
 export class App {
   /** True once she has touched the screen in this session. */
   interacted = false;
+  private saved: SavedGame = { level: 'medium', levels: {} };
+  private level: Level = 'medium';
   private index = 0;
   private game!: Game;
   private ringOrder: number[] = [];
@@ -28,11 +38,15 @@ export class App {
 
   constructor(
     root: HTMLElement,
-    private readonly puzzles: readonly Puzzle[],
+    private readonly puzzles: PuzzleSet,
     private readonly store: KeyValueStore,
     private readonly updates: Updates,
   ) {
-    this.view = new View(root, { onShuffle: () => this.shuffle(), onHint: () => this.hint() });
+    this.view = new View(root, {
+      onShuffle: () => this.shuffle(),
+      onHint: () => this.hint(),
+      onLevel: (level) => this.chooseLevel(level),
+    });
     this.tracer = new LetterTracer({
       letterAdded: () => this.showSelection(),
       letterRemoved: () => this.showSelection(),
@@ -42,23 +56,32 @@ export class App {
   }
 
   start(): void {
-    const start = resolveStart(this.puzzles, loadProgress(this.store));
-    this.loadPuzzle(start.index, start.found, start.revealed, start.bonusFound);
+    this.saved = loadSavedGame(this.store);
+    this.openLevel(this.saved.level);
     this.relayout(false);
     this.listen();
     this.resetIdle();
   }
 
-  private loadPuzzle(
-    index: number,
-    found: string[] = [],
-    revealed: Record<string, number[]> = {},
-    bonusFound: string[] = [],
-  ): void {
-    this.index = index;
-    this.game = new Game(this.puzzles[index], found, revealed, bonusFound);
+  /** Switches to a level's saved place (or its first puzzle). */
+  private openLevel(level: Level): void {
+    this.level = level;
+    this.loadPuzzle(resolveStart(this.puzzles[level], this.saved.levels[level]));
+  }
+
+  private loadPuzzle(start: StartPoint): void {
+    this.index = start.index;
+    this.game = new Game(this.puzzles[this.level][start.index], start.found, start.revealed, start.bonusFound);
     this.ringOrder = identityOrder(this.game.puzzle.letters.length);
     this.save();
+  }
+
+  /** Each level keeps its own place, so switching never loses anything. */
+  private chooseLevel(level: Level): void {
+    if (this.busy || this.tracer.isTracing || level === this.level) return;
+    this.openLevel(level);
+    this.relayout(true);
+    this.resetIdle();
   }
 
   private listen(): void {
@@ -101,7 +124,12 @@ export class App {
       wordLengths: puzzle.words.map((w) => w.length),
     });
     this.tracer.setGeometry({ screenWidth: width, safeZoneWidth: layout.safeZoneWidth, tiles: layout.tiles });
-    this.view.render(puzzle, layout, this.ringOrder, this.rowStates(), this.game.foundBonus(), animateIn);
+    this.view.render(
+      puzzle,
+      layout,
+      { ringOrder: this.ringOrder, rows: this.rowStates(), extras: this.game.foundBonus(), level: this.level },
+      animateIn,
+    );
     this.tracer.setEnabled(!this.busy);
   }
 
@@ -167,7 +195,12 @@ export class App {
     window.clearTimeout(this.idleTimer);
     this.view.setHintPulse(false);
     await this.view.showMessage('Well done!', 'screen', WELL_DONE_MS);
-    this.loadPuzzle(nextIndex(this.index, this.puzzles.length));
+    this.loadPuzzle({
+      index: nextIndex(this.index, this.puzzles[this.level].length),
+      found: [],
+      revealed: {},
+      bonusFound: [],
+    });
     if (this.updates.applyIfPending()) return; // the reload opens the new puzzle
     this.busy = false;
     this.relayout(true);
@@ -198,12 +231,14 @@ export class App {
   }
 
   private save(): void {
-    saveProgress(this.store, {
+    this.saved.level = this.level;
+    this.saved.levels[this.level] = {
       puzzleIndex: this.index,
       puzzleId: this.game.puzzle.id,
       found: this.game.foundWords(),
       revealed: this.game.revealedRecord(),
       bonusFound: this.game.foundBonus(),
-    });
+    };
+    saveSavedGame(this.store, this.saved);
   }
 }

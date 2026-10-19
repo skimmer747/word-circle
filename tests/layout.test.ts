@@ -12,6 +12,7 @@ const SCREENS: Array<[number, number]> = [
 ];
 
 const PUZZLE_SHAPES = [
+  { letterCount: 4, wordLengths: [3, 3, 4, 4] },
   { letterCount: 5, wordLengths: [3, 3, 3, 4, 4, 5] },
   { letterCount: 6, wordLengths: [3, 4, 5, 6, 6, 6] },
   { letterCount: 5, wordLengths: [3, 4, 4, 5] },
@@ -34,6 +35,7 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
 
     it('keeps everything out of the safe zones and on screen', () => {
       const rects = [
+        ...layout.levels,
         layout.extras,
         layout.bar,
         layout.shuffleButton,
@@ -81,9 +83,20 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
       expect(extras.x + extras.w).toBeGreaterThan(backing.x);
     });
 
+    it('puts three small level buttons in a row at the top left, above the word slots', () => {
+      const { levels, rows } = layout;
+      expect(levels).toHaveLength(3);
+      levels.forEach((button, i) => {
+        expect(button.h).toBeGreaterThanOrEqual(44);
+        expect(button.w).toBeLessThanOrEqual(120);
+        expect(button.y + button.h).toBeLessThanOrEqual(rows[0].y);
+        if (i > 0) expect(button.x).toBeGreaterThanOrEqual(levels[i - 1].x + levels[i - 1].w);
+      });
+    });
+
     it('keeps the left column clear of the right column', () => {
       const rightColumnStart = Math.min(layout.extras.x, layout.bar.x, layout.backing.x - layout.backing.r);
-      for (const rect of [...layout.rows, layout.shuffleButton, layout.hintButton]) {
+      for (const rect of [...layout.levels, ...layout.rows, layout.shuffleButton, layout.hintButton]) {
         expect(rect.x + rect.w).toBeLessThanOrEqual(rightColumnStart);
       }
     });
