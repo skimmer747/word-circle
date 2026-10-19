@@ -50,6 +50,40 @@ describe.each(SCREENS)('frame layout on a %i×%i screen', (width, height) => {
     expect(nextButton.y + nextButton.h).toBeLessThanOrEqual(card.y + card.h);
   });
 
+  it('puts the Games button just left of the clock, the same size and in the same row', () => {
+    const { gamesButton, clockButton, corner } = frame;
+    expect(inPlayArea(gamesButton, frame)).toBe(true);
+    expect(gamesButton.w).toBe(clockButton.w);
+    expect(gamesButton.h).toBe(clockButton.h);
+    expect(gamesButton.y).toBe(clockButton.y);
+    expect(gamesButton.x + gamesButton.w).toBe(clockButton.x - 12);
+    expect(corner).toEqual({ x: gamesButton.x, y: 16, w: clockButton.x + clockButton.w - gamesButton.x, h: clockButton.h });
+  });
+
+  it('fits Share and Next word side by side at the bottom of the card, clear of the safe zones', () => {
+    const { shareButton, nextWordButton, card } = frame;
+    for (const button of [shareButton, nextWordButton]) {
+      expect(inPlayArea(button, frame), JSON.stringify(button)).toBe(true);
+      expect(button.h).toBeGreaterThanOrEqual(96);
+      expect(button.y + button.h).toBeLessThanOrEqual(card.y + card.h);
+    }
+    expect(shareButton.x + shareButton.w).toBeLessThan(nextWordButton.x);
+    expect(nextWordButton.w).toBeGreaterThanOrEqual(360);
+  });
+
+  it('gives the Games pop-up one big card per game, below its title and above Close', () => {
+    const { gameCards, closeButton, card } = frame;
+    expect(gameCards).toHaveLength(2);
+    gameCards.forEach((game, i) => {
+      expect(inPlayArea(game, frame), JSON.stringify(game)).toBe(true);
+      expect(game.w).toBeGreaterThanOrEqual(300);
+      expect(game.h).toBeGreaterThanOrEqual(360);
+      expect(game.y).toBeGreaterThanOrEqual(card.y + 100);
+      expect(game.y + game.h).toBeLessThanOrEqual(closeButton.y - 16);
+      if (i > 0) expect(game.x).toBeGreaterThanOrEqual(gameCards[i - 1].x + gameCards[i - 1].w + 16);
+    });
+  });
+
   it('gives the clock pop-up a big Close button clear of the safe zones', () => {
     const { card, closeButton } = frame;
     expect(inPlayArea(closeButton, frame)).toBe(true);

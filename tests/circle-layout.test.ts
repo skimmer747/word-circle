@@ -72,6 +72,10 @@ describe.each(SCREENS)('Word Circle layout on a %i×%i screen', (width, height) 
       expect(frame.corner.y + frame.corner.h).toBeLessThanOrEqual(layout.bar.y);
     });
 
+    it('leaves Extra words at least 200 px wide beside the Games and clock buttons', () => {
+      expect(layout.extras.w).toBeGreaterThanOrEqual(200);
+    });
+
     it('puts three small level buttons in a row at the top left, above the word slots', () => {
       const { levels, rows } = layout;
       expect(levels).toHaveLength(3);
