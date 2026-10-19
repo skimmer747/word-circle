@@ -1,0 +1,86 @@
+# Words that are never the Word Guess answer (one per line).
+# They still count if she types one as a guess, and Word Circle is not affected.
+# To keep a word out of both games entirely, use words/blocklist.txt instead.
+# After changing this file, run: npm run puzzles
+
+# Death
+skull
+mourn
+grief
+ghoul
+fatal
+
+# Illness and the body
+virus
+fever
+cough
+bleed
+blood
+ulcer
+polio
+leper
+frail
+faint
+dizzy
+colic
+gland
+bowel
+colon
+urine
+feces
+flesh
+obese
+fatty
+
+# Violence
+rifle
+brawl
+punch
+choke
+drown
+wound
+lynch
+siege
+abuse
+bully
+
+# Crime
+crime
+thief
+steal
+theft
+fraud
+cheat
+crook
+felon
+arson
+
+# Drink and drugs
+drunk
+booze
+vodka
+opium
+tipsy
+
+# Insults
+idiot
+moron
+loser
+crazy
+nasty
+lousy
+creep
+sissy
+dunce
+freak
+
+# Upsetting
+panic
+agony
+demon
+devil
+cruel
+shame
+slave
+exile
+bribe

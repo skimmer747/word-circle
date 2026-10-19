@@ -9,14 +9,16 @@ export interface GuessSources {
   /** Every word that counts as a real word. */
   accepted: ReadonlySet<string>;
   blocklist: ReadonlySet<string>;
+  /** Words that are never the answer, but still count as guesses (words/guess-skip.txt). */
+  skip: ReadonlySet<string>;
   random: () => number;
 }
 
 /** Answers in play order (most common SCOWL size first, each size shuffled) and every accepted guess, sorted. */
-export function buildGuessWords({ answers, accepted, blocklist, random }: GuessSources): GuessWords {
+export function buildGuessWords({ answers, accepted, blocklist, skip, random }: GuessSources): GuessWords {
   const bySize = new Map<number, string[]>();
   for (const [word, size] of answers) {
-    if (!FIVE.test(word) || blocklist.has(word)) continue;
+    if (!FIVE.test(word) || blocklist.has(word) || skip.has(word)) continue;
     const group = bySize.get(size) ?? [];
     group.push(word);
     bySize.set(size, group);
@@ -29,7 +31,12 @@ export function buildGuessWords({ answers, accepted, blocklist, random }: GuessS
 }
 
 /** Everything wrong with the answers; empty when they're fine. */
-export function validateGuessWords(words: GuessWords, blocklist: ReadonlySet<string>, inflected: ReadonlySet<string>): string[] {
+export function validateGuessWords(
+  words: GuessWords,
+  blocklist: ReadonlySet<string>,
+  inflected: ReadonlySet<string>,
+  skip: ReadonlySet<string>,
+): string[] {
   const problems: string[] = [];
   const accepted = new Set(words.accepted);
   const seen = new Set<string>();
@@ -41,6 +48,7 @@ export function validateGuessWords(words: GuessWords, blocklist: ReadonlySet<str
     if (!FIVE.test(word)) say('is not five letters a–z');
     if (!accepted.has(word)) say('is not an accepted guess');
     if (inflected.has(word)) say('is a plural or other ending');
+    if (skip.has(word)) say('is on the Word Guess skip list');
   }
   return problems;
 }

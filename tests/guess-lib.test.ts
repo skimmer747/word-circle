@@ -14,7 +14,8 @@ const ANSWERS = new Map([
 ]);
 const ACCEPTED = new Set([...ANSWERS.keys(), 'cares', 'slats', 'tones', 'things']);
 const BLOCKLIST = new Set(['nasty', 'tones']);
-const build = () => buildGuessWords({ answers: ANSWERS, accepted: ACCEPTED, blocklist: BLOCKLIST, random: seededRandom(1) });
+const build = (skip = new Set<string>()) =>
+  buildGuessWords({ answers: ANSWERS, accepted: ACCEPTED, blocklist: BLOCKLIST, skip, random: seededRandom(1) });
 
 describe('building the Word Guess lists', () => {
   it('uses only five-letter answers that are not blocked', () => {
@@ -35,18 +36,26 @@ describe('building the Word Guess lists', () => {
   it('accepts every answer and every other unblocked five-letter word, in order', () => {
     expect(build().accepted).toEqual(['abbey', 'cares', 'crane', 'house', 'plant', 'slate', 'slats', 'zebra']);
   });
+
+  it('never makes a skipped word the answer, but still accepts it as a guess', () => {
+    const words = build(new Set(['crane', 'zebra']));
+    expect([...words.answers].sort()).toEqual(['abbey', 'house', 'plant', 'slate']);
+    expect(words.accepted).toContain('crane');
+    expect(words.accepted).toContain('zebra');
+  });
 });
 
 describe('checking the Word Guess lists', () => {
   it('passes good lists', () => {
-    expect(validateGuessWords({ answers: ['crane'], accepted: ['crane'] }, new Set(), new Set())).toEqual([]);
+    expect(validateGuessWords({ answers: ['crane'], accepted: ['crane'] }, new Set(), new Set(), new Set())).toEqual([]);
   });
 
   it('reports every kind of bad answer', () => {
     const problems = validateGuessWords(
-      { answers: ['crane', 'crane', 'nasty', 'cats', 'cares'], accepted: ['cares', 'crane', 'nasty'] },
+      { answers: ['crane', 'crane', 'nasty', 'cats', 'cares', 'fever'], accepted: ['cares', 'crane', 'fever', 'nasty'] },
       new Set(['nasty']),
       new Set(['cares']),
+      new Set(['fever']),
     );
     expect(problems).toEqual([
       'Word Guess: "crane" is in the answers twice',
@@ -54,6 +63,7 @@ describe('checking the Word Guess lists', () => {
       'Word Guess: "cats" is not five letters a–z',
       'Word Guess: "cats" is not an accepted guess',
       'Word Guess: "cares" is a plural or other ending',
+      'Word Guess: "fever" is on the Word Guess skip list',
     ]);
   });
 });

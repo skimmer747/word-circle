@@ -14,6 +14,7 @@ const SCOWL_DIR = path.join(ROOT, 'words/scowl/final');
 const INFLECTIONS_FILE = path.join(ROOT, 'words/agid/infl.txt');
 const BLOCKLIST_FILE = path.join(ROOT, 'words/blocklist.txt');
 const NOT_PLAIN_FILE = path.join(ROOT, 'words/not-plain.txt');
+const GUESS_SKIP_FILE = path.join(ROOT, 'words/guess-skip.txt');
 const TABOO_FILES = ['offensive.1', 'offensive.2', 'profane.1', 'profane.3'].map((name) =>
   path.join(ROOT, 'words/scowl/misc', name),
 );
@@ -60,8 +61,9 @@ LEVELS.forEach((level, i) => {
 });
 
 // Word Guess uses its own seed, so its lists never change the Word Circle puzzles.
-const guess = buildGuessWords({ answers, accepted, blocklist, random: seededRandom(SEED + 100) });
-problems.push(...validateGuessWords(guess, blocklist, inflected));
+const guessSkip = readBlocklist(GUESS_SKIP_FILE);
+const guess = buildGuessWords({ answers, accepted, blocklist, skip: guessSkip, random: seededRandom(SEED + 100) });
+problems.push(...validateGuessWords(guess, blocklist, inflected, guessSkip));
 if (guess.answers.length < GUESS_MINIMUM) {
   problems.push(`Word Guess: only ${guess.answers.length} answers could be found (need at least ${GUESS_MINIMUM})`);
 }
