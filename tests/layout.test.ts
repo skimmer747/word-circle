@@ -116,6 +116,16 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
       }
     });
 
+    it('centers the celebration card on screen with a big Next button clear of the safe zones', () => {
+      const { celebration, nextButton } = layout;
+      expect(celebration.y).toBeGreaterThanOrEqual(0);
+      expect(celebration.y + celebration.h).toBeLessThanOrEqual(height);
+      expect(Math.abs(celebration.x + celebration.w / 2 - width / 2)).toBeLessThan(1);
+      expect(inPlayArea(nextButton, layout)).toBe(true);
+      expect(nextButton.h).toBeGreaterThanOrEqual(80);
+      expect(nextButton.y + nextButton.h).toBeLessThanOrEqual(celebration.y + celebration.h);
+    });
+
     it('makes buttons at least 90 px tall', () => {
       expect(layout.shuffleButton.h).toBeGreaterThanOrEqual(90);
       expect(layout.hintButton.h).toBeGreaterThanOrEqual(90);

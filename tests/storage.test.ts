@@ -9,6 +9,7 @@ import {
   type KeyValueStore,
   type SavedGame,
 } from '../src/game/storage';
+import { emptyStats } from '../src/game/stats';
 import type { Progress, Puzzle } from '../src/game/types';
 
 class MemoryStore implements KeyValueStore {
@@ -29,17 +30,23 @@ const PROGRESS: Progress = {
   found: ['hi'],
   revealed: { fig: [0] },
   bonusFound: ['jig'],
+  elapsedMs: 42_000,
 };
-const FRESH: SavedGame = { level: 'medium', levels: {} };
+const FRESH: SavedGame = { level: 'medium', levels: {}, stats: emptyStats() };
+const STATS = { totalSolved: 48, bestMs: { medium: 112_000 }, streakDays: 5, lastPlayedDay: '2026-10-19', todaySolved: 3 };
 
 describe('saving and loading the game', () => {
   it('starts on Medium with nothing saved', () => {
     expect(loadSavedGame(new MemoryStore())).toEqual(FRESH);
   });
 
-  it('round-trips the current level and each level’s progress', () => {
+  it('round-trips the current level, each level’s progress and her stats', () => {
     const store = new MemoryStore();
-    const game: SavedGame = { level: 'hard', levels: { hard: PROGRESS, easy: { ...PROGRESS, puzzleIndex: 0 } } };
+    const game: SavedGame = {
+      level: 'hard',
+      levels: { hard: PROGRESS, easy: { ...PROGRESS, puzzleIndex: 0 } },
+      stats: STATS,
+    };
     saveSavedGame(store, game);
     expect(loadSavedGame(store)).toEqual(game);
   });
@@ -49,15 +56,31 @@ describe('saving and loading the game', () => {
     store.setItem(OLD_STORAGE_KEY, JSON.stringify({ puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: {} }));
     expect(loadSavedGame(store)).toEqual({
       level: 'medium',
-      levels: { medium: { puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: {}, bonusFound: [] } },
+      levels: {
+        medium: { puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: {}, bonusFound: [], elapsedMs: 0 },
+      },
+      stats: emptyStats(),
     });
+  });
+
+  it('loads saves from before stats existed with fresh stats, keeping her progress', () => {
+    const store = new MemoryStore();
+    const { elapsedMs: _, ...withoutTime } = PROGRESS;
+    store.setItem(STORAGE_KEY, JSON.stringify({ level: 'hard', levels: { hard: withoutTime } }));
+    expect(loadSavedGame(store)).toEqual({ level: 'hard', levels: { hard: { ...PROGRESS, elapsedMs: 0 } }, stats: emptyStats() });
+  });
+
+  it('keeps her progress even if the stats are damaged', () => {
+    const store = new MemoryStore();
+    store.setItem(STORAGE_KEY, JSON.stringify({ level: 'hard', levels: { hard: PROGRESS }, stats: { totalSolved: 'lots' } }));
+    expect(loadSavedGame(store)).toEqual({ level: 'hard', levels: { hard: PROGRESS }, stats: emptyStats() });
   });
 
   it('prefers the newer save when both exist', () => {
     const store = new MemoryStore();
     store.setItem(OLD_STORAGE_KEY, JSON.stringify(PROGRESS));
-    saveSavedGame(store, { level: 'easy', levels: {} });
-    expect(loadSavedGame(store)).toEqual({ level: 'easy', levels: {} });
+    saveSavedGame(store, { level: 'easy', levels: {}, stats: emptyStats() });
+    expect(loadSavedGame(store)).toEqual({ level: 'easy', levels: {}, stats: emptyStats() });
   });
 
   it('starts fresh from corrupt or malformed data', () => {
@@ -85,7 +108,7 @@ describe('saving and loading the game', () => {
 
 describe('resolveStart', () => {
   it('starts at the first puzzle with nothing saved', () => {
-    expect(resolveStart(PUZZLES, undefined)).toEqual({ index: 0, found: [], revealed: {}, bonusFound: [] });
+    expect(resolveStart(PUZZLES, undefined)).toEqual({ index: 0, found: [], revealed: {}, bonusFound: [], elapsedMs: 0 });
   });
 
   it('restores the saved puzzle when it still matches', () => {
@@ -94,6 +117,7 @@ describe('resolveStart', () => {
       found: ['hi'],
       revealed: { fig: [0] },
       bonusFound: ['jig'],
+      elapsedMs: 42_000,
     });
   });
 
@@ -103,6 +127,7 @@ describe('resolveStart', () => {
       found: [],
       revealed: {},
       bonusFound: [],
+      elapsedMs: 0,
     });
   });
 
@@ -112,6 +137,7 @@ describe('resolveStart', () => {
       found: ['hi'],
       revealed: { fig: [0] },
       bonusFound: ['jig'],
+      elapsedMs: 42_000,
     });
   });
 });

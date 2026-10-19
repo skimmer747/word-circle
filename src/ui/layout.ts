@@ -30,6 +30,11 @@ const LEVEL_MAX_WIDTH = 120;
 const LEVEL_GAP = 8;
 const LEVELS_BOTTOM_GAP = 16;
 const LEVEL_COUNT = 3;
+const CARD_WIDTH = 520;
+const CARD_MAX_HEIGHT = 520;
+const NEXT_WIDTH = 300;
+const NEXT_HEIGHT = 88;
+const CARD_PADDING = 24;
 
 export interface Rect {
   x: number;
@@ -73,6 +78,9 @@ export interface Layout {
   rows: Rect[];
   shuffleButton: Rect;
   hintButton: Rect;
+  /** The "Well done!" card shown after a puzzle, and its Next puzzle button. */
+  celebration: Rect;
+  nextButton: Rect;
 }
 
 export function computeLayout({ width, height, letterCount, wordLengths }: LayoutInput): Layout {
@@ -134,9 +142,20 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
     return { x: leftCenter - w / 2, y: blockTop + i * (slotSize + ROW_GAP), w, h: slotSize };
   });
 
+  const cardHeight = Math.min(CARD_MAX_HEIGHT, height - 2 * MARGIN);
+  const celebration: Rect = { x: width / 2 - CARD_WIDTH / 2, y: (height - cardHeight) / 2, w: CARD_WIDTH, h: cardHeight };
+  const nextButton: Rect = {
+    x: width / 2 - NEXT_WIDTH / 2,
+    y: celebration.y + celebration.h - CARD_PADDING - NEXT_HEIGHT,
+    w: NEXT_WIDTH,
+    h: NEXT_HEIGHT,
+  };
+
   return {
     width,
     height,
+    celebration,
+    nextButton,
     safeZoneLeft,
     safeZoneRight: SAFE_ZONE_RIGHT,
     levels,

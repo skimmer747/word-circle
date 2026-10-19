@@ -1,4 +1,6 @@
 import { Game } from './game/state';
+import { dayKey, emptyStats, recordSolve, type Celebration } from './game/stats';
+import { PlayTimer } from './game/timer';
 import {
   loadSavedGame,
   nextIndex,
@@ -10,13 +12,14 @@ import {
 } from './game/storage';
 import { LEVELS, type Level, type PuzzleSet } from './game/types';
 import { LetterTracer, type PointerInput } from './input/touch';
-import { computeLayout } from './ui/layout';
+import { computeLayout, type Layout } from './ui/layout';
 import { identityOrder, shuffleRing } from './ui/ring';
 import { View, type RowState } from './ui/view';
 
 const IDLE_HINT_MS = 120_000;
 const GOOD_MS = 1200;
-const WELL_DONE_MS = 3500;
+/** The celebration moves on by itself after this long if she doesn't tap Next puzzle. */
+const CELEBRATION_MS = 15_000;
 
 export interface Updates {
   /** Applies a waiting update (reloading the page). Returns true if it did. */
@@ -26,13 +29,17 @@ export interface Updates {
 export class App {
   /** True once she has touched the screen in this session. */
   interacted = false;
-  private saved: SavedGame = { level: 'medium', levels: {} };
+  private saved: SavedGame = { level: 'medium', levels: {}, stats: emptyStats() };
   private level: Level = 'medium';
   private index = 0;
   private game!: Game;
+  private timer = new PlayTimer();
   private ringOrder: number[] = [];
   private busy = false;
   private idleTimer = 0;
+  private layout: Layout | null = null;
+  /** Set while the celebration card is up; calling it moves on to the next puzzle. */
+  private endCelebration: (() => void) | null = null;
   private readonly view: View;
   private readonly tracer: LetterTracer;
 
@@ -53,7 +60,8 @@ export class App {
   }
 
   private buttonTapped(id: string): void {
-    if (id === 'shuffle') this.shuffle();
+    if (id === 'next') this.endCelebration?.();
+    else if (id === 'shuffle') this.shuffle();
     else if (id === 'hint') this.hint();
     else if (id.startsWith('level:')) this.chooseLevel(id.slice('level:'.length) as Level);
   }
@@ -76,6 +84,9 @@ export class App {
     this.index = start.index;
     this.game = new Game(this.puzzles[this.level][start.index], start.found, start.revealed, start.bonusFound);
     this.ringOrder = identityOrder(this.game.puzzle.letters.length);
+    this.timer = new PlayTimer(start.elapsedMs);
+    if (document.hidden) this.timer.pause();
+    else this.timer.activity(performance.now());
     this.save();
   }
 
@@ -90,6 +101,7 @@ export class App {
   private listen(): void {
     const forward = (type: PointerInput['type']) => (event: PointerEvent) => {
       if (type === 'down') this.interacted = true;
+      if (type !== 'move') this.timer.activity(performance.now());
       this.tracer.handle({ type, id: event.pointerId, x: event.clientX, y: event.clientY, time: event.timeStamp });
     };
     window.addEventListener('pointerdown', forward('down'));
@@ -102,6 +114,16 @@ export class App {
     document.addEventListener('gesturestart', block);
     document.addEventListener('contextmenu', block);
     document.addEventListener('dblclick', block);
+
+    // Play time stops while the iPad sleeps or the app is closed.
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.timer.pause();
+        this.save();
+      } else {
+        this.timer.resume(performance.now());
+      }
+    });
 
     let frame = 0;
     window.addEventListener('resize', () => {
@@ -126,24 +148,36 @@ export class App {
       letterCount: puzzle.letters.length,
       wordLengths: puzzle.words.map((w) => w.length),
     });
-    this.tracer.setGeometry({
-      screenWidth: width,
-      safeZoneLeft: layout.safeZoneLeft,
-      safeZoneRight: layout.safeZoneRight,
-      tiles: layout.tiles,
-      buttons: [
-        { id: 'shuffle', ...layout.shuffleButton },
-        { id: 'hint', ...layout.hintButton },
-        ...LEVELS.map((level, i) => ({ id: `level:${level}`, ...layout.levels[i] })),
-      ],
-    });
+    this.layout = layout;
     this.view.render(
       puzzle,
       layout,
       { ringOrder: this.ringOrder, rows: this.rowStates(), extras: this.game.foundBonus(), level: this.level },
       animateIn,
     );
-    this.tracer.setEnabled(!this.busy);
+    this.updateTouchTargets();
+  }
+
+  /** What the touch tracer listens for: the game, or only the Next puzzle button while celebrating. */
+  private updateTouchTargets(): void {
+    const layout = this.layout;
+    if (!layout) return;
+    const celebrating = this.endCelebration !== null;
+    this.tracer.setGeometry({
+      screenWidth: layout.width,
+      safeZoneLeft: layout.safeZoneLeft,
+      safeZoneRight: layout.safeZoneRight,
+      tiles: celebrating ? [] : layout.tiles,
+      buttons: celebrating
+        ? [{ id: 'next', ...layout.nextButton }]
+        : [
+            { id: 'shuffle', ...layout.shuffleButton },
+            { id: 'hint', ...layout.hintButton },
+            ...LEVELS.map((level, i) => ({ id: `level:${level}`, ...layout.levels[i] })),
+          ],
+    });
+    if (celebrating) this.view.placeCelebration(layout);
+    this.tracer.setEnabled(celebrating || !this.busy);
   }
 
   private rowStates(): RowState[] {
@@ -207,17 +241,40 @@ export class App {
     this.view.showSelection([]);
     window.clearTimeout(this.idleTimer);
     this.view.setHintPulse(false);
-    await this.view.showMessage('Well done!', 'screen', WELL_DONE_MS);
+    this.timer.activity(performance.now());
+    const { stats, celebration } = recordSolve(this.saved.stats, this.level, this.timer.elapsedMs, dayKey(new Date()));
+    this.saved.stats = stats;
+    // Save the next puzzle as her place now, so closing the app mid-celebration loses nothing.
     this.loadPuzzle({
       index: nextIndex(this.index, this.puzzles[this.level].length),
       found: [],
       revealed: {},
       bonusFound: [],
+      elapsedMs: 0,
     });
+    this.timer.pause();
+    await this.celebrate(celebration);
+    this.timer.resume(performance.now());
     if (this.updates.applyIfPending()) return; // the reload opens the new puzzle
     this.busy = false;
     this.relayout(true);
     this.resetIdle();
+  }
+
+  /** Shows the celebration until she taps Next puzzle, or for 15 seconds. */
+  private celebrate(celebration: Celebration): Promise<void> {
+    return new Promise((resolve) => {
+      const done = () => {
+        window.clearTimeout(timeout);
+        this.endCelebration = null;
+        this.view.hideCelebration();
+        resolve();
+      };
+      const timeout = window.setTimeout(done, CELEBRATION_MS);
+      this.endCelebration = done;
+      if (this.layout) this.view.showCelebration(celebration, this.layout);
+      this.updateTouchTargets();
+    });
   }
 
   private hint(): void {
@@ -251,6 +308,7 @@ export class App {
       found: this.game.foundWords(),
       revealed: this.game.revealedRecord(),
       bonusFound: this.game.foundBonus(),
+      elapsedMs: this.timer.elapsedMs,
     };
     saveSavedGame(this.store, this.saved);
   }

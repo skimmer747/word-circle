@@ -1,3 +1,4 @@
+import { formatDuration, type Celebration } from '../game/stats';
 import { LEVELS, type Level, type Puzzle } from '../game/types';
 import type { Layout, Rect } from './layout';
 
@@ -30,6 +31,21 @@ const ICON_ATTRS =
 const SHUFFLE_ICON = `<svg ${ICON_ATTRS}><path d="M18 4l3 3l-3 3"/><path d="M18 20l3 -3l-3 -3"/><path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5"/><path d="M21 7h-5a4.978 4.978 0 0 0 -3 1m-4 8a4.984 4.984 0 0 1 -3 1h-3"/></svg>`;
 const HINT_ICON = `<svg ${ICON_ATTRS}><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"/><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"/><path d="M9.7 17l4.6 0"/></svg>`;
 const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10 -10"/></svg>`;
+const TROPHY_ICON = `<svg ${ICON_ATTRS}><path d="M8 21l8 0"/><path d="M12 17l0 4"/><path d="M7 4l10 0"/><path d="M17 4v8a5 5 0 0 1 -10 0v-8"/><path d="M5 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M19 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/></svg>`;
+const CALENDAR_ICON = `<svg ${ICON_ATTRS}><path d="M11.5 21h-5.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v6"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/><path d="M15 19l2 2l4 -4"/></svg>`;
+const SUN_ICON = `<svg ${ICON_ATTRS}><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/></svg>`;
+const STAR_ICON = `<svg ${ICON_ATTRS}><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></svg>`;
+const ARROW_ICON = `<svg ${ICON_ATTRS}><path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/></svg>`;
+
+/** The good news to show, as [row style, icon, text, highlighted]. Days in a row appears from day two. */
+function celebrationRows(c: Celebration): Array<[string, string, string, boolean]> {
+  const rows: Array<[string, string, string, boolean]> = [];
+  if (c.recordMs !== null) rows.push(['row-record', TROPHY_ICON, `New record! ${formatDuration(c.recordMs)}`, true]);
+  if (c.streakDays >= 2) rows.push(['row-streak', CALENDAR_ICON, `${c.streakDays} days in a row`, false]);
+  rows.push(['row-today', SUN_ICON, `${c.todaySolved} ${c.todaySolved === 1 ? 'puzzle' : 'puzzles'} today`, false]);
+  rows.push(['row-number', STAR_ICON, `Puzzle number ${c.puzzleNumber}${c.milestone ? '!' : ''}`, c.milestone]);
+  return rows;
+}
 const SIDEWAYS_IPAD = `<svg width="240" height="170" viewBox="0 0 240 170" aria-hidden="true"><rect x="10" y="10" width="220" height="150" rx="18" fill="#fff" stroke="#141414" stroke-width="8"/><circle cx="208" cy="85" r="6" fill="#141414"/></svg>`;
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, parent: HTMLElement): HTMLElementTagNameMap[K] {
@@ -70,10 +86,12 @@ export class View {
   private message!: HTMLElement;
   private messageToken = 0;
   private barTimer = 0;
+  private readonly celebrate: HTMLElement;
   private readonly rotate: HTMLElement;
 
   /** Buttons are drawn here but tapped through the touch tracer, which works with a resting thumb. */
   constructor(private readonly root: HTMLElement) {
+    this.celebrate = el('div', 'celebrate', root);
     this.rotate = el('div', 'rotate', root);
     this.rotate.innerHTML = `${SIDEWAYS_IPAD}<div>Please turn the iPad sideways</div>`;
   }
@@ -88,7 +106,7 @@ export class View {
     this.board?.remove();
     const board = document.createElement('div');
     board.className = 'board';
-    this.root.insertBefore(board, this.rotate);
+    this.root.insertBefore(board, this.celebrate);
     this.board = board;
 
     LEVELS.forEach((level, i) => {
@@ -293,6 +311,36 @@ export class View {
 
   showRotate(on: boolean): void {
     this.rotate.classList.toggle('visible', on);
+  }
+
+  /** The "Well done!" card with her stats. Its Next puzzle button is tapped through the touch tracer. */
+  showCelebration(celebration: Celebration, layout: Layout): void {
+    this.celebrate.replaceChildren();
+    el('div', 'celebrate-dim', this.celebrate);
+    const card = el('div', 'card', this.celebrate);
+    el('div', 'card-title', card).textContent = 'Well done!';
+    for (const [kind, icon, text, highlight] of celebrationRows(celebration)) {
+      const row = el('div', `card-row ${kind}${highlight ? ' highlight' : ''}`, card);
+      row.innerHTML = `${icon}<span></span>`;
+      row.querySelector('span')!.textContent = text;
+    }
+    const next = el('button', 'next', this.celebrate);
+    next.type = 'button';
+    next.innerHTML = `<span>Next puzzle</span>${ARROW_ICON}`;
+    this.placeCelebration(layout);
+    this.celebrate.classList.add('visible');
+  }
+
+  placeCelebration(layout: Layout): void {
+    const card = this.celebrate.querySelector<HTMLElement>('.card');
+    const next = this.celebrate.querySelector<HTMLElement>('.next');
+    if (card) place(card, layout.celebration);
+    if (next) place(next, layout.nextButton);
+  }
+
+  hideCelebration(): void {
+    this.celebrate.classList.remove('visible');
+    this.celebrate.replaceChildren();
   }
 
   private chipFor(word: string): HTMLElement | undefined {

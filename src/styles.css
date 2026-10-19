@@ -373,3 +373,115 @@ body {
 .rotate.visible {
   display: flex;
 }
+
+.celebrate {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.celebrate.visible {
+  display: block;
+}
+
+.celebrate-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(216, 234, 247, 0.85);
+}
+
+.card {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 28px;
+  border-radius: 28px;
+  background: #fff;
+  border: 6px solid var(--found);
+  animation: card-in 500ms ease-out;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.card-title {
+  margin: 0 0 16px;
+  font-size: 64px;
+  line-height: 1.1;
+  color: var(--found-ink);
+}
+
+.card-row {
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+  padding: 8px 14px;
+  border: 3px solid transparent;
+  border-radius: 14px;
+  font-size: 30px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.card-row svg {
+  flex: none;
+  width: 38px;
+  height: 38px;
+}
+
+.card-row.highlight {
+  background: #fdf0e2;
+  border-color: var(--select);
+}
+
+.row-record svg {
+  color: var(--select);
+}
+
+.row-streak svg {
+  color: var(--level);
+}
+
+.row-today svg {
+  color: var(--hint);
+}
+
+.row-number svg {
+  color: var(--chip);
+}
+
+.next {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0;
+  border-radius: 20px;
+  background: #fff;
+  border: 5px solid var(--found);
+  color: var(--ink);
+  font: inherit;
+  font-size: 36px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.next svg {
+  width: 40px;
+  height: 40px;
+}

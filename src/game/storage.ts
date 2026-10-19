@@ -1,3 +1,4 @@
+import { emptyStats, type Stats } from './stats';
 import { LEVELS, type Level, type Progress, type Puzzle } from './types';
 
 export const STORAGE_KEY = 'word-circle:v2';
@@ -9,10 +10,11 @@ export interface KeyValueStore {
   setItem(key: string, value: string): void;
 }
 
-/** The level she's on, and where she is in each level she has played. */
+/** The level she's on, where she is in each level she has played, and her stats. */
 export interface SavedGame {
   level: Level;
   levels: Partial<Record<Level, Progress>>;
+  stats: Stats;
 }
 
 export interface StartPoint {
@@ -20,17 +22,22 @@ export interface StartPoint {
   found: string[];
   revealed: Record<string, number[]>;
   bonusFound: string[];
+  elapsedMs: number;
 }
 
-const fresh = (): SavedGame => ({ level: 'medium', levels: {} });
+const fresh = (): SavedGame => ({ level: 'medium', levels: {}, stats: emptyStats() });
 
 const isWordList = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((w) => typeof w === 'string');
 
 const isLevel = (value: unknown): value is Level => LEVELS.includes(value as Level);
 
-/** Saves from before extra words were tracked have no bonusFound. */
-function isProgress(value: unknown): value is Omit<Progress, 'bonusFound'> & { bonusFound?: string[] } {
+const isTime = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0;
+
+/** Progress as saved by older versions, which may lack bonusFound and elapsedMs. */
+type StoredProgress = Omit<Progress, 'bonusFound' | 'elapsedMs'> & { bonusFound?: string[]; elapsedMs?: number };
+
+function isProgress(value: unknown): value is StoredProgress {
   if (typeof value !== 'object' || value === null) return false;
   const p = value as Record<string, unknown>;
   return (
@@ -41,23 +48,37 @@ function isProgress(value: unknown): value is Omit<Progress, 'bonusFound'> & { b
     typeof p.revealed === 'object' &&
     p.revealed !== null &&
     Object.values(p.revealed).every((v) => Array.isArray(v) && v.every((n) => Number.isInteger(n))) &&
-    (p.bonusFound === undefined || isWordList(p.bonusFound))
+    (p.bonusFound === undefined || isWordList(p.bonusFound)) &&
+    (p.elapsedMs === undefined || isTime(p.elapsedMs))
   );
 }
 
-const withBonus = (p: Omit<Progress, 'bonusFound'> & { bonusFound?: string[] }): Progress => ({
-  ...p,
-  bonusFound: p.bonusFound ?? [],
-});
+const complete = (p: StoredProgress): Progress => ({ ...p, bonusFound: p.bonusFound ?? [], elapsedMs: p.elapsedMs ?? 0 });
+
+function isStats(value: unknown): value is Stats {
+  if (typeof value !== 'object' || value === null) return false;
+  const s = value as Record<string, unknown>;
+  const count = (n: unknown) => Number.isInteger(n) && (n as number) >= 0;
+  return (
+    count(s.totalSolved) &&
+    count(s.streakDays) &&
+    count(s.todaySolved) &&
+    (s.lastPlayedDay === null || (typeof s.lastPlayedDay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s.lastPlayedDay))) &&
+    typeof s.bestMs === 'object' &&
+    s.bestMs !== null &&
+    Object.entries(s.bestMs).every(([level, ms]) => isLevel(level) && isTime(ms))
+  );
+}
 
 function readSavedGame(value: unknown): SavedGame | null {
   if (typeof value !== 'object' || value === null) return null;
-  const { level, levels } = value as Record<string, unknown>;
+  const { level, levels, stats } = value as Record<string, unknown>;
   if (!isLevel(level) || typeof levels !== 'object' || levels === null) return null;
-  const result: SavedGame = { level, levels: {} };
+  // Damaged or missing stats never cost her progress.
+  const result: SavedGame = { level, levels: {}, stats: isStats(stats) ? stats : emptyStats() };
   for (const [key, progress] of Object.entries(levels)) {
     if (!isLevel(key) || !isProgress(progress)) return null;
-    result.levels[key] = withBonus(progress);
+    result.levels[key] = complete(progress);
   }
   return result;
 }
@@ -69,7 +90,7 @@ export function loadSavedGame(store: KeyValueStore): SavedGame {
     const old = store.getItem(OLD_STORAGE_KEY);
     if (old !== null) {
       const progress: unknown = JSON.parse(old);
-      if (isProgress(progress)) return { level: 'medium', levels: { medium: withBonus(progress) } };
+      if (isProgress(progress)) return { level: 'medium', levels: { medium: complete(progress) }, stats: emptyStats() };
     }
   } catch {
     // Unreadable save: start fresh.
@@ -87,10 +108,10 @@ export function saveSavedGame(store: KeyValueStore, game: SavedGame): void {
 
 /** Where to start in a level: the saved puzzle if it still matches, otherwise that position fresh. */
 export function resolveStart(puzzles: readonly Puzzle[], saved: Progress | undefined): StartPoint {
-  if (!saved) return { index: 0, found: [], revealed: {}, bonusFound: [] };
+  if (!saved) return { index: 0, found: [], revealed: {}, bonusFound: [], elapsedMs: 0 };
   const index = saved.puzzleIndex % puzzles.length;
-  if (puzzles[index].id !== saved.puzzleId) return { index, found: [], revealed: {}, bonusFound: [] };
-  return { index, found: saved.found, revealed: saved.revealed, bonusFound: saved.bonusFound };
+  if (puzzles[index].id !== saved.puzzleId) return { index, found: [], revealed: {}, bonusFound: [], elapsedMs: 0 };
+  return { index, found: saved.found, revealed: saved.revealed, bonusFound: saved.bonusFound, elapsedMs: saved.elapsedMs };
 }
 
 export function nextIndex(index: number, count: number): number {

@@ -111,13 +111,20 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 | Taps Shuffle | Tiles glide smoothly to new positions around the ring | 500 ms |
 | Taps Hint | One letter is filled into a slot (navy letter on white) | — |
 | No word found for 2 minutes | Hint button gently pulses once every 4 seconds until she taps Hint or finds a word. Never auto-reveals. | after 120 s idle |
-| Finishes the puzzle | Calm "Well done!" centered for a few seconds, then the next puzzle slides in by itself | 3500 ms |
+| Finishes the puzzle | A "Well done!" card with her stats (below) and a big **Next puzzle** button; the next puzzle slides in when she taps it, or by itself after 15 seconds | up to 15 s |
 
 - **Hint rule:** pick the shortest unfound word (ties: first in slot order); reveal its leftmost unrevealed letter. If every letter of a word becomes revealed, that word counts as found (green, with the usual "Good!").
 - **Hints are free and unlimited.**
 - **Motion:** slow and smooth; no flashing, no shaking of the whole screen.
 - **Sound:** none.
-- **Saving:** progress is written to `localStorage` after every found word, extra word, hint, level change and puzzle change. Key `word-circle:v2`, value `{ level, levels: { easy?, medium?, hard? } }` where each level's entry is `{ puzzleIndex, puzzleId, found: string[], revealed: { [word]: number[] }, bonusFound: string[] }`. A save from before levels existed (key `word-circle:v1`) is moved into Medium; saves without `bonusFound` load it as an empty list. On load, if a level's saved `puzzleId` doesn't match the puzzle at `puzzleIndex` (puzzles were regenerated), that level starts that index fresh. New players start on Medium. Home Screen web apps keep their storage (not subject to Safari's 7-day eviction).
+- **Celebration and stats** (only ever good news; no clock is shown while she plays):
+  - **New record! 1 min 52 sec**: only when she beats her best time for that level (Easy, Medium and Hard each have their own; her first puzzle in a level counts). Orange highlight with a trophy. Puzzles finished with hints still count.
+  - **5 days in a row**: days (local calendar) on which she finished at least one puzzle; shown from day 2. A missed day quietly starts the count over; nothing ever says a streak was lost.
+  - **3 puzzles today**: always shown.
+  - **Puzzle number 48**: always shown; at milestones (10, 25, 50, 100, 250, 500, 750, 1,000, then every 500) it reads "Puzzle number 50!" with the orange highlight.
+  - **Play time** counts only active time: it pauses while the iPad sleeps or the app is closed, and any stretch without touches counts for at most one minute, so putting the iPad down doesn't spoil a record. The time is saved with each level's progress.
+  - The Next puzzle button is tapped through the same per-finger tracker as everything else, so it works with a resting thumb. The next puzzle is saved as her place before the card appears, so closing the app mid-celebration loses nothing.
+- **Saving:** progress is written to `localStorage` after every found word, extra word, hint, level change and puzzle change, and when the app is hidden. Key `word-circle:v2`, value `{ level, levels: { easy?, medium?, hard? }, stats }` where each level's entry is `{ puzzleIndex, puzzleId, found: string[], revealed: { [word]: number[] }, bonusFound: string[], elapsedMs }` and `stats` is `{ totalSolved, bestMs: { easy?, medium?, hard? }, streakDays, lastPlayedDay, todaySolved }`. A save from before levels existed (key `word-circle:v1`) is moved into Medium; missing `bonusFound`, `elapsedMs` or `stats` load as empty, and damaged stats never cost her progress. On load, if a level's saved `puzzleId` doesn't match the puzzle at `puzzleIndex` (puzzles were regenerated), that level starts that index fresh. New players start on Medium. Home Screen web apps keep their storage (not subject to Safari's 7-day eviction).
 - **End of list:** after the last puzzle, wrap around to puzzle 0.
 
 ## 4. Puzzles and words
