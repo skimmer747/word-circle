@@ -3809,3 +3809,5 @@ Write a temporary `public/daily-word.txt` with today's date and a made-up word. 
 Open the app in Simulator Safari, reach a daily word's card and tap Share. If the share sheet doesn't open from her tap (iPadOS may not count a pointer event as a user action), switch `main.ts`'s `share` to run on the tap's `touchend` instead, and check again.
 
 ## Checkpoint 4 (stop here)
+
+**Outcome (Tasks 27–28):** In the browser, the made-up daily word replaced an untouched word, came next after a word she had started, showed the Today's Wordle label and the Games note, and finished with "Today's Wordle in 2 tries" and the right share text. In iPad Simulator Safari, Share opened the system share sheet straight from the tap (pointer events count as a user action on iPadOS), so no `touchend` fallback was needed. The real fetch script wrote four days of words; only counts were looked at.
