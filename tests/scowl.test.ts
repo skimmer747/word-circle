@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { readBlocklist, readScowl } from '../scripts/scowl';
+import { readBlocklist, readNeverUse, readScowl } from '../scripts/scowl';
 
 function tempDir(files: Record<string, string>): string {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'word-circle-'));
@@ -41,5 +41,17 @@ describe('readBlocklist', () => {
   it('reads one word per line, skipping blanks and comments', () => {
     const dir = tempDir({ 'blocklist.txt': '# comment\nDead\n\n  grave  \n' });
     expect([...readBlocklist(path.join(dir, 'blocklist.txt'))]).toEqual(['dead', 'grave']);
+  });
+});
+
+describe('readNeverUse', () => {
+  it("joins the owner's never-use list with SCOWL's offensive and profane lists", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'word-circle-root-'));
+    fs.mkdirSync(path.join(root, 'words/scowl/misc'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'words/blocklist.txt'), '# never\ndeath\n');
+    for (const [name, word] of [['offensive.1', 'rude'], ['offensive.2', 'crass'], ['profane.1', 'curse'], ['profane.3', 'oath']]) {
+      fs.writeFileSync(path.join(root, 'words/scowl/misc', name), `${word}\n`);
+    }
+    expect([...readNeverUse(root)].sort()).toEqual(['crass', 'curse', 'death', 'oath', 'rude']);
   });
 });

@@ -29,3 +29,12 @@ export function readBlocklist(file: string): Set<string> {
   }
   return words;
 }
+
+/** SCOWL's offensive and profane lists, which are never used. */
+const TABOO_LISTS = ['offensive.1', 'offensive.2', 'profane.1', 'profane.3'];
+
+/** Every word that must never appear: the owner's words/blocklist.txt plus SCOWL's offensive and profane lists. */
+export function readNeverUse(root: string): Set<string> {
+  const files = [path.join(root, 'words/blocklist.txt'), ...TABOO_LISTS.map((name) => path.join(root, 'words/scowl/misc', name))];
+  return new Set(files.flatMap((file) => [...readBlocklist(file)]));
+}

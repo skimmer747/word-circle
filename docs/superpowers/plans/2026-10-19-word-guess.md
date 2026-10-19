@@ -3769,3 +3769,43 @@ At 1024×768, 1133×744, 1180×820 and 1366×1024 on `127.0.0.1`: the Games butt
 ## Checkpoint 3 (stop here)
 
 Show the owner Word Guess and the Games pop-up and ask them to play it in the browser.
+
+---
+
+# Stage 4 — Turning on the daily Wordle
+
+(Written just before building; the full code for each task is in its commit.)
+
+### Task 24: One reader for the never-use lists
+
+**Files:** `scripts/scowl.ts`, `scripts/build-puzzles.ts`, `tests/scowl.test.ts`
+
+- `readNeverUse(root)`: `words/blocklist.txt` plus SCOWL's `offensive.1`, `offensive.2`, `profane.1`, `profane.3`. `build-puzzles.ts` uses it instead of its own copy of the list; the daily-word script uses it too.
+- Test first: it contains every word of the blocklist and of `offensive.1`.
+
+### Task 25: Reading the NYT replies
+
+**Files:** `scripts/daily-lib.ts`, `tests/daily-lib.test.ts`
+
+- `parseNytReply(reply, date, neverUse)` → `DailyWord | null` (needs `solution`, `print_date` equal to `date`, a whole `days_since_launch`; five letters a–z after lower-casing; not on the never-use list).
+- `datesAround(now)` → yesterday through two days ahead, as UTC dates.
+- `formatDailyFile(words)` → one `date number word` line each (empty file for none), readable by `parseDailyWords`.
+- Tests first: a good reply; a blocked word; another day's reply; not five letters; junk replies; the four dates; the file round-trips through `parseDailyWords`.
+
+### Task 26: The fetch script and the morning schedule
+
+**Files:** `scripts/daily-word.ts`, `package.json`, `.gitignore`, `.github/workflows/deploy.yml`
+
+- `npm run daily-word [-- --strict]`: fetches `https://www.nytimes.com/svc/wordle/v2/<date>.json` for each date, keeps the usable words, writes `public/daily-word.txt`, and logs only how many words it wrote (the Actions logs of a public repository are public, so no answers in them). With `--strict` it exits with an error when it got none.
+- `.gitignore`: `public/daily-word.txt`.
+- `deploy.yml`: `schedule: cron '0 9 * * *'`; a "Fetch the daily Wordle words" step before the build, with `--strict` only on scheduled runs.
+
+### Task 27: Try the daily word in the browser (with a made-up word, so no real answer is spoiled)
+
+Write a temporary `public/daily-word.txt` with today's date and a made-up word. Check: an untouched Word Guess word is replaced by it; the "Today's Wordle" label shows; the Games pop-up says "Today's Wordle is ready"; finishing it shows "Today's Wordle in N tries" with the orange highlight, and Share beside Next word; the card waits 60 s; afterwards "Share today's Wordle" shows in the left column and the note is gone; the next word comes from the list. Then delete the temporary file and check the real script fetches words (count only).
+
+### Task 28: The share sheet in the iPad Simulator
+
+Open the app in Simulator Safari, reach a daily word's card and tap Share. If the share sheet doesn't open from her tap (iPadOS may not count a pointer event as a user action), switch `main.ts`'s `share` to run on the tap's `touchend` instead, and check again.
+
+## Checkpoint 4 (stop here)
