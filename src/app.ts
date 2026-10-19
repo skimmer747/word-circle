@@ -43,15 +43,20 @@ export class App {
 
   start(): void {
     const start = resolveStart(this.puzzles, loadProgress(this.store));
-    this.loadPuzzle(start.index, start.found, start.revealed);
+    this.loadPuzzle(start.index, start.found, start.revealed, start.bonusFound);
     this.relayout(false);
     this.listen();
     this.resetIdle();
   }
 
-  private loadPuzzle(index: number, found: string[] = [], revealed: Record<string, number[]> = {}): void {
+  private loadPuzzle(
+    index: number,
+    found: string[] = [],
+    revealed: Record<string, number[]> = {},
+    bonusFound: string[] = [],
+  ): void {
     this.index = index;
-    this.game = new Game(this.puzzles[index], found, revealed);
+    this.game = new Game(this.puzzles[index], found, revealed, bonusFound);
     this.ringOrder = identityOrder(this.game.puzzle.letters.length);
     this.save();
   }
@@ -96,7 +101,7 @@ export class App {
       wordLengths: puzzle.words.map((w) => w.length),
     });
     this.tracer.setGeometry({ screenWidth: width, safeZoneWidth: layout.safeZoneWidth, tiles: layout.tiles });
-    this.view.render(puzzle, layout, this.ringOrder, this.rowStates(), animateIn);
+    this.view.render(puzzle, layout, this.ringOrder, this.rowStates(), this.game.foundBonus(), animateIn);
     this.tracer.setEnabled(!this.busy);
   }
 
@@ -132,7 +137,13 @@ export class App {
         this.view.pulseRow(row);
         return;
       case 'bonus':
+        this.save();
         this.view.barMessage('Good word!');
+        this.view.setExtras(this.game.foundBonus(), result.word);
+        return;
+      case 'bonusAgain':
+        this.view.hideBar();
+        if (!this.view.pulseExtra(result.word)) this.view.barMessage('Good word!');
         return;
       case 'notAWord':
         this.view.wiggleBar();
@@ -192,6 +203,7 @@ export class App {
       puzzleId: this.game.puzzle.id,
       found: this.game.foundWords(),
       revealed: this.game.revealedRecord(),
+      bonusFound: this.game.foundBonus(),
     });
   }
 }

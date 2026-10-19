@@ -21,7 +21,13 @@ class MemoryStore implements KeyValueStore {
 
 const puzzle = (id: string): Puzzle => ({ id, letters: [...id], words: [], bonus: [] });
 const PUZZLES = [puzzle('abcde'), puzzle('fghij'), puzzle('klmno')];
-const PROGRESS: Progress = { puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: { fig: [0] } };
+const PROGRESS: Progress = {
+  puzzleIndex: 1,
+  puzzleId: 'fghij',
+  found: ['hi'],
+  revealed: { fig: [0] },
+  bonusFound: ['jig'],
+};
 
 describe('saving and loading progress', () => {
   it('round-trips progress', () => {
@@ -42,6 +48,14 @@ describe('saving and loading progress', () => {
     expect(loadProgress(store)).toBeNull();
     store.setItem(STORAGE_KEY, JSON.stringify({ puzzleIndex: 0, puzzleId: 'x', found: [3], revealed: {} }));
     expect(loadProgress(store)).toBeNull();
+    store.setItem(STORAGE_KEY, JSON.stringify({ puzzleIndex: 0, puzzleId: 'x', found: [], revealed: {}, bonusFound: [3] }));
+    expect(loadProgress(store)).toBeNull();
+  });
+
+  it('loads saves from before extra words were tracked', () => {
+    const store = new MemoryStore();
+    store.setItem(STORAGE_KEY, JSON.stringify({ puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: {} }));
+    expect(loadProgress(store)).toEqual({ puzzleIndex: 1, puzzleId: 'fghij', found: ['hi'], revealed: {}, bonusFound: [] });
   });
 
   it('keeps playing when storage refuses to save', () => {
@@ -57,15 +71,25 @@ describe('saving and loading progress', () => {
 
 describe('resolveStart', () => {
   it('starts at the first puzzle with nothing saved', () => {
-    expect(resolveStart(PUZZLES, null)).toEqual({ index: 0, found: [], revealed: {} });
+    expect(resolveStart(PUZZLES, null)).toEqual({ index: 0, found: [], revealed: {}, bonusFound: [] });
   });
 
   it('restores the saved puzzle when it still matches', () => {
-    expect(resolveStart(PUZZLES, PROGRESS)).toEqual({ index: 1, found: ['hi'], revealed: { fig: [0] } });
+    expect(resolveStart(PUZZLES, PROGRESS)).toEqual({
+      index: 1,
+      found: ['hi'],
+      revealed: { fig: [0] },
+      bonusFound: ['jig'],
+    });
   });
 
   it('starts the saved position fresh when the puzzles changed', () => {
-    expect(resolveStart(PUZZLES, { ...PROGRESS, puzzleId: 'zzzzz' })).toEqual({ index: 1, found: [], revealed: {} });
+    expect(resolveStart(PUZZLES, { ...PROGRESS, puzzleId: 'zzzzz' })).toEqual({
+      index: 1,
+      found: [],
+      revealed: {},
+      bonusFound: [],
+    });
   });
 
   it('wraps a saved position past the end of the list', () => {
@@ -73,6 +97,7 @@ describe('resolveStart', () => {
       index: 1,
       found: ['hi'],
       revealed: { fig: [0] },
+      bonusFound: ['jig'],
     });
   });
 });

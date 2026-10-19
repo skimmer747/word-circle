@@ -2,7 +2,7 @@ import type { Puzzle } from './types';
 
 export const MIN_WORD_LENGTH = 3;
 
-export type WordResultKind = 'answer' | 'alreadyFound' | 'bonus' | 'notAWord' | 'tooShort';
+export type WordResultKind = 'answer' | 'alreadyFound' | 'bonus' | 'bonusAgain' | 'notAWord' | 'tooShort';
 
 export interface WordResult {
   kind: WordResultKind;
@@ -18,14 +18,19 @@ export interface HintResult {
 export class Game {
   private readonly found = new Set<string>();
   private readonly revealed = new Map<string, Set<number>>();
+  private readonly bonusFound = new Set<string>();
 
   constructor(
     readonly puzzle: Puzzle,
     found: readonly string[] = [],
     revealed: Record<string, number[]> = {},
+    bonusFound: readonly string[] = [],
   ) {
     for (const word of found) {
       if (puzzle.words.includes(word)) this.found.add(word);
+    }
+    for (const word of bonusFound) {
+      if (puzzle.bonus.includes(word)) this.bonusFound.add(word);
     }
     for (const [word, indices] of Object.entries(revealed)) {
       if (!puzzle.words.includes(word)) continue;
@@ -42,7 +47,11 @@ export class Game {
       this.found.add(word);
       return { kind: 'answer', word };
     }
-    if (this.puzzle.bonus.includes(word)) return { kind: 'bonus', word };
+    if (this.puzzle.bonus.includes(word)) {
+      if (this.bonusFound.has(word)) return { kind: 'bonusAgain', word };
+      this.bonusFound.add(word);
+      return { kind: 'bonus', word };
+    }
     return { kind: 'notAWord', word };
   }
 
@@ -76,6 +85,11 @@ export class Game {
 
   foundWords(): string[] {
     return this.puzzle.words.filter((w) => this.found.has(w));
+  }
+
+  /** Extra words found, oldest first. */
+  foundBonus(): string[] {
+    return [...this.bonusFound];
   }
 
   revealedRecord(): Record<string, number[]> {

@@ -34,6 +34,7 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
 
     it('keeps everything out of the safe zones and on screen', () => {
       const rects = [
+        layout.extras,
         layout.bar,
         layout.shuffleButton,
         layout.hintButton,
@@ -72,8 +73,16 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
       expect(last.y + last.h).toBeLessThanOrEqual(layout.shuffleButton.y);
     });
 
-    it('keeps the left column clear of the word bar and letter circle', () => {
-      const rightColumnStart = Math.min(layout.bar.x, layout.backing.x - layout.backing.r);
+    it('puts Extra words at the top right, above the word bar and letter circle', () => {
+      const { extras, bar, backing } = layout;
+      expect(extras.h).toBeGreaterThanOrEqual(120);
+      expect(extras.y + extras.h).toBeLessThanOrEqual(bar.y);
+      expect(bar.y + bar.h).toBeLessThanOrEqual(backing.y - backing.r);
+      expect(extras.x + extras.w).toBeGreaterThan(backing.x);
+    });
+
+    it('keeps the left column clear of the right column', () => {
+      const rightColumnStart = Math.min(layout.extras.x, layout.bar.x, layout.backing.x - layout.backing.r);
       for (const rect of [...layout.rows, layout.shuffleButton, layout.hintButton]) {
         expect(rect.x + rect.w).toBeLessThanOrEqual(rightColumnStart);
       }

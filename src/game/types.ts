@@ -14,4 +14,6 @@ export interface Progress {
   puzzleId: string;
   found: string[];
   revealed: Record<string, number[]>;
+  /** Extra (bonus) words found, in the order she found them. */
+  bonusFound: string[];
 }

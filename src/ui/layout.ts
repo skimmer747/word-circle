@@ -4,6 +4,9 @@ export const SAFE_ZONE_WIDTH = 130;
 const MARGIN = 16;
 const COLUMN_GAP = 24;
 const LEFT_SHARE = 0.45;
+/** Room for the "Extra words" label and two rows of word chips. */
+const EXTRAS_HEIGHT = 130;
+const EXTRAS_GAP = 8;
 const BAR_HEIGHT = 96;
 const BAR_MAX_WIDTH = 420;
 const BAR_GAP = 16;
@@ -41,6 +44,8 @@ export interface Layout {
   width: number;
   height: number;
   safeZoneWidth: number;
+  /** "Extra words" list at the top right. */
+  extras: Rect;
   /** Current-word bar above the circle. */
   bar: Rect;
   /** Pale circle behind the letters. */
@@ -65,8 +70,9 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
   const rightLeft = playLeft + leftWidth + COLUMN_GAP;
   const rightCenter = rightLeft + rightWidth / 2;
 
+  const extras: Rect = { x: rightLeft, y: MARGIN, w: rightWidth, h: EXTRAS_HEIGHT };
   const barWidth = Math.min(rightWidth, BAR_MAX_WIDTH);
-  const bar: Rect = { x: rightCenter - barWidth / 2, y: MARGIN, w: barWidth, h: BAR_HEIGHT };
+  const bar: Rect = { x: rightCenter - barWidth / 2, y: extras.y + extras.h + EXTRAS_GAP, w: barWidth, h: BAR_HEIGHT };
 
   const circleTop = bar.y + bar.h + BAR_GAP;
   const circleSpace = height - MARGIN - circleTop;
@@ -104,6 +110,7 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
     width,
     height,
     safeZoneWidth: SAFE_ZONE_WIDTH,
+    extras,
     bar,
     backing,
     tiles,

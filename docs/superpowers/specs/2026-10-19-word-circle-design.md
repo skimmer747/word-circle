@@ -39,7 +39,8 @@ Layout "B": word slots on the left, letter circle on the right. Landscape only.
 - **Play area:** the space between the safe zones, split roughly 45% left column / 55% right column.
 - **Left column:** one row per answer word, sorted by length then alphabetically (as Word Cookies does). Below the rows, two buttons side by side: **Shuffle** and **Hint**, each with an icon *and* a word label.
 - **Right column:**
-  - **Current-word bar** at the top: a dark navy pill showing the letters selected so far in large type. Hidden when nothing is selected.
+  - **Extra words** at the top: an "Extra words" label over navy-outlined chips, one per extra word found in this puzzle, oldest first. Room for two rows; when more are found, the oldest chips drop off screen (all stay saved). Hidden until the first extra word is found.
+  - **Current-word bar** below it: a dark navy pill showing the letters selected so far in large type. Hidden when nothing is selected.
   - **Letter circle** below it: a pale circular backing with 5 or 6 letter tiles evenly spaced around a ring.
 - **Sizing** (computed from screen size by a pure layout function):
   - Circle diameter = the largest that fits the right column width and the height remaining under the current-word bar.
@@ -96,7 +97,8 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 | Opens the app | The puzzle she was on, with found words and hinted letters still filled in. No title screen. | — |
 | Finds an answer word | Word glides from the current-word bar into its slot; slot turns green; large "Good!" appears | glide 600 ms, message 1200 ms |
 | Word already found | That word's slot gently pulses twice | ~800 ms |
-| Real word not in the slots | "Good word!" in the current-word bar, then fades | 1200 ms |
+| Real word not in the slots (new) | "Good word!" in the current-word bar, then fades; the word pops in as a chip under "Extra words" | 1200 ms |
+| Extra word already found | Its chip gently pulses twice (if it has dropped off screen, "Good word!" instead) | ~800 ms |
 | Not a word | Current-word bar wiggles once, then fades | ~400 ms + fade |
 | 1–2 letters | Selection clears silently | — |
 | Taps Shuffle | Tiles glide smoothly to new positions around the ring | 500 ms |
@@ -108,7 +110,7 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 - **Hints are free and unlimited.**
 - **Motion:** slow and smooth; no flashing, no shaking of the whole screen.
 - **Sound:** none.
-- **Saving:** progress is written to `localStorage` after every found word, hint, and puzzle change. Key `word-circle:v1`, value `{ puzzleIndex, puzzleId, found: string[], revealed: { [word]: number[] } }`. On load, if the saved `puzzleId` doesn't match the puzzle at `puzzleIndex` (puzzles were regenerated), start that index fresh. Home Screen web apps keep their storage (not subject to Safari's 7-day eviction).
+- **Saving:** progress is written to `localStorage` after every found word, extra word, hint, and puzzle change. Key `word-circle:v1`, value `{ puzzleIndex, puzzleId, found: string[], revealed: { [word]: number[] }, bonusFound: string[] }` (saves without `bonusFound` load as an empty list). On load, if the saved `puzzleId` doesn't match the puzzle at `puzzleIndex` (puzzles were regenerated), start that index fresh. Home Screen web apps keep their storage (not subject to Safari's 7-day eviction).
 - **End of list:** after the last puzzle, wrap around to puzzle 0.
 
 ## 4. Puzzles and words

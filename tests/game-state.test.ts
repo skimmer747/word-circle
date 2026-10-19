@@ -64,6 +64,22 @@ describe('Game.hint', () => {
   });
 });
 
+describe('extra words', () => {
+  it('remembers extra words she found and flags repeats', () => {
+    const game = new Game(PUZZLE);
+    expect(game.tryWord('tone')).toEqual({ kind: 'bonus', word: 'tone' });
+    expect(game.tryWord('nest')).toEqual({ kind: 'bonus', word: 'nest' });
+    expect(game.tryWord('TONE')).toEqual({ kind: 'bonusAgain', word: 'tone' });
+    expect(game.foundBonus()).toEqual(['tone', 'nest']);
+  });
+
+  it('restores extra words, dropping anything that is not an extra word', () => {
+    const game = new Game(PUZZLE, [], {}, ['son', 'one', 'zebra', 'son']);
+    expect(game.foundBonus()).toEqual(['son']);
+    expect(game.tryWord('son').kind).toBe('bonusAgain');
+  });
+});
+
 describe('Game progress', () => {
   it('reports completion only when every word is found', () => {
     const game = new Game(PUZZLE);

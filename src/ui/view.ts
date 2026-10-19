@@ -55,6 +55,8 @@ export class View {
   private ringOrder: number[] = [];
   private tiles: HTMLElement[] = [];
   private rows: HTMLElement[][] = [];
+  private extras!: HTMLElement;
+  private chips!: HTMLElement;
   private bar!: HTMLElement;
   private line!: SVGPolylineElement;
   private hintButton!: HTMLButtonElement;
@@ -72,7 +74,14 @@ export class View {
   }
 
   /** Builds the whole screen. ringOrder[slot] is the letter index shown in that ring slot. */
-  render(puzzle: Puzzle, layout: Layout, ringOrder: readonly number[], rows: readonly RowState[], animateIn: boolean): void {
+  render(
+    puzzle: Puzzle,
+    layout: Layout,
+    ringOrder: readonly number[],
+    rows: readonly RowState[],
+    extras: readonly string[],
+    animateIn: boolean,
+  ): void {
     this.puzzle = puzzle;
     this.layout = layout;
     this.ringOrder = [...ringOrder];
@@ -88,6 +97,12 @@ export class View {
     rows.forEach((state, i) => this.setRow(i, state));
     this.buildButton(board, 'Shuffle', SHUFFLE_ICON, layout.shuffleButton, () => this.handlers.onShuffle());
     this.hintButton = this.buildButton(board, 'Hint', HINT_ICON, layout.hintButton, () => this.handlers.onHint());
+
+    this.extras = el('div', 'extras', board);
+    place(this.extras, layout.extras);
+    el('div', 'extras-label', this.extras).textContent = 'Extra words';
+    this.chips = el('div', 'chips', this.extras);
+    this.setExtras(extras);
 
     const { backing } = layout;
     place(el('div', 'backing', board), {
@@ -222,6 +237,32 @@ export class View {
     this.rows[row].forEach((slot) => restartAnimation(slot, 'pulse'));
   }
 
+  /** Shows extra words as chips, oldest first; drops the oldest when they don't fit. Pops in `newest`. */
+  setExtras(words: readonly string[], newest?: string): void {
+    this.chips.replaceChildren(
+      ...words.map((word) => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.dataset.word = word;
+        chip.textContent = word.toUpperCase();
+        return chip;
+      }),
+    );
+    this.extras.classList.toggle('empty', words.length === 0);
+    while (this.chips.childElementCount > 1 && this.chips.scrollHeight > this.chips.clientHeight) {
+      this.chips.firstElementChild!.remove();
+    }
+    const chip = newest ? this.chipFor(newest) : undefined;
+    if (chip) restartAnimation(chip, 'pop');
+  }
+
+  /** Pulses an extra word's chip. Returns false if that chip isn't on screen. */
+  pulseExtra(word: string): boolean {
+    const chip = this.chipFor(word);
+    if (chip) restartAnimation(chip, 'pulse');
+    return chip !== undefined;
+  }
+
   /** Shows a large message over the circle or the whole screen, then fades it. */
   async showMessage(text: string, where: 'circle' | 'screen', ms: number): Promise<void> {
     const token = ++this.messageToken;
@@ -247,6 +288,10 @@ export class View {
 
   showRotate(on: boolean): void {
     this.rotate.classList.toggle('visible', on);
+  }
+
+  private chipFor(word: string): HTMLElement | undefined {
+    return [...this.chips.children].find((chip) => (chip as HTMLElement).dataset.word === word) as HTMLElement | undefined;
   }
 
   private buildRow(board: HTMLElement, word: string, rect: Rect): HTMLElement[] {
