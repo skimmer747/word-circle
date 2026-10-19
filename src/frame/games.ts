@@ -2,7 +2,8 @@ import type { ButtonGeometry, TileGeometry } from '../input/touch';
 import type { FrameLayout } from './layout';
 import type { CelebrationCard } from './view';
 
-export type GameId = 'circle';
+export const GAME_IDS = ['circle', 'guess'] as const;
+export type GameId = (typeof GAME_IDS)[number];
 
 /** What the touch tracker listens for in a game: its letter tiles (for tracing words) and its buttons. */
 export interface GameTargets {
