@@ -35,6 +35,10 @@ export interface TracerCallbacks {
   wordSubmitted(tiles: number[]): void;
   selectionCleared(): void;
   buttonTapped(id: string): void;
+  /** A finger came down on a button (so it can show its pressed look). */
+  buttonPressed?(id: string): void;
+  /** That finger lifted or was cancelled, or the screen changed under it. */
+  buttonReleased?(id: string): void;
 }
 
 /** A word may start slightly outside a tile's drawn edge. */
@@ -110,6 +114,7 @@ export class LetterTracer {
     const button = this.buttonAt(x, y);
     if (button !== null) {
       this.presses.set(id, { button, time });
+      this.callbacks.buttonPressed?.(button);
       return;
     }
     const tile = this.tileAt(x, y, START_HIT_FACTOR);
@@ -148,6 +153,7 @@ export class LetterTracer {
     const press = this.presses.get(id);
     if (press) {
       this.presses.delete(id);
+      this.callbacks.buttonReleased?.(press.button);
       const quick = press.time === undefined || time === undefined || time - press.time <= MAX_TAP_MS;
       if (submit && quick && this.buttonAt(x, y) === press.button) this.callbacks.buttonTapped(press.button);
       return;
@@ -162,6 +168,7 @@ export class LetterTracer {
   private reset(): void {
     this.activeId = null;
     this.selected = [];
+    for (const press of this.presses.values()) this.callbacks.buttonReleased?.(press.button);
     this.presses.clear();
   }
 

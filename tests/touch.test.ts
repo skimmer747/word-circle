@@ -293,3 +293,48 @@ describe('LetterTracer', () => {
     expect(tracer.isTracing).toBe(false);
   });
 });
+
+describe('pressed buttons', () => {
+  function pressSetup() {
+    const events: string[] = [];
+    const tracer = new LetterTracer({
+      letterAdded: () => {},
+      letterRemoved: () => {},
+      wordSubmitted: () => {},
+      selectionCleared: () => {},
+      buttonTapped: (id) => events.push(`tap ${id}`),
+      buttonPressed: (id) => events.push(`press ${id}`),
+      buttonReleased: (id) => events.push(`release ${id}`),
+    });
+    tracer.setGeometry(GEOMETRY);
+    return { tracer, events };
+  }
+
+  it('reports the press, its release, then the tap', () => {
+    const { tracer, events } = pressSetup();
+    tracer.handle({ type: 'down', id: 1, x: 390, y: 745 });
+    tracer.handle({ type: 'up', id: 1, x: 390, y: 745 });
+    expect(events).toEqual(['press hint', 'release hint', 'tap hint']);
+  });
+
+  it('releases without a tap when the touch is cancelled', () => {
+    const { tracer, events } = pressSetup();
+    tracer.handle({ type: 'down', id: 1, x: 390, y: 745 });
+    tracer.handle({ type: 'cancel', id: 1, x: 390, y: 745 });
+    expect(events).toEqual(['press hint', 'release hint']);
+  });
+
+  it('releases a held button when the screen changes', () => {
+    const { tracer, events } = pressSetup();
+    tracer.handle({ type: 'down', id: 1, x: 390, y: 745 });
+    tracer.setGeometry(GEOMETRY);
+    expect(events).toEqual(['press hint', 'release hint']);
+  });
+
+  it('ignores presses that start in a safe zone', () => {
+    const { tracer, events } = pressSetup();
+    tracer.handle({ type: 'down', id: 1, x: 60, y: 745 });
+    tracer.handle({ type: 'up', id: 1, x: 60, y: 745 });
+    expect(events).toEqual([]);
+  });
+});
