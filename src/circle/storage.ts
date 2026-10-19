@@ -1,14 +1,12 @@
+import type { KeyValueStore } from '../shared/store';
 import { emptyStats, type Stats } from './stats';
 import { LEVELS, type Level, type Progress, type Puzzle } from './types';
+
+export type { KeyValueStore };
 
 export const STORAGE_KEY = 'word-circle:v2';
 /** Single-level progress saved before difficulty levels existed; moved into Medium on load. */
 export const OLD_STORAGE_KEY = 'word-circle:v1';
-
-export interface KeyValueStore {
-  getItem(key: string): string | null;
-  setItem(key: string, value: string): void;
-}
 
 /** The level she's on, where she is in each level she has played, and her stats. */
 export interface SavedGame {

@@ -1,9 +1,9 @@
 import { clockFace, upcomingLines } from './clock/clock';
 import { cachedSchedule, refreshSchedule } from './clock/loader';
 import type { ScheduledEvent } from './clock/schedule';
-import { Game } from './game/state';
-import { dayKey, emptyStats, recordSolve, type Celebration } from './game/stats';
-import { PlayTimer } from './game/timer';
+import { Game } from './circle/state';
+import { dayKey, emptyStats, recordSolve, type Celebration } from './circle/stats';
+import { PlayTimer } from './circle/timer';
 import {
   loadSavedGame,
   nextIndex,
@@ -12,12 +12,12 @@ import {
   type KeyValueStore,
   type SavedGame,
   type StartPoint,
-} from './game/storage';
-import { LEVELS, type Level, type PuzzleSet } from './game/types';
+} from './circle/storage';
+import { LEVELS, type Level, type PuzzleSet } from './circle/types';
 import { LetterTracer, type PointerInput } from './input/touch';
-import { computeLayout, type Layout } from './ui/layout';
-import { identityOrder, shuffleRing } from './ui/ring';
-import { View, type RowState } from './ui/view';
+import { computeLayout, type Layout } from './circle/layout';
+import { identityOrder, shuffleRing } from './circle/ring';
+import { View, type RowState } from './circle/view';
 
 const IDLE_HINT_MS = 120_000;
 const GOOD_MS = 1200;

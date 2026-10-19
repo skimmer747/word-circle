@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LEVELS, type Level, type PuzzleSet } from '../src/game/types';
+import { LEVELS, type Level, type PuzzleSet } from '../src/circle/types';
 import { seededRandom } from '../src/shared/random';
 import { readInflectedForms } from './inflections';
 import { buildPuzzles, validatePuzzle, type PuzzleShape } from './puzzle-lib';

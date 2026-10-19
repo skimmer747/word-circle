@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Game } from '../src/game/state';
-import type { Puzzle } from '../src/game/types';
+import { Game } from '../src/circle/state';
+import type { Puzzle } from '../src/circle/types';
 
 const PUZZLE: Puzzle = {
   id: 'enost',

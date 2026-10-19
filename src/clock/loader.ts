@@ -1,4 +1,4 @@
-import type { KeyValueStore } from '../game/storage';
+import type { KeyValueStore } from '../shared/store';
 import { parseSchedule, type ScheduledEvent } from './schedule';
 
 /** The last schedule text the iPad saw, so the clock still works offline. */

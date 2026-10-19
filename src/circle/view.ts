@@ -1,7 +1,7 @@
 import type { ClockFace } from '../clock/clock';
-import { fitFontScale } from './fit';
-import { formatDuration, type Celebration } from '../game/stats';
-import { LEVELS, type Level, type Puzzle } from '../game/types';
+import { fitFontScale } from '../ui/fit';
+import { formatDuration, type Celebration } from './stats';
+import { LEVELS, type Level, type Puzzle } from './types';
 import type { Layout, Rect } from './layout';
 
 export interface RowState {

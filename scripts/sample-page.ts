@@ -1,4 +1,4 @@
-import type { Puzzle } from '../src/game/types';
+import type { Puzzle } from '../src/circle/types';
 
 const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
 const escape = (text: string) => text.replace(/[&<>"]/g, (ch) => ESCAPES[ch]);

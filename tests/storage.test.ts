@@ -8,9 +8,9 @@ import {
   saveSavedGame,
   type KeyValueStore,
   type SavedGame,
-} from '../src/game/storage';
-import { emptyStats } from '../src/game/stats';
-import type { Progress, Puzzle } from '../src/game/types';
+} from '../src/circle/storage';
+import { emptyStats } from '../src/circle/stats';
+import type { Progress, Puzzle } from '../src/circle/types';
 
 class MemoryStore implements KeyValueStore {
   data = new Map<string, string>();

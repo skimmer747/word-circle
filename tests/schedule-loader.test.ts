@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SCHEDULE_CACHE_KEY, cachedSchedule, refreshSchedule } from '../src/clock/loader';
-import type { KeyValueStore } from '../src/game/storage';
+import type { KeyValueStore } from '../src/circle/storage';
 
 class MemoryStore implements KeyValueStore {
   data = new Map<string, string>();

@@ -1,4 +1,4 @@
-import type { Puzzle } from '../src/game/types';
+import type { Puzzle } from '../src/circle/types';
 import { shuffle } from '../src/shared/random';
 
 export const MIN_LENGTH = 3;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Puzzle } from '../src/game/types';
+import type { Puzzle } from '../src/circle/types';
 import { seededRandom } from '../src/shared/random';
 import {
   buildPuzzles,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { seededRandom } from '../src/shared/random';
-import { identityOrder, shuffleRing } from '../src/ui/ring';
+import { identityOrder, shuffleRing } from '../src/circle/ring';
 
 describe('identityOrder', () => {
   it('lists ring slots in order', () => {

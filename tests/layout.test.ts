@@ -7,7 +7,7 @@ import {
   type Circle,
   type Layout,
   type Rect,
-} from '../src/ui/layout';
+} from '../src/circle/layout';
 
 const SCREENS: Array<[number, number]> = [
   [1024, 768],
