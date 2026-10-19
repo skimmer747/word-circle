@@ -862,7 +862,7 @@ body {
   color: var(--ink);
 }
 
-.square.next {
+.square.cursor {
   border: 4px solid var(--select);
 }
 

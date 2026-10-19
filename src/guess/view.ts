@@ -4,8 +4,8 @@ import { BACK_ICON, CHECK_ICON, ENTER_ICON, HINT_ICON, KEYBOARD_ICON, NEWS_ICON,
 import type { GuessLayout } from './layout';
 import type { KeyState, Mark } from './rules';
 
-/** How one board square looks: empty, next to fill (orange), typed but not checked, or checked. */
-export type SquareLook = 'empty' | 'next' | 'typed' | Mark;
+/** How one board square looks: empty, where her next letter goes (orange), typed but not checked, or checked. */
+export type SquareLook = 'empty' | 'cursor' | 'typed' | Mark;
 
 export interface SquareView {
   letter: string;

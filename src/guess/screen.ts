@@ -188,7 +188,7 @@ export class GuessScreen implements GameScreen {
     const next = this.game.nextSquare();
     return this.game.row.map((square, i) => ({
       letter: square.letter,
-      look: square.locked ? 'right' : square.letter ? 'typed' : i === next ? 'next' : 'empty',
+      look: square.locked ? 'right' : square.letter ? 'typed' : i === next ? 'cursor' : 'empty',
     }));
   }
 
