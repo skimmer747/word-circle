@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Every morning (about 4–5 AM Eastern): fetch the day's Wordle word into daily-word.txt and republish.
+  # GitHub switches this off after 60 days without commits; it emails first, and one click turns it back on.
+  schedule:
+    - cron: '0 9 * * *'
 
 permissions:
   contents: read
@@ -25,6 +29,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      # On the morning run, a failed fetch stops here so the last deploy (with words two days ahead) stays live.
+      - name: Fetch the daily Wordle words
+        run: npm run daily-word -- ${{ github.event_name == 'schedule' && '--strict' || '' }}
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

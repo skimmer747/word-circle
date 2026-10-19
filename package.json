@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "puzzles": "tsx scripts/build-puzzles.ts",
-    "icons": "pwa-assets-generator --preset minimal-2023 public/icon.svg"
+    "icons": "pwa-assets-generator --preset minimal-2023 public/icon.svg",
+    "daily-word": "tsx scripts/daily-word.ts"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "5.1.0"
