@@ -118,10 +118,10 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 Puzzles are generated offline by a Node script on the Mac and shipped inside the app as `puzzles.json`.
 
 - **Source:** SCOWL (Spell Checker Oriented Word Lists), en_US, with its license notice included in the repo.
-  - **Answer words:** SCOWL size ≤ 35 (common words).
+  - **Answer words:** SCOWL size ≤ 35 (common words), plain dictionary words only: no plurals or other endings (-s, -ed, -ing, -er, -est). A word is dropped if AGID (the Automatically Generated Inflection Database, `words/agid/infl.txt`) lists it only as an ending of another word, so "notes", "posed", "spoken" and "laxer" are out while "news" and "spoke" stay. Plurals and endings still count as extra words.
   - **Accepted ("Good word!") words:** SCOWL size ≤ 60.
   - Both: lowercase `a–z` only (no capitals/proper nouns, apostrophes, or accents), length 3–6, not on the never-use list.
-- **Never-use list:** `words/blocklist.txt`, one word per line, seeded with offensive words and upsetting ones (death, illness, violence). Editable by the owner; re-run the script to apply.
+- **Never-use list:** `words/blocklist.txt`, one word per line, seeded with offensive words, slurs and upsetting ones (death, illness, violence). Editable by the owner; re-run the script to apply. SCOWL's own offensive and profane lists (`words/scowl/misc`) are always excluded as well.
 - **Generation:**
   1. Candidate base words: answer words of length 5 or 6.
   2. For each, find all answer words formable from its letters (as a multiset; repeated letters allowed if the base has them). The base word is always included.

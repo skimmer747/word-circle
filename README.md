@@ -36,3 +36,4 @@ Regenerating puzzles can change their order, so she may start a fresh puzzle at 
 ## Word list credit
 
 Words come from SCOWL (Spell Checker Oriented Word Lists) by Kevin Atkinson; see `words/scowl/Copyright`.
+Plurals and other word endings are recognised with AGID (Automatically Generated Inflection Database), also by Kevin Atkinson; see `words/agid/README`.

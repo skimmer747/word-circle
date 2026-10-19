@@ -2,13 +2,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { seededRandom } from '../src/shared/random';
+import { readInflectedForms } from './inflections';
 import { buildPuzzles, validatePuzzle } from './puzzle-lib';
 import { renderSamplePage } from './sample-page';
 import { readBlocklist, readScowl } from './scowl';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SCOWL_DIR = path.join(ROOT, 'words/scowl/final');
+const INFLECTIONS_FILE = path.join(ROOT, 'words/agid/infl.txt');
 const BLOCKLIST_FILE = path.join(ROOT, 'words/blocklist.txt');
+const TABOO_FILES = ['offensive.1', 'offensive.2', 'profane.1', 'profane.3'].map((name) =>
+  path.join(ROOT, 'words/scowl/misc', name),
+);
 const OUTPUT_FILE = path.join(ROOT, 'src/data/puzzles.json');
 const SAMPLE_FILE = path.join(ROOT, 'docs/puzzle-sample.html');
 
@@ -20,9 +25,12 @@ const SIX_LETTER_TARGET = 375;
 const MINIMUM_PUZZLES = 800;
 const SAMPLE_SIZE = 60;
 
-const blocklist = readBlocklist(BLOCKLIST_FILE);
+const blocklist = new Set([BLOCKLIST_FILE, ...TABOO_FILES].flatMap((file) => [...readBlocklist(file)]));
+// Slots hold plain dictionary words only; plurals and other endings still count as extra words.
+const inflected = readInflectedForms(INFLECTIONS_FILE);
+const answers = new Map([...readScowl(SCOWL_DIR, ANSWER_MAX_SIZE)].filter(([word]) => !inflected.has(word)));
 const puzzles = buildPuzzles({
-  answers: readScowl(SCOWL_DIR, ANSWER_MAX_SIZE),
+  answers,
   accepted: new Set(readScowl(SCOWL_DIR, ACCEPTED_MAX_SIZE).keys()),
   blocklist,
   random: seededRandom(SEED),
