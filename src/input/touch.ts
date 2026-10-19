@@ -27,6 +27,8 @@ export interface TracerGeometry {
   safeZoneRight: number;
   tiles: TileGeometry[];
   buttons: ButtonGeometry[];
+  /** Areas a finger can drag up and down to scroll (buttons inside still tap). */
+  scrollAreas?: ButtonGeometry[];
 }
 
 export interface TracerCallbacks {
@@ -35,6 +37,8 @@ export interface TracerCallbacks {
   wordSubmitted(tiles: number[]): void;
   selectionCleared(): void;
   buttonTapped(id: string): void;
+  /** A scrolling finger moved; `dy` is positive when it moved up, to show what is further down. */
+  scrolled?(id: string, dy: number): void;
 }
 
 /** A word may start slightly outside a tile's drawn edge. */
@@ -51,7 +55,7 @@ interface Press {
 }
 
 /**
- * Turns finger movement into letter selections and button taps, ignoring the safe zones.
+ * Turns finger movement into letter selections, button taps and scrolling, ignoring the safe zones.
  * Every finger is tracked separately, so a resting thumb never blocks another finger
  * (iPadOS drops ordinary click events while another finger is on the screen).
  */
@@ -61,6 +65,7 @@ export class LetterTracer {
   private selected: number[] = [];
   private last = { x: 0, y: 0 };
   private readonly presses = new Map<number, Press>();
+  private scrolling: { id: number; area: string; y: number } | null = null;
   private enabled = true;
 
   constructor(private readonly callbacks: TracerCallbacks) {}
@@ -95,6 +100,7 @@ export class LetterTracer {
         return;
       case 'move':
         if (input.id === this.activeId) this.onMove(input);
+        else if (input.id === this.scrolling?.id) this.onScroll(input);
         return;
       case 'up':
         this.onEnd(input, true);
@@ -113,7 +119,11 @@ export class LetterTracer {
       return;
     }
     const tile = this.tileAt(x, y, START_HIT_FACTOR);
-    if (tile === null) return;
+    if (tile === null) {
+      const area = this.scrollAreaAt(x, y);
+      if (area !== null && this.scrolling === null) this.scrolling = { id, area, y };
+      return;
+    }
     this.activeId = id;
     this.selected = [tile];
     this.last = { x, y };
@@ -128,6 +138,13 @@ export class LetterTracer {
       this.visit(from.x + ((x - from.x) * i) / steps, from.y + ((y - from.y) * i) / steps);
     }
     this.last = { x, y };
+  }
+
+  private onScroll({ y }: PointerInput): void {
+    const scrolling = this.scrolling!;
+    const dy = scrolling.y - y;
+    scrolling.y = y;
+    if (dy !== 0) this.callbacks.scrolled?.(scrolling.area, dy);
   }
 
   private visit(x: number, y: number): void {
@@ -152,6 +169,10 @@ export class LetterTracer {
       if (submit && quick && this.buttonAt(x, y) === press.button) this.callbacks.buttonTapped(press.button);
       return;
     }
+    if (id === this.scrolling?.id) {
+      this.scrolling = null;
+      return;
+    }
     if (id !== this.activeId) return;
     const tiles = this.selected;
     this.reset();
@@ -163,11 +184,17 @@ export class LetterTracer {
     this.activeId = null;
     this.selected = [];
     this.presses.clear();
+    this.scrolling = null;
   }
 
   private buttonAt(x: number, y: number): string | null {
     const button = this.geometry.buttons.find((b) => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h);
     return button ? button.id : null;
+  }
+
+  private scrollAreaAt(x: number, y: number): string | null {
+    const area = this.geometry.scrollAreas?.find((a) => x >= a.x && x <= a.x + a.w && y >= a.y && y <= a.y + a.h);
+    return area ? area.id : null;
   }
 
   private tileAt(x: number, y: number, factor: number): number | null {

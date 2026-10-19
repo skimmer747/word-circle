@@ -25,8 +25,8 @@ const GOOD_MS = 1200;
 const CELEBRATION_MS = 15_000;
 /** The clock pop-up closes by itself after this long. */
 const CLOCK_OPEN_MS = 60_000;
-/** With the clock's very large text, three events fit on every iPad. */
-const CLOCK_MAX_EVENTS = 3;
+/** The countdown list scrolls, so it can hold everything coming up this week. */
+const CLOCK_MAX_EVENTS = 20;
 /** How often to check the online schedule for changes. */
 const SCHEDULE_REFRESH_MS = 5 * 60_000;
 
@@ -69,7 +69,14 @@ export class App {
       selectionCleared: () => this.view.showSelection([]),
       wordSubmitted: (tiles) => void this.submit(tiles),
       buttonTapped: (id) => this.buttonTapped(id),
+      scrolled: (id, dy) => this.scrolled(id, dy),
     });
+  }
+
+  private scrolled(id: string, dy: number): void {
+    if (id !== 'clock' || !this.clockOpen) return;
+    this.view.scrollClock(dy);
+    this.keepClockOpen();
   }
 
   private buttonTapped(id: string): void {
@@ -112,9 +119,15 @@ export class App {
     this.clockOpen = true;
     this.view.showClock(clockFace(new Date()), upcomingLines(this.schedule, new Date(), CLOCK_MAX_EVENTS), this.layout);
     this.clockTick = window.setInterval(() => this.updateClock(), 1000);
-    this.clockAutoClose = window.setTimeout(() => this.closeClock(), CLOCK_OPEN_MS);
+    this.keepClockOpen();
     this.updateTouchTargets();
     void this.refreshSchedule();
+  }
+
+  /** (Re)starts the countdown to closing the clock by itself, so it stays open while she scrolls. */
+  private keepClockOpen(): void {
+    window.clearTimeout(this.clockAutoClose);
+    this.clockAutoClose = window.setTimeout(() => this.closeClock(), CLOCK_OPEN_MS);
   }
 
   private updateClock(): void {
@@ -241,6 +254,8 @@ export class App {
       safeZoneRight: layout.safeZoneRight,
       tiles: popup ? [] : layout.tiles,
       buttons,
+      // A finger dragged anywhere on the clock card scrolls its countdowns.
+      scrollAreas: this.clockOpen ? [{ id: 'clock', ...layout.clockCard }] : [],
     });
     if (celebrating) this.view.placeCelebration(layout);
     if (this.clockOpen) this.view.placeClock(layout);

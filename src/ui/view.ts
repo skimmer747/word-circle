@@ -40,6 +40,11 @@ const STAR_ICON = `<svg ${ICON_ATTRS}><path d="M12 17.75l-6.172 3.245l1.179 -6.8
 const ARROW_ICON = `<svg ${ICON_ATTRS}><path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/></svg>`;
 const CLOCK_ICON = `<svg ${ICON_ATTRS}><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M12 7v5l3 3"/></svg>`;
 const CLOSE_ICON = `<svg ${ICON_ATTRS}><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg>`;
+/** Text doesn't shrink exactly in proportion to its size, so a line that has to shrink gets 2% to spare. */
+const FIT_SPARE = 0.98;
+/** Solid triangles: easier for her to spot than thin chevrons. */
+const MORE_DOWN_ICON = `<svg ${ICON_ATTRS}><path d="M4 7h16l-8 11z" fill="currentColor"/></svg>`;
+const MORE_UP_ICON = `<svg ${ICON_ATTRS}><path d="M4 17h16l-8 -11z" fill="currentColor"/></svg>`;
 const EVENT_ICON = `<svg ${ICON_ATTRS}><path d="M12 13m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M12 10l0 3l2 0"/><path d="M7 4l-2.75 2"/><path d="M17 4l2.75 2"/></svg>`;
 
 /** The good news to show, as [row style, icon, text, highlighted]. Days in a row appears from day two. */
@@ -369,7 +374,7 @@ export class View {
     const rows = [...list.children] as HTMLElement[];
     const widest = Math.max(0, ...rows.map((row) => row.scrollWidth + (row.offsetWidth - row.clientWidth)));
     const scale = fitFontScale(widest, room);
-    if (scale < 1) list.style.fontSize = `${parseFloat(getComputedStyle(list).fontSize) * scale}px`;
+    if (scale < 1) list.style.fontSize = `${parseFloat(getComputedStyle(list).fontSize) * scale * FIT_SPARE}px`;
   }
 
   hideCelebration(): void {
@@ -386,6 +391,9 @@ export class View {
     el('div', 'clock-part', card);
     el('div', 'clock-date', card);
     el('div', 'clock-events', card);
+    // Arrows in the card's side margins, beside the list, showing there are more countdowns that way.
+    el('div', 'clock-more up', card).innerHTML = MORE_UP_ICON + MORE_UP_ICON;
+    el('div', 'clock-more down', card).innerHTML = MORE_DOWN_ICON + MORE_DOWN_ICON;
     const close = el('button', 'next close', this.clockPopup);
     close.type = 'button';
     close.innerHTML = `${CLOSE_ICON}<span>Close</span>`;
@@ -407,7 +415,10 @@ export class View {
     const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
     if (!list) return;
     const current = [...list.children].map((row) => row.textContent).join('\n');
-    if (current === events.join('\n')) return;
+    if (current === events.join('\n')) {
+      this.showClockScrollFades(list);
+      return;
+    }
     list.style.display = events.length === 0 ? 'none' : '';
     list.replaceChildren(
       ...events.map((text) => {
@@ -421,7 +432,7 @@ export class View {
     this.fitClockEvents();
   }
 
-  /** Shrinks any event line too wide for one line, and drops events that still don't fit rather than cut them off. */
+  /** Shrinks any event line too wide for one line. Events that don't all fit are scrolled to. */
   private fitClockEvents(): void {
     const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
     if (!list) return;
@@ -431,9 +442,30 @@ export class View {
       // Room for the text and padding: the list's width less the row's own border, and 1px for rounding.
       const room = list.clientWidth - (row.offsetWidth - row.clientWidth) - 1;
       const scale = fitFontScale(row.scrollWidth, room);
-      if (scale < 1) row.style.fontSize = `${parseFloat(getComputedStyle(row).fontSize) * scale}px`;
+      if (scale < 1) row.style.fontSize = `${parseFloat(getComputedStyle(row).fontSize) * scale * FIT_SPARE}px`;
     }
-    while (list.children.length > 1 && list.scrollHeight > list.clientHeight + 1) list.lastElementChild!.remove();
+    this.showClockScrollFades(list);
+  }
+
+  /** Scrolls the countdowns by `dy` pixels (positive shows what is further down). */
+  scrollClock(dy: number): void {
+    const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
+    if (!list) return;
+    list.scrollTop += dy;
+    this.showClockScrollFades(list);
+  }
+
+  /** Fades the edge of the list and shows arrows where more countdowns are hidden, so she can tell there are more. */
+  private showClockScrollFades(list: HTMLElement): void {
+    const above = list.scrollTop > 1;
+    const below = list.scrollTop + list.clientHeight < list.scrollHeight - 1;
+    list.classList.toggle('more-above', above);
+    list.classList.toggle('more-below', below);
+    const card = list.parentElement!;
+    card.classList.toggle('more-above', above);
+    card.classList.toggle('more-below', below);
+    card.style.setProperty('--list-top', `${list.offsetTop}px`);
+    card.style.setProperty('--list-bottom', `${list.offsetTop + list.offsetHeight}px`);
   }
 
   placeClock(layout: Layout): void {
