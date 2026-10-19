@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { LEVELS, type Level, type PuzzleSet } from '../src/circle/types';
 import { seededRandom } from '../src/shared/random';
 import { readInflectedForms } from './inflections';
+import { buildGuessWords, validateGuessWords } from './guess-lib';
 import { buildPuzzles, validatePuzzle, type PuzzleShape } from './puzzle-lib';
 import { renderSamplePage } from './sample-page';
 import { readBlocklist, readScowl } from './scowl';
@@ -18,11 +19,14 @@ const TABOO_FILES = ['offensive.1', 'offensive.2', 'profane.1', 'profane.3'].map
 );
 const OUTPUT_FILE = path.join(ROOT, 'src/data/puzzles.json');
 const SAMPLE_FILE = path.join(ROOT, 'docs/puzzle-sample.html');
+const GUESS_OUTPUT_FILE = path.join(ROOT, 'src/data/guess-words.json');
 
 const SEED = 20261019;
 const ANSWER_MAX_SIZE = 35;
 const ACCEPTED_MAX_SIZE = 60;
 const SAMPLE_SIZE = 20;
+/** Fail the build if Word Guess has fewer answers than this, so the word-list rules can be revisited. */
+const GUESS_MINIMUM = 1500;
 
 interface LevelPlan extends PuzzleShape {
   target: number;
@@ -54,6 +58,13 @@ LEVELS.forEach((level, i) => {
   }
   set[level] = puzzles;
 });
+
+// Word Guess uses its own seed, so its lists never change the Word Circle puzzles.
+const guess = buildGuessWords({ answers, accepted, blocklist, random: seededRandom(SEED + 100) });
+problems.push(...validateGuessWords(guess, blocklist, inflected));
+if (guess.answers.length < GUESS_MINIMUM) {
+  problems.push(`Word Guess: only ${guess.answers.length} answers could be found (need at least ${GUESS_MINIMUM})`);
+}
 if (problems.length > 0) {
   console.error(problems.slice(0, 50).join('\n'));
   process.exit(1);
@@ -69,8 +80,14 @@ fs.writeFileSync(
       title: `${level[0].toUpperCase()}${level.slice(1)}`,
       puzzles: set[level].slice(0, SAMPLE_SIZE),
     })),
+    guess.answers,
   ),
+);
+fs.writeFileSync(
+  GUESS_OUTPUT_FILE,
+  `{\n"answers": ${JSON.stringify(guess.answers)},\n"accepted": ${JSON.stringify(guess.accepted)}\n}\n`,
 );
 
 console.log(`Wrote ${LEVELS.map((level) => `${set[level].length} ${level}`).join(', ')} puzzles to src/data/puzzles.json`);
 console.log('Sample page: docs/puzzle-sample.html');
+console.log(`Wrote ${guess.answers.length} Word Guess answers and ${guess.accepted.length} accepted words to src/data/guess-words.json`);

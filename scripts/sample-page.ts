@@ -24,7 +24,14 @@ ${rows}
 </table>`;
 }
 
-export function renderSamplePage(sections: readonly SampleSection[]): string {
+function renderGuessAnswers(answers: readonly string[]): string {
+  if (answers.length === 0) return '';
+  const items = answers.map((word) => `<li>${escape(word)}</li>`).join('');
+  return `<h2>Word Guess answers, in play order</h2>
+<ol class="answers">${items}</ol>`;
+}
+
+export function renderSamplePage(sections: readonly SampleSection[], guessAnswers: readonly string[] = []): string {
   const body = sections.map((s) => `<h2>${escape(s.title)}</h2>\n${renderTable(s.puzzles)}`).join('\n');
   return `<!doctype html>
 <html lang="en">
@@ -37,13 +44,15 @@ table { border-collapse: collapse; width: 100%; margin-bottom: 32px; }
 th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; vertical-align: top; }
 .letters { font-weight: 700; letter-spacing: 0.1em; white-space: nowrap; }
 .bonus { color: #555; }
+.answers { columns: 8 120px; font-size: 15px; }
 </style>
 </head>
 <body>
 <h1>Word Circle puzzle sample</h1>
-<p>The first puzzles of each level, in play order. To keep a word from ever appearing, add it to
-<code>words/blocklist.txt</code> and run <code>npm run puzzles</code>.</p>
+<p>The first puzzles of each Word Circle level, and every Word Guess answer, in play order. To keep a word
+from ever appearing, add it to <code>words/blocklist.txt</code> and run <code>npm run puzzles</code>.</p>
 ${body}
+${renderGuessAnswers(guessAnswers)}
 </body>
 </html>
 `;
