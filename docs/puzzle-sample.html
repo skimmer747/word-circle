@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Word Circle puzzle sample</title>
+<style>
+body { font-family: system-ui, sans-serif; margin: 24px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; vertical-align: top; }
+.letters { font-weight: 700; letter-spacing: 0.1em; white-space: nowrap; }
+.bonus { color: #555; }
+</style>
+</head>
+<body>
+<h1>Word Circle puzzle sample</h1>
+<p>The first 60 puzzles in play order. To keep a word from ever appearing, add it to
+<code>words/blocklist.txt</code> and run <code>npm run puzzles</code>.</p>
+<table>
+<thead><tr><th>#</th><th>Letters</th><th>Words to find</th><th>Also accepted ("Good word!")</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="letters">N S P K O E</td><td>one, pen, ones, open, opens, spoken</td><td class="bonus">ens, eon, eons, ken, keno, kens, noes, nope, nose, ope, opes, ops, pens, peon, peons, peso, poke, pokes, pone, pones, pose, son, sop, spoke</td></tr>
+<tr><td>2</td><td class="letters">E N A L G</td><td>age, leg, lane, angel, angle, glean</td><td class="bonus">ale, gal, gale, gel, glen, lag, lea, lean, nae, nag</td></tr>
+<tr><td>3</td><td class="letters">E X A R L</td><td>are, ear, era, real, laxer, relax</td><td class="bonus">ale, axle, earl, lax, lea</td></tr>
+<tr><td>4</td><td class="letters">E T L I T S</td><td>its, let, lie, lets, title, titles</td><td class="bonus">isle, islet, lei, leis, lest, lies, list, lit, lite, set, sett, silt, sit, site, slit, stet, stile, stilt, test, tie, ties, til, tile, tiles, tilt, tilts</td></tr>
+<tr><td>5</td><td class="letters">W C D O R</td><td>cod, cow, rod, row, word, crowd</td><td class="bonus">cord, crow, doc, orc</td></tr>
+<tr><td>6</td><td class="letters">O P H G I N</td><td>gin, hip, hog, ion, nigh, hoping</td><td class="bonus">hop, nip, oping, phi, pig, pin, ping, poi, pong</td></tr>
+<tr><td>7</td><td class="letters">K B D A C E</td><td>ace, bad, bed, back, baked, backed</td><td class="bonus">abed, aced, bade, bake, bead, beak, beck, cab, cad, cake, caked, dab, dace, deb, deck</td></tr>
+<tr><td>8</td><td class="letters">S K M U C</td><td>sum, cums, muck, musk, scum, mucks</td><td class="bonus">suck</td></tr>
+<tr><td>9</td><td class="letters">S T L E E T</td><td>let, see, else, lets, steel, settle</td><td class="bonus">eel, eels, lee, lees, lest, set, sett, sleet, stet, tee, tees, test</td></tr>
+<tr><td>10</td><td class="letters">O R D E V</td><td>doe, red, rod, over, rode, drove</td><td class="bonus">derv, doer, dove, ode, ore, redo, rev, roe, rove, roved</td></tr>
+<tr><td>11</td><td class="letters">E A L W H</td><td>ale, awe, law, hale, heal, whale</td><td class="bonus">awl, haw, hew, lea, wale, weal, wheal</td></tr>
+<tr><td>12</td><td class="letters">S S T E C</td><td>set, sect, sets, sects</td><td class="bonus">secs</td></tr>
+<tr><td>13</td><td class="letters">R A B L O</td><td>bar, boa, lab, oar, oral, labor</td><td class="bonus">alb, boar, bola, bra, lob, lobar, orb, rob</td></tr>
+<tr><td>14</td><td class="letters">H C P N I</td><td>chi, hip, pin, chip, inch, pinch</td><td class="bonus">chin, nip, phi, pic</td></tr>
+<tr><td>15</td><td class="letters">A T F R E</td><td>are, art, ate, eat, fate, after</td><td class="bonus">aft, ear, era, eta, far, fare, fat, fear, feat, fer, feta, frat, fret, raft, rat, rate, ref, tar, tare, tea, tear</td></tr>
+<tr><td>16</td><td class="letters">W H T R O G</td><td>got, hot, how, grow, throw, growth</td><td class="bonus">goth, hog, rho, rot, row, tho, tog, tor, tow, trow, two, who, wog, wort, worth, wot, wroth</td></tr>
+<tr><td>17</td><td class="letters">R I G N D</td><td>dig, gin, rid, grid, ring, grind</td><td class="bonus">din, ding, gird, grin, rig, rind</td></tr>
+<tr><td>18</td><td class="letters">S W N R E A</td><td>are, new, near, news, warns, answer</td><td class="bonus">anew, ares, awe, awes, awn, awns, ear, earn, earns, ears, ens, era, eras, nae, nears, ran, raw, sane, saner, saw, sea, sear, sew, sewn, snare, swan, swear, wan, wane, wanes, war, ware, wares, warn, wars, was, wean, weans, wear, wears, wen, wens, wren, wrens</td></tr>
+<tr><td>19</td><td class="letters">A W D D E</td><td>add, awe, wed, awed, wade, waded</td><td class="bonus">dad, dew, wad</td></tr>
+<tr><td>20</td><td class="letters">S E H L P</td><td>hes, she, help, helps</td><td class="bonus">hep</td></tr>
+<tr><td>21</td><td class="letters">S W O H S</td><td>how, ohs, who, hows, show, shows</td><td class="bonus">hos, sow, sows, ssh</td></tr>
+<tr><td>22</td><td class="letters">N A I O P</td><td>ion, nap, pan, pin, pain, piano</td><td class="bonus">nip, poi</td></tr>
+<tr><td>23</td><td class="letters">S Y T R O</td><td>rot, toy, try, sort, toys, story</td><td class="bonus">rosy, rots, sot, soy, sty, tor, tors, troy, troys, tyro, tyros</td></tr>
+<tr><td>24</td><td class="letters">S R M W A</td><td>arm, raw, saw, warm, swarm, warms</td><td class="bonus">arms, mar, mars, mas, maw, maws, ram, rams, swam, war, wars, was</td></tr>
+<tr><td>25</td><td class="letters">F L U R O</td><td>for, fur, our, foul, four, flour</td><td class="bonus">flu, fro, furl, lour</td></tr>
+<tr><td>26</td><td class="letters">O C A T R</td><td>act, art, car, cat, coat, actor</td><td class="bonus">arc, cart, cot, oar, oat, orc, rat, rot, rota, taco, tar, taro, tor</td></tr>
+<tr><td>27</td><td class="letters">S S T E N</td><td>net, set, ten, sent, sets, nests</td><td class="bonus">ens, nest, nets, sens, tens</td></tr>
+<tr><td>28</td><td class="letters">R O D E R S</td><td>doe, err, red, does, order, orders</td><td class="bonus">doer, doers, dos, dose, errs, ode, odes, ore, ores, redo, reds, rod, rode, rods, roe, roes, rose, sod, sore, sorer</td></tr>
+<tr><td>29</td><td class="letters">P E R I D</td><td>per, red, rid, ride, pride, pried</td><td class="bonus">dip, dire, drip, ire, pie, pied, pier, rep, rip, ripe</td></tr>
+<tr><td>30</td><td class="letters">Y T D S U</td><td>dust, duty, stud, dusty, study</td><td class="bonus">sty</td></tr>
+<tr><td>31</td><td class="letters">B H O E T R</td><td>bet, her, bore, both, other, bother</td><td class="bonus">berth, broth, herb, hero, hob, hoe, hoer, hot, orb, ore, rho, rob, robe, roe, rot, rote, the, tho, throb, throe, toe, tor, tore</td></tr>
+<tr><td>32</td><td class="letters">F A E Z S</td><td>fez, sea, faze, safe, fazes</td><td class="bonus"></td></tr>
+<tr><td>33</td><td class="letters">F M R E A</td><td>are, arm, far, farm, fear, frame</td><td class="bonus">ear, era, fame, fare, fer, mar, mare, ram, ream, ref</td></tr>
+<tr><td>34</td><td class="letters">P L Y P A</td><td>lap, lay, pal, pay, play, apply</td><td class="bonus">alp, pap, ply, yap</td></tr>
+<tr><td>35</td><td class="letters">S N D R E</td><td>end, red, ends, rend, send, rends</td><td class="bonus">den, dens, ens, nerd, nerds, reds</td></tr>
+<tr><td>36</td><td class="letters">F R R U Y</td><td>fry, fur, fury, furry</td><td class="bonus"></td></tr>
+<tr><td>37</td><td class="letters">S S E R I A</td><td>air, are, rise, arise, arises, raises</td><td class="bonus">airs, ares, ear, ears, era, eras, ire, raise, rises, sari, saris, sea, sear, sears, seas, sir, sire, sires, sirs, sis</td></tr>
+<tr><td>38</td><td class="letters">P E T Y T</td><td>pet, yet, type, petty</td><td class="bonus">yep</td></tr>
+<tr><td>39</td><td class="letters">N H S D A</td><td>and, had, has, sad, hand, hands</td><td class="bonus">ads, ash, dash, nah, sand, shad</td></tr>
+<tr><td>40</td><td class="letters">C O F R E</td><td>foe, for, fro, core, fore, force</td><td class="bonus">fer, orc, ore, ref, roe</td></tr>
+<tr><td>41</td><td class="letters">N A D K R</td><td>and, ark, ran, dark, rank, drank</td><td class="bonus">dank, darn, nark, rand</td></tr>
+<tr><td>42</td><td class="letters">A S P T H</td><td>has, hat, sat, past, path, paths</td><td class="bonus">apt, ash, asp, hap, hasp, hast, hats, pah, pas, pat, pats, phat, sap, spa, spat, staph, tap, taps</td></tr>
+<tr><td>43</td><td class="letters">L L S I W</td><td>ill, ills, sill, will, swill, wills</td><td class="bonus"></td></tr>
+<tr><td>44</td><td class="letters">D A R N B</td><td>and, bad, ban, bar, band, brand</td><td class="bonus">bard, barn, bra, brad, bran, dab, darn, drab, nab, ran, rand</td></tr>
+<tr><td>45</td><td class="letters">C A F T R</td><td>act, art, car, cat, fact, craft</td><td class="bonus">aft, arc, cart, far, fat, frat, raft, rat, tar</td></tr>
+<tr><td>46</td><td class="letters">H S D E S</td><td>hes, she, shed, shes, sheds</td><td class="bonus">ssh</td></tr>
+<tr><td>47</td><td class="letters">A C S S T</td><td>act, cat, sat, acts, cast, casts</td><td class="bonus">cats, sac, sacs, scat, scats</td></tr>
+<tr><td>48</td><td class="letters">T T O O M</td><td>moo, too, tot, moot, toot, motto</td><td class="bonus">mot, tom</td></tr>
+<tr><td>49</td><td class="letters">D T F R A</td><td>art, far, fat, rat, daft, draft</td><td class="bonus">aft, dart, drat, fad, frat, raft, tad, tar, trad</td></tr>
+<tr><td>50</td><td class="letters">E Y D A L</td><td>day, lay, deal, lady, lead, delay</td><td class="bonus">ale, aye, dale, dye, lad, lade, lea, led, lye, yea</td></tr>
+<tr><td>51</td><td class="letters">S N E R U</td><td>run, sun, runs, sure, nurse, runes</td><td class="bonus">ens, nus, rue, rues, rune, ruse, sue, urn, urns, use, user</td></tr>
+<tr><td>52</td><td class="letters">Y W T R H O</td><td>hot, how, row, try, throw, worthy</td><td class="bonus">rho, rot, tho, thy, tor, tow, toy, trow, troy, two, tyro, who, why, wort, worth, wot, wroth, wry, yow</td></tr>
+<tr><td>53</td><td class="letters">P L A E L</td><td>ale, all, leap, pale, plea, lapel</td><td class="bonus">alp, ape, ell, lap, lea, pal, pall, pea, peal</td></tr>
+<tr><td>54</td><td class="letters">O E S S N</td><td>one, son, nose, ones, sons, noses</td><td class="bonus">ens, eon, eons, noes, sens</td></tr>
+<tr><td>55</td><td class="letters">E R E I V D</td><td>red, rid, ever, ride, drive, derive</td><td class="bonus">deer, derv, dire, dive, diver, eider, ere, eve, ire, reed, rev, rive, rived, veer, vie, vied</td></tr>
+<tr><td>56</td><td class="letters">A E M D R</td><td>are, arm, dare, dear, armed, dream</td><td class="bonus">dam, dame, dram, ear, era, mad, made, mar, mare, mead, ram, read, ream, red</td></tr>
+<tr><td>57</td><td class="letters">T O S L E W</td><td>let, lets, lose, stole, lowest, towels</td><td class="bonus">lest, lost, lot, lots, low, lows, oles, owe, owes, owl, owlet, owlets, owls, set, sew, slew, sloe, slot, slow, sol, sole, sot, sow, stew, stow, swot, toe, toes, tole, tow, towel, tows, two, twos, welt, welts, west, wet, wets, woe, woes, wot</td></tr>
+<tr><td>58</td><td class="letters">C A L H E</td><td>ace, ale, ache, each, hale, leach</td><td class="bonus">heal, lac, lace, lea, lech</td></tr>
+<tr><td>59</td><td class="letters">K Y R S I</td><td>irk, sir, sky, irks, risk, risky</td><td class="bonus">ski</td></tr>
+<tr><td>60</td><td class="letters">C O E V I</td><td>ice, vie, cove, vice, voice</td><td class="bonus"></td></tr>
+</tbody>
+</table>
+</body>
+</html>
