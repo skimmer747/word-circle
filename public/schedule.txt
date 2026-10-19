@@ -13,5 +13,6 @@
 
 # ---- Her events (no # in front) ----
 every day 6:00 PM Supper
+2026-10-20 11:00 AM Jermaine
 2026-10-21 7:00 PM RuthAnne gets home
 2026-10-21 8:00 PM Magic's first game vs. Hawks
