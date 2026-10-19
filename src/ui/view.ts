@@ -1,4 +1,5 @@
 import type { ClockFace } from '../clock/clock';
+import { fitFontScale } from './fit';
 import { formatDuration, type Celebration } from '../game/stats';
 import { LEVELS, type Level, type Puzzle } from '../game/types';
 import type { Layout, Rect } from './layout';
@@ -395,6 +396,20 @@ export class View {
         return row;
       }),
     );
+    this.fitClockEvents();
+  }
+
+  /** Shrinks any event line too wide for one line, and drops events that still don't fit rather than cut them off. */
+  private fitClockEvents(): void {
+    const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
+    if (!list) return;
+    const rows = [...list.children] as HTMLElement[];
+    rows.forEach((row) => (row.style.fontSize = ''));
+    for (const row of rows) {
+      const scale = fitFontScale(row.scrollWidth, list.clientWidth);
+      if (scale < 1) row.style.fontSize = `${parseFloat(getComputedStyle(row).fontSize) * scale}px`;
+    }
+    while (list.children.length > 1 && list.scrollHeight > list.clientHeight + 1) list.lastElementChild!.remove();
   }
 
   placeClock(layout: Layout): void {
@@ -406,6 +421,7 @@ export class View {
       card.style.setProperty('--u', `${layout.clockCard.h / 100}px`);
     }
     if (close) place(close, layout.closeButton);
+    this.fitClockEvents();
   }
 
   hideClock(): void {

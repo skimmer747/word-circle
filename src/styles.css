@@ -565,22 +565,27 @@ body {
   border-top: 5px solid var(--bg);
 }
 
+/* Each event stays on one line; the view shrinks a long one to fit (icon and spacing scale with it). */
 .clock-event {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: calc(var(--u) * 1.8);
+  gap: 0.3em;
+  max-width: 100%;
   margin-bottom: calc(var(--u) * 1);
-  padding: calc(var(--u) * 0.3) calc(var(--u) * 1.6);
+  padding: 0.05em 0.3em;
   border: 4px solid transparent;
   border-radius: 18px;
   font-size: calc(var(--u) * 5.6);
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .clock-event svg {
   flex: none;
-  width: calc(var(--u) * 5.6);
-  height: calc(var(--u) * 5.6);
+  width: 1em;
+  height: 1em;
   color: var(--select);
 }
 
