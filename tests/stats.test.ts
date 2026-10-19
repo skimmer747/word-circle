@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { dayKey, emptyStats, formatDuration, previousDay, recordSolve, type Stats } from '../src/circle/stats';
+import { emptyStats, formatDuration, recordSolve, type Stats } from '../src/circle/stats';
+import { dayKey, previousDay } from '../src/shared/days';
 
 const solve = (stats: Stats, day: string, ms = 120_000, level: 'easy' | 'medium' | 'hard' = 'medium') =>
   recordSolve(stats, level, ms, day);

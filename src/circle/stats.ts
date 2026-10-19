@@ -1,3 +1,4 @@
+import { isMilestone, previousDay } from '../shared/days';
 import type { Level } from './types';
 
 /** Her lifetime stats. Days are local calendar dates as "YYYY-MM-DD". */
@@ -19,28 +20,8 @@ export interface Celebration {
   milestone: boolean;
 }
 
-const MILESTONES = [10, 25, 50, 100, 250, 500, 750, 1000];
-/** After 1,000, every 500th puzzle is a milestone too. */
-const LATE_MILESTONE_EVERY = 500;
-
 export function emptyStats(): Stats {
   return { totalSolved: 0, bestMs: {}, streakDays: 0, lastPlayedDay: null, todaySolved: 0 };
-}
-
-export function dayKey(date: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
-/** The calendar day before `day` ("YYYY-MM-DD"), worked out in UTC so clock changes don't matter. */
-export function previousDay(day: string): string {
-  const [y, m, d] = day.split('-').map(Number);
-  const before = new Date(Date.UTC(y, m - 1, d) - 24 * 60 * 60 * 1000);
-  return before.toISOString().slice(0, 10);
-}
-
-function isMilestone(n: number): boolean {
-  return MILESTONES.includes(n) || (n > 1000 && n % LATE_MILESTONE_EVERY === 0);
 }
 
 export function recordSolve(
