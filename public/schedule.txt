@@ -1,0 +1,15 @@
+# Word Circle schedule
+# The clock pop-up counts down to these events. One event per line.
+# Lines starting with # are ignored, so delete the # at the start of a line to turn it on.
+#
+# Every day:             every day 5:00 PM Supper
+# Some days each week:   Sun 10:00 AM Church
+#                        Tue,Fri 3:00 PM Phone call with family
+# One day only:          2026-10-22 2:00 PM Doctor visit
+#
+# Times can be written 5:00 PM, 5 PM, 5:30pm or 17:30.
+# Changes reach her iPad within about 10 minutes whenever it has Wi-Fi.
+
+# every day 8:00 AM Breakfast
+# every day 12:00 PM Lunch
+# every day 5:00 PM Supper

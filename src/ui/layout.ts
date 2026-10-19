@@ -35,6 +35,10 @@ const CARD_MAX_HEIGHT = 520;
 const NEXT_WIDTH = 300;
 const NEXT_HEIGHT = 88;
 const CARD_PADDING = 24;
+const CLOCK_SIZE = 72;
+const CLOCK_GAP = 12;
+const CLOCK_CARD_WIDTH = 620;
+const CLOCK_CARD_MAX_HEIGHT = 600;
 
 export interface Rect {
   x: number;
@@ -81,6 +85,10 @@ export interface Layout {
   /** The "Well done!" card shown after a puzzle, and its Next puzzle button. */
   celebration: Rect;
   nextButton: Rect;
+  /** Clock button at the top right, and the clock pop-up with its Close button. */
+  clockButton: Rect;
+  clockCard: Rect;
+  closeButton: Rect;
 }
 
 export function computeLayout({ width, height, letterCount, wordLengths }: LayoutInput): Layout {
@@ -96,7 +104,8 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
   const rightLeft = playLeft + leftWidth + COLUMN_GAP;
   const rightCenter = rightLeft + rightWidth / 2;
 
-  const extras: Rect = { x: rightLeft, y: MARGIN, w: rightWidth, h: EXTRAS_HEIGHT };
+  const clockButton: Rect = { x: playRight - CLOCK_SIZE, y: MARGIN, w: CLOCK_SIZE, h: CLOCK_SIZE };
+  const extras: Rect = { x: rightLeft, y: MARGIN, w: rightWidth - CLOCK_SIZE - CLOCK_GAP, h: EXTRAS_HEIGHT };
   const barWidth = Math.min(rightWidth, BAR_MAX_WIDTH);
   const bar: Rect = { x: rightCenter - barWidth / 2, y: extras.y + extras.h + EXTRAS_GAP, w: barWidth, h: BAR_HEIGHT };
 
@@ -151,11 +160,28 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
     h: NEXT_HEIGHT,
   };
 
+  const clockCardHeight = Math.min(CLOCK_CARD_MAX_HEIGHT, height - 2 * MARGIN);
+  const clockCard: Rect = {
+    x: width / 2 - CLOCK_CARD_WIDTH / 2,
+    y: (height - clockCardHeight) / 2,
+    w: CLOCK_CARD_WIDTH,
+    h: clockCardHeight,
+  };
+  const closeButton: Rect = {
+    x: width / 2 - NEXT_WIDTH / 2,
+    y: clockCard.y + clockCard.h - CARD_PADDING - NEXT_HEIGHT,
+    w: NEXT_WIDTH,
+    h: NEXT_HEIGHT,
+  };
+
   return {
     width,
     height,
     celebration,
     nextButton,
+    clockButton,
+    clockCard,
+    closeButton,
     safeZoneLeft,
     safeZoneRight: SAFE_ZONE_RIGHT,
     levels,

@@ -127,6 +127,16 @@ Uses Pointer Events. The touch module receives normalized events `{type: down|mo
 - **Saving:** progress is written to `localStorage` after every found word, extra word, hint, level change and puzzle change, and when the app is hidden. Key `word-circle:v2`, value `{ level, levels: { easy?, medium?, hard? }, stats }` where each level's entry is `{ puzzleIndex, puzzleId, found: string[], revealed: { [word]: number[] }, bonusFound: string[], elapsedMs }` and `stats` is `{ totalSolved, bestMs: { easy?, medium?, hard? }, streakDays, lastPlayedDay, todaySolved }`. A save from before levels existed (key `word-circle:v1`) is moved into Medium; missing `bonusFound`, `elapsedMs` or `stats` load as empty, and damaged stats never cost her progress. On load, if a level's saved `puzzleId` doesn't match the puzzle at `puzzleIndex` (puzzles were regenerated), that level starts that index fresh. New players start on Medium. Home Screen web apps keep their storage (not subject to Safari's 7-day eviction).
 - **End of list:** after the last puzzle, wrap around to puzzle 0.
 
+## 3b. Clock and schedule
+
+- **Clock button:** a 72 px white square with a dark-blue clock icon at the top right of the right column (Extra words narrows to make room). Tapped through the per-finger tracker like every button.
+- **Clock pop-up:** a large centered card (dark-blue border) over the dimmed game:
+  - the time ("10:30 AM", 108 px), the part of day ("in the morning" 5–11, "in the afternoon" 12–4, "in the evening" 5–8, "at night" 9–4), and the day and date ("Monday, October 19"); updated every second;
+  - up to 4 upcoming events, soonest first: countdowns for the rest of today ("Supper in 4 hours 30 minutes", minutes rounded up), "Time for Supper" (orange highlight) from 5 minutes before until 30 minutes after, then one-off events in the next 7 days ("Doctor visit tomorrow at 2:00 PM", "… on Thursday at 2:00 PM"). With nothing coming up, only the time and date show;
+  - a big **Close** button; it also closes by itself after 60 seconds. While it's open, only Close responds.
+- **Schedule file:** `public/schedule.txt`, deployed with the site and edited on GitHub (or by asking Claude). One event per line: `every day 5:00 PM Supper`, `Sun 10:00 AM Church`, `Tue,Fri 3 PM Phone call`, `2026-10-22 2:00 PM Doctor visit`. Times may be `5:00 PM`, `5 PM`, `5:30pm` or `17:30`. `#` lines and unreadable lines are skipped.
+- **Fetching:** the app fetches the file (bypassing caches) when it opens, when it comes back to the foreground, every 5 minutes while visible, and when the clock is opened. The last fetched text is kept in `localStorage` (`word-circle:schedule`) so the clock works offline. The file is not precached by the service worker.
+
 ## 4. Puzzles and words
 
 Puzzles are generated offline by a Node script on the Mac and shipped inside the app as `puzzles.json`.

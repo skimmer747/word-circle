@@ -1,3 +1,6 @@
+import { clockFace, upcomingLines } from './clock/clock';
+import { cachedSchedule, refreshSchedule } from './clock/loader';
+import type { ScheduledEvent } from './clock/schedule';
 import { Game } from './game/state';
 import { dayKey, emptyStats, recordSolve, type Celebration } from './game/stats';
 import { PlayTimer } from './game/timer';
@@ -20,6 +23,10 @@ const IDLE_HINT_MS = 120_000;
 const GOOD_MS = 1200;
 /** The celebration moves on by itself after this long if she doesn't tap Next puzzle. */
 const CELEBRATION_MS = 15_000;
+/** The clock pop-up closes by itself after this long. */
+const CLOCK_OPEN_MS = 60_000;
+/** How often to check the online schedule for changes. */
+const SCHEDULE_REFRESH_MS = 5 * 60_000;
 
 export interface Updates {
   /** Applies a waiting update (reloading the page). Returns true if it did. */
@@ -40,6 +47,10 @@ export class App {
   private layout: Layout | null = null;
   /** Set while the celebration card is up; calling it moves on to the next puzzle. */
   private endCelebration: (() => void) | null = null;
+  private schedule: ScheduledEvent[] = [];
+  private clockOpen = false;
+  private clockTick = 0;
+  private clockAutoClose = 0;
   private readonly view: View;
   private readonly tracer: LetterTracer;
 
@@ -61,6 +72,8 @@ export class App {
 
   private buttonTapped(id: string): void {
     if (id === 'next') this.endCelebration?.();
+    else if (id === 'clock') this.openClock();
+    else if (id === 'close') this.closeClock();
     else if (id === 'shuffle') this.shuffle();
     else if (id === 'hint') this.hint();
     else if (id.startsWith('level:')) this.chooseLevel(id.slice('level:'.length) as Level);
@@ -68,10 +81,52 @@ export class App {
 
   start(): void {
     this.saved = loadSavedGame(this.store);
+    this.schedule = cachedSchedule(this.store);
     this.openLevel(this.saved.level);
     this.relayout(false);
     this.listen();
     this.resetIdle();
+    void this.refreshSchedule();
+    window.setInterval(() => {
+      if (!document.hidden) void this.refreshSchedule();
+    }, SCHEDULE_REFRESH_MS);
+  }
+
+  /** Picks up changes to the online schedule; keeps the last copy when offline. */
+  private async refreshSchedule(): Promise<void> {
+    const url = `${import.meta.env.BASE_URL}schedule.txt?v=${Date.now()}`;
+    const events = await refreshSchedule(async () => {
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Schedule not available (${response.status})`);
+      return response.text();
+    }, this.store);
+    if (!events) return;
+    this.schedule = events;
+    if (this.clockOpen) this.updateClock();
+  }
+
+  private openClock(): void {
+    if (this.busy || this.tracer.isTracing || this.clockOpen || !this.layout) return;
+    this.clockOpen = true;
+    this.view.showClock(clockFace(new Date()), upcomingLines(this.schedule, new Date()), this.layout);
+    this.clockTick = window.setInterval(() => this.updateClock(), 1000);
+    this.clockAutoClose = window.setTimeout(() => this.closeClock(), CLOCK_OPEN_MS);
+    this.updateTouchTargets();
+    void this.refreshSchedule();
+  }
+
+  private updateClock(): void {
+    const now = new Date();
+    this.view.updateClock(clockFace(now), upcomingLines(this.schedule, now));
+  }
+
+  private closeClock(): void {
+    if (!this.clockOpen) return;
+    window.clearInterval(this.clockTick);
+    window.clearTimeout(this.clockAutoClose);
+    this.clockOpen = false;
+    this.view.hideClock();
+    this.updateTouchTargets();
   }
 
   /** Switches to a level's saved place (or its first puzzle). */
@@ -122,6 +177,7 @@ export class App {
         this.save();
       } else {
         this.timer.resume(performance.now());
+        void this.refreshSchedule();
       }
     });
 
@@ -158,26 +214,35 @@ export class App {
     this.updateTouchTargets();
   }
 
-  /** What the touch tracer listens for: the game, or only the Next puzzle button while celebrating. */
+  /**
+   * What the touch tracer listens for: only Next puzzle while celebrating, only Close while the clock is open,
+   * otherwise the game.
+   */
   private updateTouchTargets(): void {
     const layout = this.layout;
     if (!layout) return;
     const celebrating = this.endCelebration !== null;
+    const popup = celebrating || this.clockOpen;
+    let buttons;
+    if (celebrating) buttons = [{ id: 'next', ...layout.nextButton }];
+    else if (this.clockOpen) buttons = [{ id: 'close', ...layout.closeButton }];
+    else
+      buttons = [
+        { id: 'shuffle', ...layout.shuffleButton },
+        { id: 'hint', ...layout.hintButton },
+        { id: 'clock', ...layout.clockButton },
+        ...LEVELS.map((level, i) => ({ id: `level:${level}`, ...layout.levels[i] })),
+      ];
     this.tracer.setGeometry({
       screenWidth: layout.width,
       safeZoneLeft: layout.safeZoneLeft,
       safeZoneRight: layout.safeZoneRight,
-      tiles: celebrating ? [] : layout.tiles,
-      buttons: celebrating
-        ? [{ id: 'next', ...layout.nextButton }]
-        : [
-            { id: 'shuffle', ...layout.shuffleButton },
-            { id: 'hint', ...layout.hintButton },
-            ...LEVELS.map((level, i) => ({ id: `level:${level}`, ...layout.levels[i] })),
-          ],
+      tiles: popup ? [] : layout.tiles,
+      buttons,
     });
     if (celebrating) this.view.placeCelebration(layout);
-    this.tracer.setEnabled(celebrating || !this.busy);
+    if (this.clockOpen) this.view.placeClock(layout);
+    this.tracer.setEnabled(popup || !this.busy);
   }
 
   private rowStates(): RowState[] {

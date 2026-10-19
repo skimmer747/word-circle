@@ -126,6 +126,26 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
       expect(nextButton.y + nextButton.h).toBeLessThanOrEqual(celebration.y + celebration.h);
     });
 
+    it('puts the clock button at the top right, beside Extra words', () => {
+      const { clockButton, extras, bar } = layout;
+      expect(inPlayArea(clockButton, layout)).toBe(true);
+      expect(clockButton.w).toBeGreaterThanOrEqual(64);
+      expect(clockButton.h).toBeGreaterThanOrEqual(64);
+      expect(clockButton.x + clockButton.w).toBeCloseTo(width - layout.safeZoneRight - 16, 5);
+      expect(extras.x + extras.w).toBeLessThanOrEqual(clockButton.x);
+      expect(clockButton.y + clockButton.h).toBeLessThanOrEqual(bar.y);
+    });
+
+    it('centers the clock pop-up with a big Close button clear of the safe zones', () => {
+      const { clockCard, closeButton } = layout;
+      expect(clockCard.y).toBeGreaterThanOrEqual(0);
+      expect(clockCard.y + clockCard.h).toBeLessThanOrEqual(height);
+      expect(Math.abs(clockCard.x + clockCard.w / 2 - width / 2)).toBeLessThan(1);
+      expect(inPlayArea(closeButton, layout)).toBe(true);
+      expect(closeButton.h).toBeGreaterThanOrEqual(80);
+      expect(closeButton.y + closeButton.h).toBeLessThanOrEqual(clockCard.y + clockCard.h);
+    });
+
     it('makes buttons at least 90 px tall', () => {
       expect(layout.shuffleButton.h).toBeGreaterThanOrEqual(90);
       expect(layout.hintButton.h).toBeGreaterThanOrEqual(90);

@@ -25,6 +25,28 @@ npm test
 npm run build
 ```
 
+## Changing her schedule (the clock pop-up)
+
+The clock button at the top right shows the time, the date, and countdowns like "Supper in 4 hours 30 minutes".
+The events come from `public/schedule.txt`, one per line:
+
+```text
+every day 5:00 PM Supper
+Sun 10:00 AM Church
+Tue,Fri 3:00 PM Phone call with family
+2026-10-22 2:00 PM Doctor visit
+```
+
+To change it from your phone or computer:
+
+1. Open https://github.com/skimmer747/word-circle/blob/main/public/schedule.txt
+2. Tap the pencil icon (Edit this file).
+3. Add, change or delete lines. Lines starting with `#` are ignored.
+4. Tap **Commit changes**.
+
+Her iPad picks up the new list within about 10 minutes whenever it has Wi-Fi (sooner if she opens the clock).
+A line with a typo is simply skipped. You can also just ask Claude to change it.
+
 ## Changing the words
 
 1. Add any word she shouldn't see to `words/blocklist.txt` (one per line). It won't appear anywhere, not even as an extra word.

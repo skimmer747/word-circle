@@ -1,3 +1,4 @@
+import type { ClockFace } from '../clock/clock';
 import { formatDuration, type Celebration } from '../game/stats';
 import { LEVELS, type Level, type Puzzle } from '../game/types';
 import type { Layout, Rect } from './layout';
@@ -36,6 +37,9 @@ const CALENDAR_ICON = `<svg ${ICON_ATTRS}><path d="M11.5 21h-5.5a2 2 0 0 1 -2 -2
 const SUN_ICON = `<svg ${ICON_ATTRS}><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/></svg>`;
 const STAR_ICON = `<svg ${ICON_ATTRS}><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></svg>`;
 const ARROW_ICON = `<svg ${ICON_ATTRS}><path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/></svg>`;
+const CLOCK_ICON = `<svg ${ICON_ATTRS}><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M12 7v5l3 3"/></svg>`;
+const CLOSE_ICON = `<svg ${ICON_ATTRS}><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg>`;
+const EVENT_ICON = `<svg ${ICON_ATTRS}><path d="M12 13m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M12 10l0 3l2 0"/><path d="M7 4l-2.75 2"/><path d="M17 4l2.75 2"/></svg>`;
 
 /** The good news to show, as [row style, icon, text, highlighted]. Days in a row appears from day two. */
 function celebrationRows(c: Celebration): Array<[string, string, string, boolean]> {
@@ -87,11 +91,13 @@ export class View {
   private messageToken = 0;
   private barTimer = 0;
   private readonly celebrate: HTMLElement;
+  private readonly clockPopup: HTMLElement;
   private readonly rotate: HTMLElement;
 
   /** Buttons are drawn here but tapped through the touch tracer, which works with a resting thumb. */
   constructor(private readonly root: HTMLElement) {
     this.celebrate = el('div', 'celebrate', root);
+    this.clockPopup = el('div', 'clock-popup', root);
     this.rotate = el('div', 'rotate', root);
     this.rotate.innerHTML = `${SIDEWAYS_IPAD}<div>Please turn the iPad sideways</div>`;
   }
@@ -120,6 +126,12 @@ export class View {
     state.rows.forEach((row, i) => this.setRow(i, row));
     this.buildButton(board, 'shuffle', 'Shuffle', SHUFFLE_ICON, layout.shuffleButton);
     this.hintButton = this.buildButton(board, 'hint', 'Hint', HINT_ICON, layout.hintButton);
+
+    const clockButton = el('button', 'clock-button', board);
+    clockButton.type = 'button';
+    clockButton.setAttribute('aria-label', 'Clock');
+    clockButton.innerHTML = CLOCK_ICON;
+    place(clockButton, layout.clockButton);
 
     this.extras = el('div', 'extras', board);
     place(this.extras, layout.extras);
@@ -341,6 +353,60 @@ export class View {
   hideCelebration(): void {
     this.celebrate.classList.remove('visible');
     this.celebrate.replaceChildren();
+  }
+
+  /** The big clock pop-up. Its Close button is tapped through the touch tracer. */
+  showClock(face: ClockFace, events: readonly string[], layout: Layout): void {
+    this.clockPopup.replaceChildren();
+    el('div', 'celebrate-dim', this.clockPopup);
+    const card = el('div', 'clock-card', this.clockPopup);
+    el('div', 'clock-time', card);
+    el('div', 'clock-part', card);
+    el('div', 'clock-date', card);
+    el('div', 'clock-events', card);
+    const close = el('button', 'next close', this.clockPopup);
+    close.type = 'button';
+    close.innerHTML = `${CLOSE_ICON}<span>Close</span>`;
+    this.updateClock(face, events);
+    this.placeClock(layout);
+    this.clockPopup.classList.add('visible');
+  }
+
+  /** Refreshes the time and countdowns while the pop-up is open. */
+  updateClock(face: ClockFace, events: readonly string[]): void {
+    const set = (selector: string, text: string) => {
+      const node = this.clockPopup.querySelector(selector);
+      if (node && node.textContent !== text) node.textContent = text;
+    };
+    set('.clock-time', face.time);
+    set('.clock-part', face.part);
+    set('.clock-date', face.date);
+    const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
+    if (!list) return;
+    const current = [...list.children].map((row) => row.textContent).join('\n');
+    if (current === events.join('\n')) return;
+    list.style.display = events.length === 0 ? 'none' : '';
+    list.replaceChildren(
+      ...events.map((text) => {
+        const row = document.createElement('div');
+        row.className = text.startsWith('Time for ') ? 'clock-event now' : 'clock-event';
+        row.innerHTML = `${EVENT_ICON}<span></span>`;
+        row.querySelector('span')!.textContent = text;
+        return row;
+      }),
+    );
+  }
+
+  placeClock(layout: Layout): void {
+    const card = this.clockPopup.querySelector<HTMLElement>('.clock-card');
+    const close = this.clockPopup.querySelector<HTMLElement>('.next');
+    if (card) place(card, layout.clockCard);
+    if (close) place(close, layout.closeButton);
+  }
+
+  hideClock(): void {
+    this.clockPopup.classList.remove('visible');
+    this.clockPopup.replaceChildren();
   }
 
   private chipFor(word: string): HTMLElement | undefined {
