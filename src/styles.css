@@ -1,0 +1,252 @@
+:root {
+  --bg: #fbf5e6;
+  --ink: #141414;
+  --navy: #1b3a6b;
+  --green: #2f6b2f;
+  --slot-border: #6b6b6b;
+  --backing: #efe6cf;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+body {
+  position: fixed;
+  inset: 0;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+#app,
+.board {
+  position: absolute;
+  inset: 0;
+}
+
+.board {
+  transition: opacity 500ms ease, transform 500ms ease;
+}
+
+.board.entering {
+  opacity: 0;
+  transform: translateX(80px);
+}
+
+.slot {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #fff;
+  border: 3px solid var(--slot-border);
+  color: var(--navy);
+}
+
+.slot.found {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.slot.pulse {
+  animation: pulse 400ms ease-in-out 2;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.button {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  border-radius: 18px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  color: var(--ink);
+  font: inherit;
+  font-size: 30px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.button svg {
+  width: 40px;
+  height: 40px;
+}
+
+.button.pulse {
+  animation: hint-pulse 4s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  0%,
+  20%,
+  100% {
+    transform: scale(1);
+  }
+  10% {
+    transform: scale(1.12);
+  }
+}
+
+.backing {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--backing);
+}
+
+.lines {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+.lines polyline {
+  fill: none;
+  stroke: var(--navy);
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff;
+  border: 4px solid var(--ink);
+  transition: transform 500ms ease-in-out;
+}
+
+.tile.selected {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.bar {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: var(--navy);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.bar.visible {
+  opacity: 1;
+}
+
+.bar.wiggle {
+  animation: wiggle 400ms ease-in-out;
+}
+
+@keyframes wiggle {
+  20% {
+    transform: translateX(-14px);
+  }
+  40% {
+    transform: translateX(14px);
+  }
+  60% {
+    transform: translateX(-8px);
+  }
+  80% {
+    transform: translateX(8px);
+  }
+}
+
+.flyer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--navy);
+  color: #fff;
+  pointer-events: none;
+  transition:
+    transform 600ms ease-in-out,
+    width 600ms ease-in-out,
+    height 600ms ease-in-out,
+    font-size 600ms ease-in-out,
+    background-color 600ms ease-in-out;
+}
+
+.flyer.landing {
+  background: var(--green);
+}
+
+.message {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 12px 44px;
+  white-space: nowrap;
+  border-radius: 28px;
+  background: var(--bg);
+  border: 4px solid var(--navy);
+  color: var(--navy);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.message.visible {
+  opacity: 1;
+}
+
+.rotate {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 48px;
+  background: var(--bg);
+  font-size: 52px;
+  text-align: center;
+}
+
+.rotate.visible {
+  display: flex;
+}
