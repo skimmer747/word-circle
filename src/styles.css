@@ -13,6 +13,10 @@
   --level: #6a4fb3;
   --chip: #3d7cc9;
   --label: #2c3e57;
+  /* Word Guess: right letter in the wrong spot, not in the word, and the Today's Wordle label. */
+  --present: #b8860b;
+  --absent: #9aa6b2;
+  --daily-fill: #fff4d6;
 }
 
 html,
@@ -611,4 +615,373 @@ body {
 
 .next.close {
   border-color: var(--navy);
+}
+
+/* The Games button sits left of the clock in every game. */
+.games-button {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 0;
+  border-radius: 18px;
+  background: #fff;
+  border: 4px solid var(--navy);
+  color: var(--navy);
+  font: inherit;
+  font-size: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.games-button svg {
+  width: 34px;
+  height: 34px;
+}
+
+.games-button span {
+  color: var(--ink);
+}
+
+/* "Pick a game": fills almost the screen like the clock. Sizes use --u (1% of the card's height, set by the
+   view on the pop-up). */
+.games-popup {
+  --u: 7.4px;
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.games-popup.visible {
+  display: block;
+}
+
+.games-card {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: calc(var(--u) * 3);
+  border-radius: 32px;
+  background: #fff;
+  border: 8px solid var(--navy);
+  animation: card-in 400ms ease-out;
+}
+
+.games-title {
+  font-size: calc(var(--u) * 10);
+  line-height: 1.1;
+  color: var(--navy);
+}
+
+.game-choice {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 2.5);
+  padding: 0 12px;
+  border-radius: 24px;
+  background: #fff;
+  border: 4px solid var(--slot-border);
+  color: var(--ink);
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+  animation: card-in 400ms ease-out;
+}
+
+.game-choice.on {
+  border: 8px solid var(--level);
+}
+
+.game-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: calc(var(--u) * 6);
+  height: calc(var(--u) * 6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--level);
+  color: #fff;
+}
+
+.game-check svg {
+  width: 70%;
+  height: 70%;
+}
+
+.game-name {
+  font-size: calc(var(--u) * 6.5);
+  line-height: 1.1;
+}
+
+.game-note {
+  padding: 0.1em 0.5em;
+  border-radius: 12px;
+  background: #fdf0e2;
+  border: 3px solid var(--select);
+  font-size: calc(var(--u) * 3.8);
+  line-height: 1.3;
+}
+
+/* Small pictures of each game. */
+.pic-circle {
+  position: relative;
+  width: calc(var(--u) * 26);
+  height: calc(var(--u) * 26);
+  border-radius: 50%;
+  background: var(--backing);
+}
+
+.pic-circle b {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  box-sizing: border-box;
+  width: calc(var(--u) * 8);
+  height: calc(var(--u) * 8);
+  margin: calc(var(--u) * -4) 0 0 calc(var(--u) * -4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--navy);
+  font-size: calc(var(--u) * 4.6);
+  transform: rotate(calc(var(--i) * 72deg - 90deg)) translate(calc(var(--u) * 8.6)) rotate(calc(90deg - var(--i) * 72deg));
+}
+
+.pic-guess {
+  display: grid;
+  grid-template-columns: repeat(5, calc(var(--u) * 6.4));
+  gap: calc(var(--u) * 0.8);
+}
+
+.pic-guess span {
+  box-sizing: border-box;
+  height: calc(var(--u) * 6.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #fff;
+  border: 3px solid var(--slot-border);
+  font-size: calc(var(--u) * 3.8);
+}
+
+.pic-guess .right {
+  border-color: var(--found);
+}
+
+.pic-guess .present {
+  border-color: var(--present);
+}
+
+.pic-guess .absent {
+  border-color: var(--absent);
+}
+
+/* Word Guess's "Well done!" card also shows her word, so its title and lines are a little smaller. */
+.card.with-word .card-title {
+  margin-bottom: calc(var(--u) * 2);
+  font-size: calc(var(--u) * 12);
+}
+
+.card-word {
+  display: flex;
+  gap: calc(var(--u) * 1);
+  margin-bottom: calc(var(--u) * 2.5);
+}
+
+.card-word span {
+  box-sizing: border-box;
+  width: calc(var(--u) * 9);
+  height: calc(var(--u) * 9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #fff;
+  border: 5px solid var(--found);
+  font-size: calc(var(--u) * 5.6);
+  color: var(--ink);
+}
+
+.card.with-word .card-rows {
+  font-size: calc(var(--u) * 6.5);
+}
+
+.next.share {
+  border-color: var(--level);
+}
+
+.next.share svg {
+  color: var(--level);
+}
+
+.row-tries svg {
+  color: var(--found);
+}
+
+.row-daily svg {
+  color: var(--select);
+}
+
+/* Word Guess: white squares with colored borders; every letter is dark. */
+.guess-row {
+  position: absolute;
+  display: flex;
+  transition:
+    transform 500ms ease,
+    opacity 500ms ease;
+}
+
+.guess-row.wiggle {
+  animation: wiggle 400ms ease-in-out;
+}
+
+.square {
+  box-sizing: border-box;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #fff;
+  border: 3px solid var(--slot-border);
+  color: var(--ink);
+}
+
+.square.next {
+  border: 4px solid var(--select);
+}
+
+.square.typed {
+  border: 3px solid var(--navy);
+}
+
+.square.right {
+  border: 5px solid var(--found);
+}
+
+.square.present {
+  border: 5px solid var(--present);
+}
+
+.square.absent {
+  border: 5px solid var(--absent);
+}
+
+.square.pop {
+  animation: pop-letter 150ms ease-out;
+}
+
+@keyframes pop-letter {
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+.key {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2em;
+  padding: 0;
+  border-radius: 12px;
+  background: #fff;
+  border: 3px solid var(--navy);
+  color: var(--ink);
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: opacity 300ms ease;
+}
+
+.key.right {
+  border: 5px solid var(--found);
+}
+
+.key.present {
+  border: 5px solid var(--present);
+}
+
+.key.absent {
+  border: 3px solid var(--absent);
+}
+
+.key.gone {
+  opacity: 0;
+}
+
+.key.pressed {
+  border-color: var(--select);
+  box-shadow: 0 0 0 5px var(--select);
+}
+
+.key.wide span {
+  font-size: 0.6em;
+}
+
+.key svg {
+  flex: none;
+  width: 0.8em;
+  height: 0.8em;
+}
+
+.board.guess .button {
+  font-size: 26px;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.board.guess .button svg {
+  width: 34px;
+  height: 34px;
+}
+
+.button.all-letters {
+  border-color: var(--shuffle);
+}
+
+.button.all-letters svg {
+  color: var(--shuffle);
+}
+
+.button.all-letters.on {
+  border-width: 7px;
+}
+
+.button.daily {
+  background: var(--daily-fill);
+  border-color: var(--hint);
+}
+
+.button.daily svg {
+  color: var(--hint);
+}
+
+.button.daily.share {
+  background: #fff;
+  border-color: var(--level);
+}
+
+.button.daily.share svg {
+  color: var(--level);
+}
+
+.button.daily.hidden {
+  visibility: hidden;
 }

@@ -1,7 +1,8 @@
 import type { ClockFace } from '../clock/clock';
 import { el, place } from '../ui/dom';
 import { fitFontScale } from '../ui/fit';
-import { ARROW_ICON, CLOCK_ICON, CLOSE_ICON, EVENT_ICON } from '../ui/icons';
+import { ARROW_ICON, CHECK_ICON, CLOCK_ICON, CLOSE_ICON, EVENT_ICON, GAMES_ICON, SHARE_ICON } from '../ui/icons';
+import type { GameId } from './games';
 import type { FrameLayout } from './layout';
 
 /** One line of good news on the "Well done!" card. */
@@ -16,14 +17,38 @@ export interface CelebrationLine {
 
 /** What a game puts on the "Well done!" card. */
 export interface CelebrationCard {
+  /** Shown in green squares under "Well done!" (Word Guess). */
+  word?: string;
   lines: CelebrationLine[];
   /** "Next puzzle" or "Next word". */
   nextLabel: string;
   /** The card moves on by itself after this long. */
   timeoutMs: number;
+  /** Puts a Share button beside the Next button. The card waits while the share sheet is open. */
+  share?: () => Promise<void>;
+}
+
+/** A game's card in the Games pop-up. */
+export interface GameEntry {
+  id: GameId;
+  title: string;
+  /** An extra line under the name, e.g. "Today's Wordle is ready". */
+  note: string | null;
 }
 
 const SIDEWAYS_IPAD = `<svg width="240" height="170" viewBox="0 0 240 170" aria-hidden="true"><rect x="10" y="10" width="220" height="150" rx="18" fill="#fff" stroke="#141414" stroke-width="8"/><circle cx="208" cy="85" r="6" fill="#141414"/></svg>`;
+
+const pictureRow = (letters: string, looks: readonly string[]) =>
+  [...letters].map((letter, i) => `<span class="${looks[i]}">${letter.trim()}</span>`).join('');
+
+/** A small picture of each game for its card in the Games pop-up. */
+const GAME_PICTURES: Record<GameId, string> = {
+  circle: `<span class="pic-circle">${[...'STONE'].map((letter, i) => `<b style="--i:${i}">${letter}</b>`).join('')}</span>`,
+  guess: `<span class="pic-guess">${pictureRow('STARE', ['right', 'present', 'right', 'absent', 'right'])}${pictureRow(
+    'SLATE',
+    ['right', 'right', 'right', 'right', 'right'],
+  )}${pictureRow('     ', ['', '', '', '', ''])}</span>`,
+};
 
 /** Draws what every game shares: the top-right buttons, the pop-ups and the "Well done!" card. */
 export class FrameView {
@@ -32,6 +57,7 @@ export class FrameView {
   private readonly corner: HTMLElement;
   private readonly celebrate: HTMLElement;
   private readonly clockPopup: HTMLElement;
+  private readonly gamesPopup: HTMLElement;
   private readonly rotate: HTMLElement;
 
   /** Buttons are drawn here but tapped through the touch tracker, which works with a resting thumb. */
@@ -40,13 +66,18 @@ export class FrameView {
     this.corner = el('div', 'corner', root);
     this.celebrate = el('div', 'celebrate', root);
     this.clockPopup = el('div', 'clock-popup', root);
+    this.gamesPopup = el('div', 'games-popup', root);
     this.rotate = el('div', 'rotate', root);
     this.rotate.innerHTML = `${SIDEWAYS_IPAD}<div>Please turn the iPad sideways</div>`;
   }
 
-  /** The buttons in the top-right corner. */
+  /** The Games and Clock buttons in the top-right corner. */
   renderCorner(layout: FrameLayout): void {
     this.corner.replaceChildren();
+    const games = el('button', 'games-button', this.corner);
+    games.type = 'button';
+    games.innerHTML = `${GAMES_ICON}<span>Games</span>`;
+    place(games, layout.gamesButton);
     const clock = el('button', 'clock-button', this.corner);
     clock.type = 'button';
     clock.setAttribute('aria-label', 'Clock');
@@ -58,19 +89,28 @@ export class FrameView {
     this.rotate.classList.toggle('visible', on);
   }
 
-  /** The "Well done!" card with her good news. Its button is tapped through the touch tracker. */
+  /** The "Well done!" card with her good news. Its buttons are tapped through the touch tracker. */
   showCelebration(card: CelebrationCard, layout: FrameLayout): void {
     this.celebrate.replaceChildren();
     el('div', 'celebrate-dim', this.celebrate);
-    const box = el('div', 'card', this.celebrate);
+    const box = el('div', card.word ? 'card with-word' : 'card', this.celebrate);
     el('div', 'card-title', box).textContent = 'Well done!';
+    if (card.word) {
+      const word = el('div', 'card-word', box);
+      for (const letter of card.word) el('span', '', word).textContent = letter.toUpperCase();
+    }
     const rows = el('div', 'card-rows', box);
     for (const line of card.lines) {
       const row = el('div', `card-row ${line.kind}${line.highlight ? ' highlight' : ''}`, rows);
       row.innerHTML = `${line.icon}<span></span>`;
       row.querySelector('span')!.textContent = line.text;
     }
-    const next = el('button', 'next', this.celebrate);
+    if (card.share) {
+      const share = el('button', 'next share', this.celebrate);
+      share.type = 'button';
+      share.innerHTML = `${SHARE_ICON}<span>Share</span>`;
+    }
+    const next = el('button', 'next forward', this.celebrate);
     next.type = 'button';
     next.innerHTML = `<span></span>${ARROW_ICON}`;
     next.querySelector('span')!.textContent = card.nextLabel;
@@ -81,19 +121,57 @@ export class FrameView {
 
   placeCelebration(layout: FrameLayout): void {
     const box = this.celebrate.querySelector<HTMLElement>('.card');
-    const next = this.celebrate.querySelector<HTMLElement>('.next');
+    const share = this.celebrate.querySelector<HTMLElement>('.share');
+    const next = this.celebrate.querySelector<HTMLElement>('.forward');
     if (box) {
       place(box, layout.card);
       // Text sizes in the stylesheet are multiples of 1% of the card's height.
       box.style.setProperty('--u', `${layout.card.h / 100}px`);
     }
-    if (next) place(next, layout.nextButton);
+    if (share) place(share, layout.shareButton);
+    if (next) place(next, share ? layout.nextWordButton : layout.nextButton);
     this.fitCelebrationRows();
   }
 
   hideCelebration(): void {
     this.celebrate.classList.remove('visible');
     this.celebrate.replaceChildren();
+  }
+
+  /** The "Pick a game" pop-up: a big card per game, the one she's in marked. Tapped through the touch tracker. */
+  showGames(entries: readonly GameEntry[], current: GameId, layout: FrameLayout): void {
+    this.gamesPopup.replaceChildren();
+    el('div', 'celebrate-dim', this.gamesPopup);
+    const card = el('div', 'games-card', this.gamesPopup);
+    el('div', 'games-title', card).textContent = 'Pick a game';
+    for (const entry of entries) {
+      const on = entry.id === current;
+      const choice = el('button', on ? 'game-choice on' : 'game-choice', this.gamesPopup);
+      choice.type = 'button';
+      choice.innerHTML = `${on ? `<span class="game-check">${CHECK_ICON}</span>` : ''}${GAME_PICTURES[entry.id]}<span class="game-name"></span>`;
+      choice.querySelector('.game-name')!.textContent = entry.title;
+      if (entry.note) el('span', 'game-note', choice).textContent = entry.note;
+    }
+    const close = el('button', 'next close', this.gamesPopup);
+    close.type = 'button';
+    close.innerHTML = `${CLOSE_ICON}<span>Close</span>`;
+    this.gamesPopup.classList.add('visible');
+    this.placeGames(layout);
+  }
+
+  placeGames(layout: FrameLayout): void {
+    // Text and pictures are multiples of 1% of the card's height.
+    this.gamesPopup.style.setProperty('--u', `${layout.card.h / 100}px`);
+    const card = this.gamesPopup.querySelector<HTMLElement>('.games-card');
+    if (card) place(card, layout.card);
+    this.gamesPopup.querySelectorAll<HTMLElement>('.game-choice').forEach((choice, i) => place(choice, layout.gameCards[i]));
+    const close = this.gamesPopup.querySelector<HTMLElement>('.next');
+    if (close) place(close, layout.closeButton);
+  }
+
+  hideGames(): void {
+    this.gamesPopup.classList.remove('visible');
+    this.gamesPopup.replaceChildren();
   }
 
   /** The big clock pop-up. Its Close button is tapped through the touch tracker. */

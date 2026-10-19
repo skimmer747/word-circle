@@ -20,6 +20,7 @@ const CELEBRATION_MS = 15_000;
 /** Word Circle: slide across a circle of letters to fill the word slots. */
 export class CircleScreen implements GameScreen {
   readonly id = 'circle';
+  readonly title = 'Word Circle';
   /** True from finishing a puzzle until the next one is on screen. */
   busy = false;
   private host!: FrameHost;
@@ -204,7 +205,13 @@ export class CircleScreen implements GameScreen {
       elapsedMs: 0,
     });
     this.timer.pause();
-    await this.host.celebrate({ lines: circleLines(celebration), nextLabel: 'Next puzzle', timeoutMs: CELEBRATION_MS });
+    // Days in a row count puzzles and words in either game.
+    const streakDays = this.host.recordPlayDay();
+    await this.host.celebrate({
+      lines: circleLines({ ...celebration, streakDays }),
+      nextLabel: 'Next puzzle',
+      timeoutMs: CELEBRATION_MS,
+    });
     this.timer.resume(performance.now());
     this.busy = false;
     this.host.redraw(true);

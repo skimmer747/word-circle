@@ -17,30 +17,45 @@ export interface FrameHost {
   readonly isTracing: boolean;
   /** The tiles traced so far. */
   readonly selection: readonly number[];
-  /** Shows the "Well done!" card until she taps its button or it moves on by itself. */
+  /** Shows the "Well done!" card until she taps its Next button or it moves on by itself. */
   celebrate(card: CelebrationCard): Promise<void>;
   /** Redraws the game (and tells the touch tracker about its new targets). */
   redraw(animateIn: boolean): void;
+  /** The game's buttons changed without a redraw (e.g. keys hidden): tells the touch tracker. */
+  updateTargets(targets: GameTargets): void;
+  /** Marks today as played (in either game) and returns her days in a row. */
+  recordPlayDay(): number;
 }
 
-/** A game the frame can show. Button ids "next", "clock" and "close" belong to the frame. */
+/**
+ * A game the frame can show. Button ids "next", "share", "clock", "close", "games", "games-close" and
+ * "game:…" belong to the frame.
+ */
 export interface GameScreen {
   readonly id: GameId;
-  /** True while it's animating or celebrating: pop-ups wait. */
+  /** Its name in the Games pop-up. */
+  readonly title: string;
+  /** True while it's animating or celebrating: pop-ups and switching games wait. */
   readonly busy: boolean;
   /** Loads its saved progress. Called once, before the first render. */
   start(host: FrameHost): void;
   /** Draws itself into `layer` and returns what the touch tracker should listen for. */
   render(layer: HTMLElement, frame: FrameLayout, animateIn: boolean): GameTargets;
   buttonTapped(id: string): void;
+  /** A finger came down on a button (for its pressed look)... */
+  buttonPressed?(id: string): void;
+  /** ...and lifted. */
+  buttonReleased?(id: string): void;
   letterAdded?(): void;
   letterRemoved?(): void;
   selectionCleared?(): void;
   wordSubmitted?(tiles: readonly number[]): void;
   /** A finger touched down or lifted (for play time). */
   activity?(): void;
-  /** She left it (the app went to the background): save and stop timers. */
+  /** She left it: she picked another game, or the app went to the background. Save and stop timers. */
   pause(): void;
   /** She's back. */
   resume(): void;
+  /** A line under its name in the Games pop-up, or null. */
+  note?(): string | null;
 }
