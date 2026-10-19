@@ -1,0 +1,27 @@
+{
+  "name": "word-circle",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "puzzles": "tsx scripts/build-puzzles.ts",
+    "icons": "pwa-assets-generator --preset minimal-2023 public/icon.svg"
+  },
+  "dependencies": {
+    "@fontsource/atkinson-hyperlegible": "5.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.6",
+    "@vite-pwa/assets-generator": "0.2.6",
+    "tsx": "4.19.2",
+    "typescript": "5.6.3",
+    "vite": "5.4.21",
+    "vite-plugin-pwa": "0.21.2",
+    "vitest": "2.1.9",
+    "workbox-window": "7.3.0"
+  }
+}
