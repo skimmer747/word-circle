@@ -13,8 +13,8 @@ import { FrameView, type CelebrationCard } from './view';
 const CLOCK_OPEN_MS = 60_000;
 /** The Games pop-up closes by itself after this long. */
 const GAMES_OPEN_MS = 60_000;
-/** With the clock's very large text, three events fit on every iPad. */
-const CLOCK_MAX_EVENTS = 3;
+/** The countdown list scrolls, so it can hold everything coming up this week. */
+const CLOCK_MAX_EVENTS = 20;
 /** How often to check the online schedule for changes. */
 const SCHEDULE_REFRESH_MS = 5 * 60_000;
 
@@ -70,6 +70,7 @@ export class Frame implements FrameHost {
       buttonTapped: (id) => this.buttonTapped(id),
       buttonPressed: (id) => this.game.buttonPressed?.(id),
       buttonReleased: (id) => this.game.buttonReleased?.(id),
+      scrolled: (id, dy) => this.scrolled(id, dy),
     });
   }
 
@@ -129,6 +130,12 @@ export class Frame implements FrameHost {
     this.saved = { ...this.saved, ...days };
     saveSavedFrame(this.store, this.saved);
     return days.streakDays;
+  }
+
+  private scrolled(id: string, dy: number): void {
+    if (id !== 'clock' || !this.clockOpen) return;
+    this.view.scrollClock(dy);
+    this.keepClockOpen();
   }
 
   private buttonTapped(id: string): void {
@@ -210,9 +217,15 @@ export class Frame implements FrameHost {
     this.clockOpen = true;
     this.view.showClock(clockFace(new Date()), upcomingLines(this.schedule, new Date(), CLOCK_MAX_EVENTS), this.layout);
     this.clockTick = window.setInterval(() => this.updateClock(), 1000);
-    this.clockAutoClose = window.setTimeout(() => this.closeClock(), CLOCK_OPEN_MS);
+    this.keepClockOpen();
     this.updateTouchTargets();
     void this.refreshSchedule();
+  }
+
+  /** (Re)starts the countdown to closing the clock by itself, so it stays open while she scrolls. */
+  private keepClockOpen(): void {
+    window.clearTimeout(this.clockAutoClose);
+    this.clockAutoClose = window.setTimeout(() => this.closeClock(), CLOCK_OPEN_MS);
   }
 
   private updateClock(): void {
@@ -312,6 +325,8 @@ export class Frame implements FrameHost {
       safeZoneRight: layout.safeZoneRight,
       tiles,
       buttons,
+      // A finger dragged anywhere on the clock card scrolls its countdowns.
+      scrollAreas: this.clockOpen ? [{ id: 'clock', ...layout.card }] : [],
     });
     if (this.celebration) this.view.placeCelebration(layout);
     if (this.clockOpen) this.view.placeClock(layout);

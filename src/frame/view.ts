@@ -36,7 +36,15 @@ export interface GameEntry {
   note: string | null;
 }
 
-const SIDEWAYS_IPAD = `<svg width="240" height="170" viewBox="0 0 240 170" aria-hidden="true"><rect x="10" y="10" width="220" height="150" rx="18" fill="#fff" stroke="#141414" stroke-width="8"/><circle cx="208" cy="85" r="6" fill="#141414"/></svg>`;
+/** Text doesn't shrink exactly in proportion to its size, so a line that has to shrink gets 2% to spare. */
+const FIT_SPARE = 0.98;
+const ICON_ATTRS =
+  'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+/** Solid triangles: easier for her to spot than thin chevrons. */
+const MORE_DOWN_ICON = `<svg ${ICON_ATTRS}><path d="M4 7h16l-8 11z" fill="currentColor"/></svg>`;
+const MORE_UP_ICON = `<svg ${ICON_ATTRS}><path d="M4 17h16l-8 -11z" fill="currentColor"/></svg>`;
+
+const SIDEWAYS_IPAD =`<svg width="240" height="170" viewBox="0 0 240 170" aria-hidden="true"><rect x="10" y="10" width="220" height="150" rx="18" fill="#fff" stroke="#141414" stroke-width="8"/><circle cx="208" cy="85" r="6" fill="#141414"/></svg>`;
 
 const pictureRow = (letters: string, looks: readonly string[]) =>
   [...letters].map((letter, i) => `<span class="${looks[i]}">${letter.trim()}</span>`).join('');
@@ -183,6 +191,9 @@ export class FrameView {
     el('div', 'clock-part', card);
     el('div', 'clock-date', card);
     el('div', 'clock-events', card);
+    // Arrows in the card's side margins, beside the list, showing there are more countdowns that way.
+    el('div', 'clock-more up', card).innerHTML = MORE_UP_ICON + MORE_UP_ICON;
+    el('div', 'clock-more down', card).innerHTML = MORE_DOWN_ICON + MORE_DOWN_ICON;
     const close = el('button', 'next close', this.clockPopup);
     close.type = 'button';
     close.innerHTML = `${CLOSE_ICON}<span>Close</span>`;
@@ -204,7 +215,10 @@ export class FrameView {
     const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
     if (!list) return;
     const current = [...list.children].map((row) => row.textContent).join('\n');
-    if (current === events.join('\n')) return;
+    if (current === events.join('\n')) {
+      this.showClockScrollFades(list);
+      return;
+    }
     list.style.display = events.length === 0 ? 'none' : '';
     list.replaceChildren(
       ...events.map((text) => {
@@ -246,10 +260,10 @@ export class FrameView {
     const rows = [...list.children] as HTMLElement[];
     const widest = Math.max(0, ...rows.map((row) => row.scrollWidth + (row.offsetWidth - row.clientWidth)));
     const scale = fitFontScale(widest, room);
-    if (scale < 1) list.style.fontSize = `${parseFloat(getComputedStyle(list).fontSize) * scale}px`;
+    if (scale < 1) list.style.fontSize = `${parseFloat(getComputedStyle(list).fontSize) * scale * FIT_SPARE}px`;
   }
 
-  /** Shrinks any event line too wide for one line, and drops events that still don't fit rather than cut them off. */
+  /** Shrinks any event line too wide for one line. Events that don't all fit are scrolled to. */
   private fitClockEvents(): void {
     const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
     if (!list) return;
@@ -259,8 +273,29 @@ export class FrameView {
       // Room for the text and padding: the list's width less the row's own border, and 1px for rounding.
       const room = list.clientWidth - (row.offsetWidth - row.clientWidth) - 1;
       const scale = fitFontScale(row.scrollWidth, room);
-      if (scale < 1) row.style.fontSize = `${parseFloat(getComputedStyle(row).fontSize) * scale}px`;
+      if (scale < 1) row.style.fontSize = `${parseFloat(getComputedStyle(row).fontSize) * scale * FIT_SPARE}px`;
     }
-    while (list.children.length > 1 && list.scrollHeight > list.clientHeight + 1) list.lastElementChild!.remove();
+    this.showClockScrollFades(list);
+  }
+
+  /** Scrolls the countdowns by `dy` pixels (positive shows what is further down). */
+  scrollClock(dy: number): void {
+    const list = this.clockPopup.querySelector<HTMLElement>('.clock-events');
+    if (!list) return;
+    list.scrollTop += dy;
+    this.showClockScrollFades(list);
+  }
+
+  /** Fades the edge of the list and shows arrows where more countdowns are hidden, so she can tell there are more. */
+  private showClockScrollFades(list: HTMLElement): void {
+    const above = list.scrollTop > 1;
+    const below = list.scrollTop + list.clientHeight < list.scrollHeight - 1;
+    list.classList.toggle('more-above', above);
+    list.classList.toggle('more-below', below);
+    const card = list.parentElement!;
+    card.classList.toggle('more-above', above);
+    card.classList.toggle('more-below', below);
+    card.style.setProperty('--list-top', `${list.offsetTop}px`);
+    card.style.setProperty('--list-bottom', `${list.offsetTop + list.offsetHeight}px`);
   }
 }

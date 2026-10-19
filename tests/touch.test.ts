@@ -338,3 +338,88 @@ describe('pressed buttons', () => {
     expect(events).toEqual([]);
   });
 });
+
+describe('scrolling', () => {
+  // The clock pop-up: the whole card scrolls, and its Close button sits inside it.
+  const CLOCK: TracerGeometry = {
+    screenWidth: 1180,
+    safeZoneLeft: 200,
+    safeZoneRight: 130,
+    tiles: [],
+    buttons: [{ id: 'close', x: 410, y: 680, w: 360, h: 100 }],
+    scrollAreas: [{ id: 'clock', x: 16, y: 16, w: 1148, h: 788 }],
+  };
+
+  function scrollSetup() {
+    const events: string[] = [];
+    const tracer = new LetterTracer({
+      letterAdded: (tile) => events.push(`add ${tile}`),
+      letterRemoved: (tile) => events.push(`remove ${tile}`),
+      wordSubmitted: (tiles) => events.push(`submit ${tiles.join(',')}`),
+      selectionCleared: () => events.push('clear'),
+      buttonTapped: (id) => events.push(`tap ${id}`),
+      scrolled: (id, dy) => events.push(`scroll ${id} ${dy}`),
+    });
+    tracer.setGeometry(CLOCK);
+    const send = (type: PointerInput['type'], id: number, x: number, y: number) => tracer.handle({ type, id, x, y });
+    return { tracer, events, send };
+  }
+
+  it('scrolls by how far the finger moves: up shows what is further down', () => {
+    const { events, send } = scrollSetup();
+    send('down', 1, 600, 500);
+    send('move', 1, 600, 460);
+    send('move', 1, 600, 430);
+    send('move', 1, 600, 450);
+    send('up', 1, 600, 450);
+    expect(events).toEqual(['scroll clock 40', 'scroll clock 30', 'scroll clock -20']);
+  });
+
+  it('ignores a drag that starts in a safe zone', () => {
+    const { events, send } = scrollSetup();
+    send('down', 1, 100, 500);
+    send('move', 1, 300, 400);
+    send('up', 1, 300, 400);
+    expect(events).toEqual([]);
+  });
+
+  it('scrolls while her thumb rests in the safe zone', () => {
+    const { events, send } = scrollSetup();
+    send('down', 1, 60, 500);
+    send('move', 1, 62, 480);
+    send('down', 2, 600, 500);
+    send('move', 2, 600, 450);
+    send('up', 2, 600, 450);
+    expect(events).toEqual(['scroll clock 50']);
+  });
+
+  it('follows only the first scrolling finger', () => {
+    const { events, send } = scrollSetup();
+    send('down', 1, 600, 500);
+    send('down', 2, 800, 500);
+    send('move', 2, 800, 300);
+    send('move', 1, 600, 490);
+    expect(events).toEqual(['scroll clock 10']);
+  });
+
+  it('still taps a button inside the scrolling area', () => {
+    const { events, send } = scrollSetup();
+    send('down', 1, 590, 730);
+    send('up', 1, 590, 730);
+    expect(events).toEqual(['tap close']);
+  });
+
+  it('stops scrolling when the screen changes', () => {
+    const { tracer, events, send } = scrollSetup();
+    send('down', 1, 600, 500);
+    tracer.setGeometry(CLOCK);
+    send('move', 1, 600, 400);
+    expect(events).toEqual([]);
+  });
+
+  it('is not tracing a word while scrolling', () => {
+    const { tracer, send } = scrollSetup();
+    send('down', 1, 600, 500);
+    expect(tracer.isTracing).toBe(false);
+  });
+});

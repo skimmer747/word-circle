@@ -571,7 +571,10 @@ body {
   color: var(--label);
 }
 
+/* Scrolled by dragging a finger on the card (through the touch tracer, which skips the safe zones).
+   A fade at the top or bottom shows there are more countdowns that way; the divider line stays. */
 .clock-events {
+  --fade: calc(var(--u) * 9);
   box-sizing: border-box;
   flex: 1;
   min-height: 0;
@@ -584,9 +587,56 @@ body {
   border-top: 5px solid var(--bg);
 }
 
-/* Each event stays on one line; the view shrinks a long one to fit (icon and spacing scale with it). */
+.clock-events.more-below {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
+}
+
+.clock-events.more-above {
+  -webkit-mask-image: linear-gradient(to bottom, #000 6px, transparent 6px, #000 var(--fade));
+  mask-image: linear-gradient(to bottom, #000 6px, transparent 6px, #000 var(--fade));
+}
+
+.clock-events.more-above.more-below {
+  -webkit-mask-image: linear-gradient(to bottom, #000 6px, transparent 6px, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+  mask-image: linear-gradient(to bottom, #000 6px, transparent 6px, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+}
+
+/* ▲▲ / ▼▼ in the card's side padding (never over text), at the top or bottom of the list. */
+.clock-more {
+  position: absolute;
+  /* Centered in the card's 48px side padding. */
+  left: 4px;
+  right: 4px;
+  display: none;
+  justify-content: space-between;
+  pointer-events: none;
+  color: var(--navy);
+}
+
+.clock-more svg {
+  width: 40px;
+  height: 40px;
+}
+
+.clock-more.up {
+  top: calc(var(--list-top) + 10px);
+}
+
+.clock-more.down {
+  top: calc(var(--list-bottom) - 50px);
+}
+
+.clock-card.more-above .clock-more.up,
+.clock-card.more-below .clock-more.down {
+  display: flex;
+}
+
+/* Each event stays on one line; the view shrinks a long one to fit (icon and spacing scale with it).
+   Rows keep their full height (flex: none) so extra events scroll instead of squashing. */
 .clock-event {
   box-sizing: border-box;
+  flex: none;
   display: flex;
   align-items: center;
   gap: 0.3em;
