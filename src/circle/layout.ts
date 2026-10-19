@@ -1,18 +1,14 @@
-/** Right-edge thumb safe zone (about an inch). */
-export const SAFE_ZONE_RIGHT = 130;
-/** Her left thumb rests on the screen, so the left safe zone grows to about 1.5 inches where there's room... */
-export const SAFE_ZONE_LEFT_TARGET = 200;
-/** ...and never shrinks below an inch. */
-export const SAFE_ZONE_LEFT_MIN = 130;
-/** Play-area width needed for a Hard puzzle at the smallest allowed tile and slot sizes. */
-const MIN_PLAY_WIDTH = 760;
+import { MARGIN, type FrameLayout, type Rect } from '../frame/layout';
 
-const MARGIN = 16;
+export type { Rect };
+
 const COLUMN_GAP = 24;
 const LEFT_SHARE = 0.45;
 /** Room for the "Extra words" label and two rows of word chips. */
 const EXTRAS_HEIGHT = 130;
 const EXTRAS_GAP = 8;
+/** Space between Extra words and the buttons in the top-right corner. */
+const CORNER_GAP = 12;
 const BAR_HEIGHT = 96;
 const BAR_MAX_WIDTH = 420;
 const BAR_GAP = 16;
@@ -30,20 +26,6 @@ const LEVEL_MAX_WIDTH = 120;
 const LEVEL_GAP = 8;
 const LEVELS_BOTTOM_GAP = 16;
 const LEVEL_COUNT = 3;
-const NEXT_WIDTH = 420;
-const NEXT_HEIGHT = 100;
-const CARD_PADDING = 24;
-const CLOCK_SIZE = 72;
-const CLOCK_GAP = 12;
-const CLOSE_WIDTH = 360;
-const CLOSE_HEIGHT = 100;
-
-export interface Rect {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
 
 export interface Circle {
   x: number;
@@ -51,18 +33,15 @@ export interface Circle {
   r: number;
 }
 
-export interface LayoutInput {
-  width: number;
-  height: number;
+/** How many letters are in the circle, and how long each answer word is. */
+export interface CircleShape {
   letterCount: number;
   wordLengths: number[];
 }
 
 export interface Layout {
-  width: number;
-  height: number;
-  safeZoneLeft: number;
-  safeZoneRight: number;
+  /** The frame's geometry: safe zones, play area, top-right buttons and pop-up cards. */
+  frame: FrameLayout;
   /** Easy, Medium and Hard buttons at the top left. */
   levels: Rect[];
   /** "Extra words" list at the top right. */
@@ -80,30 +59,18 @@ export interface Layout {
   rows: Rect[];
   shuffleButton: Rect;
   hintButton: Rect;
-  /** The "Well done!" card shown after a puzzle, and its Next puzzle button. */
-  celebration: Rect;
-  nextButton: Rect;
-  /** Clock button at the top right, and the clock pop-up with its Close button. */
-  clockButton: Rect;
-  clockCard: Rect;
-  closeButton: Rect;
 }
 
-export function computeLayout({ width, height, letterCount, wordLengths }: LayoutInput): Layout {
-  const safeZoneLeft = Math.min(
-    SAFE_ZONE_LEFT_TARGET,
-    Math.max(SAFE_ZONE_LEFT_MIN, width - SAFE_ZONE_RIGHT - MIN_PLAY_WIDTH),
-  );
-  const playLeft = safeZoneLeft + MARGIN;
-  const playRight = width - SAFE_ZONE_RIGHT - MARGIN;
-  const columnsWidth = playRight - playLeft - COLUMN_GAP;
+export function computeLayout(frame: FrameLayout, { letterCount, wordLengths }: CircleShape): Layout {
+  const { height } = frame;
+  const playLeft = frame.play.x;
+  const columnsWidth = frame.play.w - COLUMN_GAP;
   const leftWidth = columnsWidth * LEFT_SHARE;
   const rightWidth = columnsWidth - leftWidth;
   const rightLeft = playLeft + leftWidth + COLUMN_GAP;
   const rightCenter = rightLeft + rightWidth / 2;
 
-  const clockButton: Rect = { x: playRight - CLOCK_SIZE, y: MARGIN, w: CLOCK_SIZE, h: CLOCK_SIZE };
-  const extras: Rect = { x: rightLeft, y: MARGIN, w: rightWidth - CLOCK_SIZE - CLOCK_GAP, h: EXTRAS_HEIGHT };
+  const extras: Rect = { x: rightLeft, y: MARGIN, w: frame.corner.x - CORNER_GAP - rightLeft, h: EXTRAS_HEIGHT };
   const barWidth = Math.min(rightWidth, BAR_MAX_WIDTH);
   const bar: Rect = { x: rightCenter - barWidth / 2, y: extras.y + extras.h + EXTRAS_GAP, w: barWidth, h: BAR_HEIGHT };
 
@@ -149,33 +116,8 @@ export function computeLayout({ width, height, letterCount, wordLengths }: Layou
     return { x: leftCenter - w / 2, y: blockTop + i * (slotSize + ROW_GAP), w, h: slotSize };
   });
 
-  // The "Well done!" card and the clock fill almost the whole screen so their text can be as big as possible.
-  const celebration: Rect = { x: MARGIN, y: MARGIN, w: width - 2 * MARGIN, h: height - 2 * MARGIN };
-  const nextButton: Rect = {
-    x: width / 2 - NEXT_WIDTH / 2,
-    y: celebration.y + celebration.h - CARD_PADDING - NEXT_HEIGHT,
-    w: NEXT_WIDTH,
-    h: NEXT_HEIGHT,
-  };
-
-  const clockCard: Rect = { ...celebration };
-  const closeButton: Rect = {
-    x: width / 2 - CLOSE_WIDTH / 2,
-    y: clockCard.y + clockCard.h - CARD_PADDING - CLOSE_HEIGHT,
-    w: CLOSE_WIDTH,
-    h: CLOSE_HEIGHT,
-  };
-
   return {
-    width,
-    height,
-    celebration,
-    nextButton,
-    clockButton,
-    clockCard,
-    closeButton,
-    safeZoneLeft,
-    safeZoneRight: SAFE_ZONE_RIGHT,
+    frame,
     levels,
     extras,
     bar,

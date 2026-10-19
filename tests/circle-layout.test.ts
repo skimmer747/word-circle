@@ -1,23 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import {
-  computeLayout,
-  SAFE_ZONE_LEFT_MIN,
-  SAFE_ZONE_LEFT_TARGET,
-  SAFE_ZONE_RIGHT,
-  type Circle,
-  type Layout,
-  type Rect,
-} from '../src/circle/layout';
-
-const SCREENS: Array<[number, number]> = [
-  [1024, 768],
-  [1080, 810],
-  [1133, 744],
-  [1180, 820],
-  [1194, 834],
-  [1366, 1024],
-  [1376, 1032],
-];
+import { computeLayout, type Circle, type Rect } from '../src/circle/layout';
+import { computeFrameLayout } from '../src/frame/layout';
+import { SCREENS, inPlayArea } from './screens';
 
 const PUZZLE_SHAPES = [
   { letterCount: 4, wordLengths: [3, 3, 4, 4] },
@@ -28,18 +12,10 @@ const PUZZLE_SHAPES = [
 
 const circleRect = (c: Circle): Rect => ({ x: c.x - c.r, y: c.y - c.r, w: c.r * 2, h: c.r * 2 });
 
-function inPlayArea(rect: Rect, layout: Layout): boolean {
-  return (
-    rect.x >= layout.safeZoneLeft &&
-    rect.x + rect.w <= layout.width - layout.safeZoneRight &&
-    rect.y >= 0 &&
-    rect.y + rect.h <= layout.height
-  );
-}
-
-describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
+describe.each(SCREENS)('Word Circle layout on a %i×%i screen', (width, height) => {
   describe.each(PUZZLE_SHAPES)('with $letterCount letters and words $wordLengths', (shape) => {
-    const layout = computeLayout({ width, height, ...shape });
+    const layout = computeLayout(computeFrameLayout(width, height), shape);
+    const { frame } = layout;
 
     it('keeps everything out of the safe zones and on screen', () => {
       const rects = [
@@ -52,14 +28,7 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
         circleRect(layout.backing),
         ...layout.tiles.map(circleRect),
       ];
-      for (const rect of rects) expect(inPlayArea(rect, layout), JSON.stringify(rect)).toBe(true);
-    });
-
-    it('gives her left thumb a wider safe zone where the screen has room', () => {
-      expect(layout.safeZoneRight).toBe(SAFE_ZONE_RIGHT);
-      expect(layout.safeZoneLeft).toBeGreaterThanOrEqual(SAFE_ZONE_LEFT_MIN);
-      expect(layout.safeZoneLeft).toBeLessThanOrEqual(SAFE_ZONE_LEFT_TARGET);
-      if (width >= 1133) expect(layout.safeZoneLeft).toBe(SAFE_ZONE_LEFT_TARGET);
+      for (const rect of rects) expect(inPlayArea(rect, frame), JSON.stringify(rect)).toBe(true);
     });
 
     it('makes letter tiles at least 110 px across', () => {
@@ -98,6 +67,11 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
       expect(extras.x + extras.w).toBeGreaterThan(backing.x);
     });
 
+    it('keeps Extra words and the word bar clear of the top-right buttons', () => {
+      expect(layout.extras.x + layout.extras.w).toBeLessThanOrEqual(frame.corner.x);
+      expect(frame.corner.y + frame.corner.h).toBeLessThanOrEqual(layout.bar.y);
+    });
+
     it('puts three small level buttons in a row at the top left, above the word slots', () => {
       const { levels, rows } = layout;
       expect(levels).toHaveLength(3);
@@ -114,45 +88,6 @@ describe.each(SCREENS)('layout on a %i×%i screen', (width, height) => {
       for (const rect of [...layout.levels, ...layout.rows, layout.shuffleButton, layout.hintButton]) {
         expect(rect.x + rect.w).toBeLessThanOrEqual(rightColumnStart);
       }
-    });
-
-    it('fills almost the whole screen with the celebration card, with a big Next button clear of the safe zones', () => {
-      const { celebration, nextButton } = layout;
-      expect(celebration.x).toBeGreaterThanOrEqual(0);
-      expect(celebration.y).toBeGreaterThanOrEqual(0);
-      expect(celebration.x + celebration.w).toBeLessThanOrEqual(width);
-      expect(celebration.y + celebration.h).toBeLessThanOrEqual(height);
-      expect(celebration.w).toBeGreaterThanOrEqual(width - 40);
-      expect(celebration.h).toBeGreaterThanOrEqual(height - 40);
-      expect(inPlayArea(nextButton, layout)).toBe(true);
-      expect(nextButton.h).toBeGreaterThanOrEqual(96);
-      expect(nextButton.w).toBeGreaterThanOrEqual(400);
-      expect(Math.abs(nextButton.x + nextButton.w / 2 - width / 2)).toBeLessThan(1);
-      expect(nextButton.y + nextButton.h).toBeLessThanOrEqual(celebration.y + celebration.h);
-    });
-
-    it('puts the clock button at the top right, beside Extra words', () => {
-      const { clockButton, extras, bar } = layout;
-      expect(inPlayArea(clockButton, layout)).toBe(true);
-      expect(clockButton.w).toBeGreaterThanOrEqual(64);
-      expect(clockButton.h).toBeGreaterThanOrEqual(64);
-      expect(clockButton.x + clockButton.w).toBeCloseTo(width - layout.safeZoneRight - 16, 5);
-      expect(extras.x + extras.w).toBeLessThanOrEqual(clockButton.x);
-      expect(clockButton.y + clockButton.h).toBeLessThanOrEqual(bar.y);
-    });
-
-    it('makes the clock pop-up fill almost the whole screen, with a big Close button clear of the safe zones', () => {
-      const { clockCard, closeButton } = layout;
-      expect(clockCard.x).toBeGreaterThanOrEqual(0);
-      expect(clockCard.y).toBeGreaterThanOrEqual(0);
-      expect(clockCard.x + clockCard.w).toBeLessThanOrEqual(width);
-      expect(clockCard.y + clockCard.h).toBeLessThanOrEqual(height);
-      expect(clockCard.w).toBeGreaterThanOrEqual(width - 40);
-      expect(clockCard.h).toBeGreaterThanOrEqual(height - 40);
-      expect(inPlayArea(closeButton, layout)).toBe(true);
-      expect(closeButton.h).toBeGreaterThanOrEqual(96);
-      expect(closeButton.w).toBeGreaterThanOrEqual(340);
-      expect(closeButton.y + closeButton.h).toBeLessThanOrEqual(clockCard.y + clockCard.h);
     });
 
     it('makes buttons at least 90 px tall', () => {
