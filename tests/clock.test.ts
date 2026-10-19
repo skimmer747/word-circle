@@ -54,11 +54,22 @@ describe('upcomingLines', () => {
     expect(upcomingLines(events, at(17, 31))[0]).toBe('Bingo in 1 hour 29 minutes');
   });
 
-  it('mentions one-off events coming up this week', () => {
+  it('counts down to one-off events coming up this week', () => {
     expect(upcomingLines(events, at(20, 0))).toEqual([
-      'Hair appointment tomorrow at 9:00 AM',
-      'Doctor visit on Thursday at 2:00 PM',
+      'Hair appointment in 13 hours',
+      'Doctor visit in 2 days and 18 hours',
     ]);
+  });
+
+  it('says days and hours, to the nearest hour, once an event is a day or more away', () => {
+    const doctor = parseSchedule('2026-10-22 2:00 PM Doctor visit');
+    expect(upcomingLines(doctor, at(13, 20))).toEqual(['Doctor visit in 3 days and 1 hour']);
+    expect(upcomingLines(doctor, at(13, 40))).toEqual(['Doctor visit in 3 days']);
+    expect(upcomingLines(doctor, at(14, 29))).toEqual(['Doctor visit in 3 days']);
+    expect(upcomingLines(doctor, at(14, 31))).toEqual(['Doctor visit in 2 days and 23 hours']);
+    expect(upcomingLines(doctor, at(13, 0, 21))).toEqual(['Doctor visit in 1 day and 1 hour']);
+    expect(upcomingLines(doctor, at(14, 0, 21))).toEqual(['Doctor visit in 1 day']);
+    expect(upcomingLines(doctor, at(14, 30, 21))).toEqual(['Doctor visit in 23 hours 30 minutes']);
   });
 
   it('counts minutes up so it never says zero', () => {

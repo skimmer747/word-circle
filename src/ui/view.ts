@@ -406,7 +406,9 @@ export class View {
     const rows = [...list.children] as HTMLElement[];
     rows.forEach((row) => (row.style.fontSize = ''));
     for (const row of rows) {
-      const scale = fitFontScale(row.scrollWidth, list.clientWidth);
+      // Room for the text and padding: the list's width less the row's own border, and 1px for rounding.
+      const room = list.clientWidth - (row.offsetWidth - row.clientWidth) - 1;
+      const scale = fitFontScale(row.scrollWidth, room);
       if (scale < 1) row.style.fontSize = `${parseFloat(getComputedStyle(row).fontSize) * scale}px`;
     }
     while (list.children.length > 1 && list.scrollHeight > list.clientHeight + 1) list.lastElementChild!.remove();
