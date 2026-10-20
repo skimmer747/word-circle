@@ -1482,6 +1482,11 @@ body {
   font-size: 40px;
 }
 
+/* The settings page's 22 px headings would be smaller than the welcome's 24 px steps. */
+.welcome-page .settings-section h2 {
+  font-size: 28px;
+}
+
 .welcome-about {
   margin: 12px 0 24px;
   line-height: 1.4;
