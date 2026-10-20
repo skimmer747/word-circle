@@ -23,6 +23,10 @@ For another family, just send them the link https://skimmer747.github.io/word-ci
 
 **Games › Your stats** opens her stats: five big, cheerful cards (her total, her favorite game, her bests and Word Guess chart, a garden of the days she played, and a fun fact), with confetti when something's new. With only one game turned on, the corner's Stats button opens them. Every finished puzzle or word is logged on the iPad (13 months of detail, plus lifetime figures). The caregiver settings page has **How they're doing**: honest weekly charts of speed, hints, tries and play, after about 2 weeks of play.
 
+## Visitor counts
+
+The live site counts visits and a few events (a puzzle or word finished, with its game, level and whether Hint helped; a game switched; stats or settings opened) in Google Analytics, property "Word Circle" (`G-FEE3EFJD8Y`, set in `src/analytics.ts`). Nothing is counted when testing locally, Google's ad features are off, and no names, words, answers or schedules are ever sent. The welcome and settings pages tell families so.
+
 ## Commands
 
 ```bash

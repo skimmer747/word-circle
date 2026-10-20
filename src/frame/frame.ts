@@ -1,3 +1,4 @@
+import { puzzleEvent, track } from '../analytics';
 import { clockFace, upcomingEvents } from '../clock/clock';
 import { cachedSchedule, refreshSchedule } from '../clock/loader';
 import { parseSchedule, type ScheduledEvent } from '../clock/schedule';
@@ -175,6 +176,7 @@ export class Frame implements FrameHost {
 
   logPlay(record: PlayRecord): void {
     addPlay(this.store, record);
+    track('puzzle_finished', puzzleEvent(record));
   }
 
   private scrolled(id: string, dy: number): void {
@@ -251,6 +253,7 @@ export class Frame implements FrameHost {
     this.game.pause();
     this.game = next;
     this.saved = { ...this.saved, current: id };
+    track('game_switched', { game: id });
     saveSavedFrame(this.store, this.saved);
     this.relayout(true);
     this.game.resume();
@@ -265,6 +268,7 @@ export class Frame implements FrameHost {
   private openStats(): void {
     if (this.blocked() || !this.layout) return;
     this.statsOpen = true;
+    track('stats_opened');
     this.game.pause();
     this.statsInput = {
       games: this.games.map((game) => ({ id: game.id, title: game.title, ...game.summary() })),
@@ -376,6 +380,7 @@ export class Frame implements FrameHost {
     this.cancelHold();
     if (this.blocked()) return;
     this.settingsOpen = true;
+    track('settings_opened');
     this.tracer.setEnabled(false);
     this.game.pause();
     this.options.openSettings(() => this.settingsClosed());

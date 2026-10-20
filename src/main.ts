@@ -13,6 +13,7 @@ import { GridScreen } from './grid/screen';
 import type { GridPuzzleSet, GridWords } from './grid/types';
 import { GuessScreen } from './guess/screen';
 import type { GuessWords } from './guess/words';
+import { startAnalytics } from './analytics';
 import { setupUpdates } from './pwa';
 import { firstScreen, isInstalled } from './settings/first-screen';
 import { openSettingsPage } from './settings/page';
@@ -108,7 +109,9 @@ const firstSetup = () =>
     },
     () => {},
   );
-const screen = firstScreen({ firstTime, installed: isInstalled(window) });
+const installed = isInstalled(window);
+startAnalytics(installed);
+const screen = firstScreen({ firstTime, installed });
 if (screen === 'welcome') openWelcomePage(root, { setUpHere: firstSetup });
 else if (screen === 'setup') firstSetup();
 else startApp(settings);

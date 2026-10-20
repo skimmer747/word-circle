@@ -289,7 +289,7 @@ export function openSettingsPage(root: HTMLElement, settings: Settings, options:
     renderFamily(doing, options.family);
   }
 
-  el('p', 'settings-privacy', sheet).textContent = 'Everything on this page stays on this iPad.';
+  el('p', 'settings-privacy', sheet).textContent = 'Everything on this page stays on this iPad. Visits and finished puzzles are counted with Google Analytics; never names, words or schedules.';
   const actions = el('div', 'settings-actions', sheet);
   if (!options.firstTime) {
     button(

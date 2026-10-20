@@ -26,7 +26,7 @@ export function openWelcomePage(root: HTMLElement, options: WelcomeOptions): voi
   el('h2', '', steps).textContent = 'First, put it on the Home Screen';
   const list = el('ol', 'welcome-steps', steps);
   for (const step of STEPS) el('li', '', list).innerHTML = step;
-  el('p', 'settings-privacy', sheet).textContent = 'Nothing you set up is sent anywhere. It stays on this iPad.';
+  el('p', 'settings-privacy', sheet).textContent = 'Nothing you set up is sent anywhere. It stays on this iPad. Visits and finished puzzles are counted with Google Analytics; never names, words or schedules.';
   const here = el('button', 'welcome-here', sheet);
   here.type = 'button';
   here.textContent = 'Not on an iPad? Set it up in this browser instead';

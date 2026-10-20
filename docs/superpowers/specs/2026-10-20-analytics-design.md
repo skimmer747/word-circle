@@ -1,7 +1,7 @@
 # Google Analytics — Design
 
 **Date:** 2026-10-20
-**Status:** Design approved; not built yet.
+**Status:** Built 2026-10-20.
 
 ## Purpose
 
