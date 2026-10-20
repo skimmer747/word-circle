@@ -18,7 +18,7 @@ import {
   type SavedGame,
   type StartPoint,
 } from './storage';
-import { PlayTimer } from './timer';
+import { PlayTimer } from '../shared/timer';
 import { LEVELS, type Level, type PuzzleSet } from './types';
 import { View, type RowState } from './view';
 

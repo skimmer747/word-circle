@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { IDLE_CAP_MS, PlayTimer } from '../src/circle/timer';
+import { IDLE_CAP_MS, PlayTimer } from '../src/shared/timer';
 
 describe('PlayTimer', () => {
   it('counts the time between touches', () => {
