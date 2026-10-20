@@ -1472,3 +1472,45 @@ body {
     stroke-dashoffset: 0;
   }
 }
+
+/* The welcome a browser tab shows the first time: bigger text, since it's all there is to read. */
+.welcome-page {
+  font-size: 24px;
+}
+
+.welcome-page .settings-title {
+  font-size: 40px;
+}
+
+.welcome-about {
+  margin: 12px 0 24px;
+  line-height: 1.4;
+}
+
+.welcome-steps {
+  margin: 0;
+  padding-left: 1.4em;
+  line-height: 1.4;
+}
+
+.welcome-steps li + li {
+  margin-top: 12px;
+}
+
+.welcome-here {
+  display: block;
+  margin: 8px auto 0;
+  padding: 12px;
+  border: none;
+  background: none;
+  color: var(--navy);
+  font: inherit;
+  font-size: 20px;
+  text-decoration: underline;
+}
+
+/* "Nothing … leaves this iPad", on the welcome and the settings page. */
+.settings-privacy {
+  margin: 0 0 16px;
+  color: var(--label);
+}
