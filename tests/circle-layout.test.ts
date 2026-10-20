@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { computeLayout, type Circle, type Rect } from '../src/circle/layout';
 import { computeFrameLayout } from '../src/frame/layout';
-import { SCREENS, inPlayArea } from './screens';
+import { SCREENS_AND_THUMBS, inPlayArea } from './screens';
 
 const PUZZLE_SHAPES = [
   { letterCount: 4, wordLengths: [3, 3, 4, 4] },
@@ -12,9 +12,9 @@ const PUZZLE_SHAPES = [
 
 const circleRect = (c: Circle): Rect => ({ x: c.x - c.r, y: c.y - c.r, w: c.r * 2, h: c.r * 2 });
 
-describe.each(SCREENS)('Word Circle layout on a %i×%i screen', (width, height) => {
+describe.each(SCREENS_AND_THUMBS)('Word Circle layout on a %i×%i screen, thumb %s', (width, height, thumb) => {
   describe.each(PUZZLE_SHAPES)('with $letterCount letters and words $wordLengths', (shape) => {
-    const layout = computeLayout(computeFrameLayout(width, height), shape);
+    const layout = computeLayout(computeFrameLayout(width, height, 3, thumb), shape);
     const { frame } = layout;
 
     it('keeps everything out of the safe zones and on screen', () => {

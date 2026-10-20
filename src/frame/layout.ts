@@ -1,9 +1,11 @@
-/** Right-edge thumb safe zone (about an inch). */
-export const SAFE_ZONE_RIGHT = 130;
-/** Her left thumb rests on the screen, so the left safe zone grows to about 1.5 inches where there's room... */
-export const SAFE_ZONE_LEFT_TARGET = 200;
-/** ...and never shrinks below an inch. */
-export const SAFE_ZONE_LEFT_MIN = 130;
+/** Every safe zone is at least about an inch wide... */
+export const SAFE_ZONE_MIN = 130;
+/** ...and the side a thumb rests on grows to about 1.5 inches where there's room. */
+export const SAFE_ZONE_THUMB = 200;
+
+/** Which side a thumb rests on while she plays (set on the settings page). */
+export const THUMBS = ['left', 'right', 'none'] as const;
+export type Thumb = (typeof THUMBS)[number];
 /** Play-area width needed for a Hard Word Circle puzzle at the smallest allowed tile and slot sizes. */
 const MIN_PLAY_WIDTH = 760;
 /** Space between the play area and the safe zones and screen edges. */
@@ -72,15 +74,14 @@ export interface FrameLayout {
   gameCards: Rect[];
 }
 
-export function computeFrameLayout(width: number, height: number, gameCount = 2): FrameLayout {
-  const safeZoneLeft = Math.min(
-    SAFE_ZONE_LEFT_TARGET,
-    Math.max(SAFE_ZONE_LEFT_MIN, width - SAFE_ZONE_RIGHT - MIN_PLAY_WIDTH),
-  );
+export function computeFrameLayout(width: number, height: number, gameCount = 2, thumb: Thumb = 'left'): FrameLayout {
+  const wide = Math.min(SAFE_ZONE_THUMB, Math.max(SAFE_ZONE_MIN, width - SAFE_ZONE_MIN - MIN_PLAY_WIDTH));
+  const safeZoneLeft = thumb === 'left' ? wide : SAFE_ZONE_MIN;
+  const safeZoneRight = thumb === 'right' ? wide : SAFE_ZONE_MIN;
   const play: Rect = {
     x: safeZoneLeft + MARGIN,
     y: MARGIN,
-    w: width - safeZoneLeft - SAFE_ZONE_RIGHT - 2 * MARGIN,
+    w: width - safeZoneLeft - safeZoneRight - 2 * MARGIN,
     h: height - 2 * MARGIN,
   };
   const clockButton: Rect = { x: play.x + play.w - CORNER_SIZE, y: MARGIN, w: CORNER_SIZE, h: CORNER_SIZE };
@@ -122,7 +123,7 @@ export function computeFrameLayout(width: number, height: number, gameCount = 2)
     width,
     height,
     safeZoneLeft,
-    safeZoneRight: SAFE_ZONE_RIGHT,
+    safeZoneRight,
     play,
     gamesButton,
     clockButton,

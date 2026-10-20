@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { computeFrameLayout } from '../src/frame/layout';
 import { computeGuessLayout } from '../src/guess/layout';
-import { SCREENS, inPlayArea, overlaps } from './screens';
+import { SCREENS_AND_THUMBS, inPlayArea, overlaps } from './screens';
 
-describe.each(SCREENS)('Word Guess layout on a %i×%i screen', (width, height) => {
-  const layout = computeGuessLayout(computeFrameLayout(width, height));
+describe.each(SCREENS_AND_THUMBS)('Word Guess layout on a %i×%i screen, thumb %s', (width, height, thumb) => {
+  const layout = computeGuessLayout(computeFrameLayout(width, height, 3, thumb));
   const { frame, rows, keys } = layout;
   const left = [layout.hintButton, layout.allLettersButton, layout.dailyButton];
   const keyRects = keys.map((key) => key.rect);

@@ -1,4 +1,4 @@
-import type { Rect } from '../src/frame/layout';
+import { THUMBS, type Rect } from '../src/frame/layout';
 
 /** Every current iPad in landscape, in CSS px. */
 export const SCREENS: Array<[number, number]> = [
@@ -10,6 +10,9 @@ export const SCREENS: Array<[number, number]> = [
   [1366, 1024],
   [1376, 1032],
 ];
+
+/** Every iPad, with a thumb resting on the left, on the right, or neither. */
+export const SCREENS_AND_THUMBS = SCREENS.flatMap(([width, height]) => THUMBS.map((thumb) => [width, height, thumb] as const));
 
 export interface Zones {
   width: number;

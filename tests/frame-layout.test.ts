@@ -1,15 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { computeFrameLayout, SAFE_ZONE_LEFT_MIN, SAFE_ZONE_LEFT_TARGET, SAFE_ZONE_RIGHT } from '../src/frame/layout';
-import { SCREENS, inPlayArea } from './screens';
+import { computeFrameLayout, SAFE_ZONE_MIN, SAFE_ZONE_THUMB } from '../src/frame/layout';
+import { SCREENS, SCREENS_AND_THUMBS, inPlayArea } from './screens';
 
-describe.each(SCREENS)('frame layout on a %i×%i screen', (width, height) => {
-  const frame = computeFrameLayout(width, height, 3);
+describe.each(SCREENS_AND_THUMBS)('frame layout on a %i×%i screen, thumb %s', (width, height, thumb) => {
+  const frame = computeFrameLayout(width, height, 3, thumb);
 
-  it('gives her left thumb a wider safe zone where the screen has room', () => {
-    expect(frame.safeZoneRight).toBe(SAFE_ZONE_RIGHT);
-    expect(frame.safeZoneLeft).toBeGreaterThanOrEqual(SAFE_ZONE_LEFT_MIN);
-    expect(frame.safeZoneLeft).toBeLessThanOrEqual(SAFE_ZONE_LEFT_TARGET);
-    if (width >= 1133) expect(frame.safeZoneLeft).toBe(SAFE_ZONE_LEFT_TARGET);
+  it('gives a resting thumb a wider safe zone where the screen has room, and the other sides an inch', () => {
+    const wide = thumb === 'left' ? frame.safeZoneLeft : thumb === 'right' ? frame.safeZoneRight : null;
+    const narrow =
+      thumb === 'left' ? [frame.safeZoneRight] : thumb === 'right' ? [frame.safeZoneLeft] : [frame.safeZoneLeft, frame.safeZoneRight];
+    for (const zone of narrow) expect(zone).toBe(SAFE_ZONE_MIN);
+    if (wide !== null) {
+      expect(wide).toBeGreaterThanOrEqual(SAFE_ZONE_MIN);
+      expect(wide).toBeLessThanOrEqual(SAFE_ZONE_THUMB);
+      if (width >= 1133) expect(wide).toBe(SAFE_ZONE_THUMB);
+    }
   });
 
   it('makes the play area the space between the safe zones, inside a 16 px margin', () => {
@@ -106,5 +111,25 @@ describe.each(SCREENS)('frame layout on a %i×%i screen', (width, height) => {
     expect(closeButton.h).toBeGreaterThanOrEqual(96);
     expect(closeButton.w).toBeGreaterThanOrEqual(340);
     expect(closeButton.y + closeButton.h).toBeLessThanOrEqual(card.y + card.h);
+  });
+});
+
+describe.each(SCREENS)('thumb sides on a %i×%i screen', (width, height) => {
+  it('keeps the left thumb layout exactly as it was', () => {
+    expect(computeFrameLayout(width, height, 3)).toEqual(computeFrameLayout(width, height, 3, 'left'));
+  });
+
+  it('mirrors the safe zones for a right thumb', () => {
+    const left = computeFrameLayout(width, height, 3, 'left');
+    const right = computeFrameLayout(width, height, 3, 'right');
+    expect(right.safeZoneLeft).toBe(left.safeZoneRight);
+    expect(right.safeZoneRight).toBe(left.safeZoneLeft);
+    expect(right.play.w).toBe(left.play.w);
+  });
+
+  it('fits one game card in the Games pop-up', () => {
+    const frame = computeFrameLayout(width, height, 1);
+    expect(frame.gameCards).toHaveLength(1);
+    expect(inPlayArea(frame.gameCards[0], frame)).toBe(true);
   });
 });

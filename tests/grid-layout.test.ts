@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { computeFrameLayout } from '../src/frame/layout';
 import { computeGridLayout, trayTiles } from '../src/grid/layout';
-import { SCREENS, inPlayArea, overlaps } from './screens';
+import { SCREENS_AND_THUMBS, inPlayArea, overlaps } from './screens';
 
 const SIZES = [4, 5, 6];
 
-describe.each(SCREENS)('Word Grid layout on a %i×%i screen', (width, height) => {
-  const frame = computeFrameLayout(width, height, 3);
+describe.each(SCREENS_AND_THUMBS)('Word Grid layout on a %i×%i screen, thumb %s', (width, height, thumb) => {
+  const frame = computeFrameLayout(width, height, 3, thumb);
 
   describe.each(SIZES)('with a %i-square box', (size) => {
     const layout = computeGridLayout(frame, size);
