@@ -21,6 +21,10 @@
   --right-fill: #cdeccf;
   --present-fill: #f6e09c;
   --absent-fill: #dde2e8;
+  /* Word Grid: lines inside a section, the selected section, and the not-a-word squiggle. */
+  --grid-line: #9aa6b2;
+  --section-fill: #ffe9d6;
+  --squiggle: #d9577f;
 }
 
 html,
@@ -1090,4 +1094,162 @@ body {
 
 .button.daily.hidden {
   visibility: hidden;
+}
+
+/* Word Grid: a crossword split into outlined sections; the selected section's letters wait in a tray on top. */
+.board.grid .level {
+  font-size: 24px;
+  border: 3px solid var(--slot-border);
+}
+
+.board.grid .level.on {
+  border: 6px solid var(--level);
+}
+
+.board.grid .level svg {
+  width: 24px;
+  height: 24px;
+}
+
+.board.grid .button.hint {
+  border-width: 5px;
+}
+
+.tray {
+  position: absolute;
+  border-radius: 20px;
+  background: var(--backing);
+}
+
+.tile {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #fff;
+  border: 4px solid var(--navy);
+  color: var(--ink);
+  line-height: 1;
+}
+
+.tile.appear {
+  animation: grid-fade-in 200ms ease-out;
+}
+
+.tile.used {
+  border-style: dashed;
+  opacity: 0.35;
+}
+
+.tile.pressed {
+  border-color: var(--select);
+  box-shadow: 0 0 0 5px var(--select);
+}
+
+.tile.lifted {
+  opacity: 0.35;
+}
+
+.tile.ghost {
+  display: none;
+  z-index: 5;
+  pointer-events: none;
+  border-color: var(--select);
+  box-shadow: 0 0 0 6px var(--select);
+  transition:
+    left 250ms ease,
+    top 250ms ease,
+    width 250ms ease,
+    height 250ms ease;
+}
+
+.tile.ghost.visible {
+  display: flex;
+}
+
+.cell {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-style: solid;
+  color: var(--ink);
+}
+
+.cell.in-section {
+  background: var(--section-fill);
+}
+
+.cell.selected {
+  box-shadow: inset 0 0 0 7px var(--select);
+}
+
+.cell.done {
+  background: var(--right-fill);
+  box-shadow: inset 0 0 0 5px var(--found);
+}
+
+.cell-letter {
+  display: inline-block;
+  line-height: 1;
+}
+
+.cell.hinted .cell-letter {
+  color: var(--navy);
+}
+
+.cell.lifted .cell-letter {
+  opacity: 0.3;
+}
+
+.cell.pop .cell-letter {
+  animation: pop-letter 150ms ease-out;
+}
+
+.cell-corner {
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  color: var(--navy);
+}
+
+.cell-corner .used {
+  opacity: 0.35;
+}
+
+.squiggles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.squiggle {
+  fill: none;
+  stroke: var(--squiggle);
+  stroke-width: 6px;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.squiggle.appear {
+  animation: grid-fade-in 300ms ease-out;
+}
+
+@keyframes grid-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.row-nohints svg {
+  color: var(--found);
 }
