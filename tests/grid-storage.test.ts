@@ -8,7 +8,9 @@ import {
   saveSavedGrid,
   type SavedGrid,
 } from '../src/grid/storage';
+import { answerWords } from '../src/grid/puzzle';
 import type { GridPuzzleSet } from '../src/grid/types';
+import { avoidChecker } from '../src/shared/avoid';
 import { MemoryStore } from './memory-store';
 
 const puzzle = (cells: string) => ({ size: 2, cells, sections: 'aabb' });
@@ -94,5 +96,25 @@ describe('counting finished puzzles', () => {
     expect(first).toEqual({ totalSolved: 1, todaySolved: 1, lastPlayedDay: '2026-10-20' });
     expect(recordGridSolve(first, '2026-10-20')).toEqual({ totalSolved: 2, todaySolved: 2, lastPlayedDay: '2026-10-20' });
     expect(recordGridSolve(first, '2026-10-21')).toEqual({ totalSolved: 2, todaySolved: 1, lastPlayedDay: '2026-10-21' });
+  });
+});
+
+describe('words she should never see', () => {
+  it('lists every word across and down', () => {
+    expect(answerWords(puzzle('abcd'))).toEqual(['ab', 'cd', 'ac', 'bd']);
+  });
+
+  it('skips a saved puzzle with an avoided word, fresh, and keeps one without', () => {
+    // Easy's saved puzzle, efgh, has "eg" down.
+    expect(progressFor(SAVED, PUZZLES, 'easy', avoidChecker(['eg']))).toEqual({ index: 0, id: 'abcd', placed: [], hinted: [] });
+    expect(progressFor(SAVED, PUZZLES, 'easy', avoidChecker(['ab']))).toEqual(SAVED.levels.easy);
+  });
+
+  it('skips avoided puzzles when moving on', () => {
+    expect(nextPuzzle(SAVED, PUZZLES, 'medium', avoidChecker(['mn'])).levels.medium).toEqual({ index: 0, id: 'ijkl', placed: [], hinted: [] });
+  });
+
+  it('starts a new player on the chosen level', () => {
+    expect(loadSavedGrid(new MemoryStore(), 'hard').level).toBe('hard');
   });
 });

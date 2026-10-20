@@ -1,5 +1,7 @@
+import { NOTHING_AVOIDED, firstAllowed, type AvoidCheck } from '../shared/avoid';
 import type { KeyValueStore } from '../shared/store';
-import { GRID_LEVELS, type GridLevel, type GridPuzzleSet } from './types';
+import { answerWords } from './puzzle';
+import { GRID_LEVELS, type GridLevel, type GridPuzzle, type GridPuzzleSet } from './types';
 
 export const GRID_KEY = 'word-grid:v1';
 
@@ -35,27 +37,33 @@ export function emptyGridStats(): GridStats {
   return { totalSolved: 0, todaySolved: 0, lastPlayedDay: null };
 }
 
-export function freshGrid(): SavedGrid {
-  return { level: 'easy', levels: {}, stats: emptyGridStats() };
+export function freshGrid(level: GridLevel = 'easy'): SavedGrid {
+  return { level, levels: {}, stats: emptyGridStats() };
 }
 
-function freshProgress(puzzles: GridPuzzleSet, level: GridLevel, index: number): GridProgress {
+const hasAvoided = (avoided: AvoidCheck) => (puzzle: GridPuzzle) => answerWords(puzzle).some(avoided);
+
+/** A fresh start at `index` (wrapping at the end), or at the next puzzle without a word she should never see. */
+function freshProgress(puzzles: GridPuzzleSet, level: GridLevel, index: number, avoided: AvoidCheck): GridProgress {
   const list = puzzles[level];
-  const i = index % list.length;
+  const i = firstAllowed(list, index % list.length, hasAvoided(avoided));
   return { index: i, id: list[i].cells, placed: [], hinted: [] };
 }
 
-/** Her place in `level`: the saved one if that puzzle is still there, otherwise that place, fresh. */
-export function progressFor(saved: SavedGrid, puzzles: GridPuzzleSet, level: GridLevel): GridProgress {
+/** Her place in `level`: the saved one if that puzzle is still there and allowed, otherwise that place (or the next allowed one), fresh. */
+export function progressFor(saved: SavedGrid, puzzles: GridPuzzleSet, level: GridLevel, avoided: AvoidCheck = NOTHING_AVOIDED): GridProgress {
   const progress = saved.levels[level];
-  if (!progress) return freshProgress(puzzles, level, 0);
+  if (!progress) return freshProgress(puzzles, level, 0, avoided);
   const index = progress.index % puzzles[level].length;
-  return puzzles[level][index].cells === progress.id ? { ...progress, index } : freshProgress(puzzles, level, index);
+  const puzzle = puzzles[level][index];
+  return puzzle.cells === progress.id && !hasAvoided(avoided)(puzzle)
+    ? { ...progress, index }
+    : freshProgress(puzzles, level, index, avoided);
 }
 
-/** Moves `level` on to its next puzzle (wrapping at the end), with nothing placed. */
-export function nextPuzzle(saved: SavedGrid, puzzles: GridPuzzleSet, level: GridLevel): SavedGrid {
-  const next = freshProgress(puzzles, level, progressFor(saved, puzzles, level).index + 1);
+/** Moves `level` on to its next allowed puzzle (wrapping at the end), with nothing placed. */
+export function nextPuzzle(saved: SavedGrid, puzzles: GridPuzzleSet, level: GridLevel, avoided: AvoidCheck = NOTHING_AVOIDED): SavedGrid {
+  const next = freshProgress(puzzles, level, progressFor(saved, puzzles, level, avoided).index + 1, avoided);
   return { ...saved, levels: { ...saved.levels, [level]: next } };
 }
 
@@ -107,7 +115,8 @@ function readSavedGrid(value: unknown): SavedGrid | null {
   return { level: value.level as GridLevel, levels, stats: readStats(value.stats) };
 }
 
-export function loadSavedGrid(store: KeyValueStore): SavedGrid {
+/** Her save, or a fresh start on `startLevel` (set on the settings page). */
+export function loadSavedGrid(store: KeyValueStore, startLevel: GridLevel = 'easy'): SavedGrid {
   try {
     const raw = store.getItem(GRID_KEY);
     const saved = raw === null ? null : readSavedGrid(JSON.parse(raw));
@@ -115,7 +124,7 @@ export function loadSavedGrid(store: KeyValueStore): SavedGrid {
   } catch {
     // Unreadable save: start fresh.
   }
-  return freshGrid();
+  return freshGrid(startLevel);
 }
 
 export function saveSavedGrid(store: KeyValueStore, saved: SavedGrid): void {

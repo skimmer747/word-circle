@@ -1,6 +1,7 @@
 import type { FrameHost, GameScreen, GameTargets } from '../frame/games';
 import type { FrameLayout, Rect } from '../frame/layout';
 import type { ButtonGeometry } from '../input/touch';
+import { NOTHING_AVOIDED, type AvoidCheck } from '../shared/avoid';
 import { dayKey } from '../shared/days';
 import type { KeyValueStore } from '../shared/store';
 import { gridLines } from './celebration';
@@ -21,6 +22,15 @@ type Held = { from: 'tray'; index: number; letter: string } | { from: 'square'; 
 
 const contains = (rect: Rect, x: number, y: number) => x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 
+export interface GridOptions {
+  /** Her level the very first time (default Easy). */
+  startLevel?: GridLevel;
+  /** Words she should never see: puzzles with one are skipped. */
+  avoided?: AvoidCheck;
+  /** The current time; tests can pass a fixed one. */
+  now?: () => Date;
+}
+
 /** Word Grid: Knotwords in big print, with a tray of letters on top to tap or drag into place. */
 export class GridScreen implements GameScreen {
   readonly id = 'grid';
@@ -36,19 +46,25 @@ export class GridScreen implements GameScreen {
   private layout: GridLayout | null = null;
   private idleTimer = 0;
   private readonly isWord: (word: string) => boolean;
+  private readonly startLevel: GridLevel;
+  private readonly avoided: AvoidCheck;
+  private readonly now: () => Date;
 
   constructor(
     private readonly puzzles: GridPuzzleSet,
     words: GridWords,
     private readonly store: KeyValueStore,
-    private readonly now: () => Date = () => new Date(),
+    options: GridOptions = {},
   ) {
     this.isWord = wordChecker(words);
+    this.startLevel = options.startLevel ?? 'easy';
+    this.avoided = options.avoided ?? NOTHING_AVOIDED;
+    this.now = options.now ?? (() => new Date());
   }
 
   start(host: FrameHost): void {
     this.host = host;
-    this.saved = loadSavedGrid(this.store);
+    this.saved = loadSavedGrid(this.store, this.startLevel);
     this.loadPuzzle();
     this.save();
   }
@@ -152,7 +168,7 @@ export class GridScreen implements GameScreen {
 
   private loadPuzzle(): void {
     const level = this.saved.level;
-    const progress = progressFor(this.saved, this.puzzles, level);
+    const progress = progressFor(this.saved, this.puzzles, level, this.avoided);
     this.game = new GridGame(this.puzzles[level][progress.index], progress.placed, progress.hinted, this.isWord);
     this.saved = { ...this.saved, levels: { ...this.saved.levels, [level]: progress } };
     this.selected = this.game.firstEmpty();
@@ -160,7 +176,7 @@ export class GridScreen implements GameScreen {
 
   private save(): void {
     const level = this.saved.level;
-    const progress = progressFor(this.saved, this.puzzles, level);
+    const progress = progressFor(this.saved, this.puzzles, level, this.avoided);
     const current = { ...progress, placed: this.game.placed, hinted: this.game.hinted };
     this.saved = { ...this.saved, levels: { ...this.saved.levels, [level]: current } };
     saveSavedGrid(this.store, this.saved);
@@ -278,7 +294,7 @@ export class GridScreen implements GameScreen {
     this.saved = { ...this.saved, stats: recordGridSolve(this.saved.stats, dayKey(this.now())) };
     const streakDays = this.host.recordPlayDay();
     // Save the next puzzle as her place now, so closing the app mid-celebration loses nothing.
-    this.saved = nextPuzzle(this.saved, this.puzzles, this.saved.level);
+    this.saved = nextPuzzle(this.saved, this.puzzles, this.saved.level, this.avoided);
     this.loadPuzzle();
     this.save();
     await this.host.celebrate({

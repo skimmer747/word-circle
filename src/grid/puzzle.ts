@@ -60,3 +60,9 @@ export function readPuzzle(puzzle: GridPuzzle): GridShape {
     answer: [...cells].map((ch) => (ch === '.' ? '' : ch)),
   };
 }
+
+/** Every word across and down in the puzzle's answer. */
+export function answerWords(puzzle: GridPuzzle): string[] {
+  const open = [...puzzle.cells].map((ch) => ch !== '.');
+  return findRuns(open, puzzle.size).map((run) => run.map((square) => puzzle.cells[square]).join(''));
+}
