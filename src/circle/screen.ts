@@ -219,7 +219,11 @@ export class CircleScreen implements GameScreen {
           this.wordsFlying--;
         }
         // The puzzle moved on (a level switch, or the hint star finished it) while the word flew: nothing to draw.
-        if (this.game !== game) return;
+        // If the new puzzle was saved complete, it's celebrated now.
+        if (this.game !== game) {
+          this.finishIfComplete();
+          return;
+        }
         this.view.setRow(row, this.rowState(result.word));
         this.afterWordFound();
         return;
