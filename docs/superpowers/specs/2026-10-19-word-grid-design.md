@@ -1,7 +1,7 @@
 # Word Grid — Design
 
 **Date:** 2026-10-19
-**Status:** Designed, not built yet
+**Status:** Built 2026-10-19 (plan: `docs/superpowers/plans/2026-10-19-word-grid.md`). At the second checkpoint the owner asked for the buttons to be in the same places in all three games; that standard is §1's "Shared layout", and it changed Word Circle and Word Guess too.
 **Builds on:** `2026-10-19-word-circle-design.md` (player, constraints, colors, font, touch rules) and `2026-10-19-word-guess-design.md` (the shared frame, Games button and pop-up, "Well done!" card, saving)
 
 ## Purpose
@@ -22,23 +22,36 @@ Add a third game to the Word Circle site: **Word Grid**, our own big-print versi
 ## 1. The screen
 
 ```
-┌──────┬───────────┬──────────────────────────────────────────┬──────┐
-│      │ [Easy]    │  ( [A] [E] [O] [P] )      [Games][Clock] │      │
-│      │ [Medium ✓]│                                          │      │
-│ safe │ [Hard]    │   ┏━━━━━━━━━━━┳━━━━━━━┓                  │ safe │
-│ zone │           │   ┃ E   E   R ┃ I   E ┃                  │ zone │
-│      │ [Hint]    │   ┗━━━┳━━━━━━━┻━━━┳━━━┛                  │      │
-│      │           │       ┃ D~~I~~L~~ ┃     (squiggle)       │      │
-│      │           │      …the rest of the crossword…         │      │
-└──────┴───────────┴──────────────────────────────────────────┴──────┘
+┌──────┬────────────────────────────────────────────────────────┬──────┐
+│      │ [Hint]  ( [A] [E] [O] [P] )             [Games][Clock] │      │
+│      │                                                        │      │
+│ safe │         ┏━━━━━━━━━━━┳━━━━━━━┓                          │ safe │
+│ zone │         ┃ E   E   R ┃ I   E ┃                          │ zone │
+│      │         ┗━━━┳━━━━━━━┻━━━┳━━━┛                          │      │
+│      │             ┃ D~~I~~L~~ ┃     (squiggle)               │      │
+│      │            …the rest of the crossword…                 │      │
+│      │ [Easy][Medium ✓][Hard]                                 │      │
+└──────┴────────────────────────────────────────────────────────┴──────┘
 ```
 
 - **Safe zones and play area:** exactly as in the other games (left `clamp(width − 890, 130, 200)`, right 130); nothing is drawn in them.
 - **Top right:** the frame's **Games** and **Clock** buttons, unchanged.
-- **Left column** (130 px wide, at least 110): **Easy**, **Medium**, **Hard** stacked (each 64 px tall, 12 px apart; the current level has a 6 px purple border and a check), then **Hint** (96 px tall) 28 px below them.
-- **Tray** at the top, between the left column and the top-right buttons (16 px clear of each): a soft-yellow backing `clamp(12% of screen height, 96, 110)` px tall holding up to four square tiles (tray height − 12 px, 12 px apart), centered in that space.
-- **Grid** below the tray (16 px gap) down to the bottom of the play area, between the left column (16 px gap) and the right edge of the play area. Square size = the largest that fits the puzzle's box (4, 5 or 6 squares each way) in that space, at most 150 px; the grid is centered in it. On the smallest iPad (1024×768) that's about 145 px on Easy, 116 px on Medium and 97 px on Hard.
-- **Sizing** is computed by a pure layout function and tested at 1024×768, 1080×810, 1133×744, 1180×820, 1194×834 and 1366×1024: nothing in the safe zones, nothing overlapping the top-right buttons, squares at least 90 px and tray tiles at least 84 px.
+- **Hint** in the top-left corner and **Easy**, **Medium**, **Hard** in a row along the bottom left, in the same places as in every game (see "Shared layout" below).
+- **Tray** at the top, between Hint and the top-right buttons (16 px clear of each): a soft-yellow backing `clamp(12% of screen height, 96, 110)` px tall holding up to four square tiles (tray height − 12 px, 12 px apart), centered in that space.
+- **Grid** in the whole width of the play area, from 16 px below the tray to 16 px above the level buttons. Square size = the largest that fits the puzzle's box (4, 5 or 6 squares each way) in that space, at most 150 px; the grid is centered in it. On the smallest iPad (1024×768) that's about 136 px on Easy, 108 px on Medium and 90 px on Hard; on the shorter 1133×744 iPad, Hard is 86 px.
+- **Sizing** is computed by a pure layout function and tested at 1024×768, 1080×810, 1133×744, 1180×820, 1194×834, 1366×1024 and 1376×1032: nothing in the safe zones, nothing overlapping the top-right buttons, squares at least 85 px and tray tiles at least 84 px.
+
+### Shared layout (all three games)
+
+So she always finds them in the same place, every game puts the same buttons in the same spots, worked out once by the frame's layout:
+
+- **Hint**: always the top-left button of the play area, 130 × 96 px, white with a 4 px gold border, lightbulb icon and "Hint".
+- **The game's own purple button** right beside Hint, the same size, 4 px purple border: **Shuffle** to its right in Word Circle; **All letters** below it in Word Guess (with Today's Wordle below that); Word Grid has none.
+- **Easy, Medium, Hard**: in Word Circle and Word Grid, a row along the bottom left of the play area, each 100 × 64 px, 8 px apart (three fit beside Word Circle's letter circle on the narrowest iPad). White with a 3 px gray border; her level has a 6 px purple border and a check above the word. Word Guess has no levels.
+- **Games and Clock**: top right, unchanged.
+- **Finished words**: a 5 px green border and light green fill with dark letters in every game (Word Circle's found words gained the fill).
+
+Word Circle keeps the same room for its word slots: Hint and Shuffle took the levels' old place at the top, and the levels took the buttons' old place at the bottom.
 
 ### Colors and look (Sky, as in the other games)
 
@@ -58,7 +71,7 @@ Add a third game to the Word Circle site: **Word Grid**, our own big-print versi
 | Tile being dragged | follows the finger at 110% size, orange border plus orange ring (like a selected Word Circle tile) |
 | Not-a-word squiggle | soft pink `#D9577F`, 6 px wavy line at 80% through the run's squares |
 | Finished word | 5 px green `#2E9E4F` border and the light green fill Word Guess uses, on its squares |
-| Level buttons / Hint | white; level buttons 3 px gray border, current one 6 px purple `#6A4FB3` plus check; Hint 5 px gold `#B8860B` border and icon |
+| Level buttons / Hint | as in every game (Shared layout above) |
 
 ## 2. How Word Grid plays
 
@@ -155,7 +168,8 @@ The **solver** fills squares in reading order with letters from each square's se
 - **`npm run grid-puzzles`** (`scripts/build-grid-puzzles.ts`, using `scripts/grid-lib.ts` and the existing `scripts/scowl.ts`) makes all three levels with a fixed seed, so rebuilds are identical, and writes:
   - `src/data/grid-puzzles.json`: `{ easy: GridPuzzle[], medium: …, hard: … }`, each puzzle `{ "size": 5, "cells": "eerie.lid..odes.pea.be.so", "sections": "aaabb.ccc..deee.ddd.ff.gg" }` (reading order, `.` for a blocked square, sections lettered in order of first appearance). A puzzle's `cells` string is its id.
   - `src/data/grid-words.json`: `{ "words": [...] }`, every real word, sorted.
-  - Both are committed, like Word Circle's puzzles. It takes a few minutes; `npm run puzzles` is unchanged.
+  - Both are committed, like Word Circle's puzzles. It takes about two minutes (Easy 2 s, Medium about 30 s, Hard about 90 s); `npm run puzzles` is unchanged.
+  - At the first review the owner kept 12 odd short words out of the answers by adding them to `words/guess-skip.txt` (hes, sic, ugh, huh, sod, gin, con, ken, mod, cam, ion, scum).
 - **Build checks** (the script fails on any): a second solver, written independently (section by section, trying each arrangement of a section's letters), finds exactly one answer for every puzzle, and it's the stored one; every run of every puzzle is an answer word and none repeats; every section is connected, 1 to the level's biggest size, with at most one one-letter section; shapes follow the rules above; no puzzle appears twice in a level; at least 400 puzzles per level.
 - **Review page:** `docs/grid-sample.html` (its own page, so the two puzzle scripts never overwrite each other's), written by the same script, drawing the first 20 puzzles of each level (solved, with sections outlined) and listing every answer word used, so the owner can skim and blocklist any. After blocklisting, run `npm run grid-puzzles` again.
 - **Order:** each level plays its list in order and wraps to the start after the last puzzle.
@@ -230,7 +244,7 @@ All in `localStorage`; damaged or missing data never costs her progress elsewher
   - `input/touch`: tap versus drag on draggables, the 12 px threshold and 2-second limit, a drag starting in a safe zone ignored, other fingers ignored while dragging, cancel, and tracing and buttons unchanged.
   - `grid/storage` and `frame/storage`: round trips, regenerated list, letters in the wrong section dropped, damaged data, `'grid'` accepted.
   - `grid/celebration`: the lines, with and without hints, milestones.
-  - Layout (Word Grid and the frame's three Games cards) at all six iPad sizes: nothing in the safe zones, nothing overlapping, squares at least 90 px and tray tiles at least 84 px on every level.
+  - Layout (Word Grid and the frame's three Games cards) at every iPad size: nothing in the safe zones, nothing overlapping, squares at least 85 px and tray tiles at least 84 px on every level; Hint and the level buttons exactly where the frame puts them in every game.
 - All existing tests keep passing; `npm test` and `npm run build` stay green.
 - **Browser checks** at 1024×768, 1133×744, 1180×820 and 1366×1024 on the `127.0.0.1:5173` test address (so the owner's own saved progress isn't touched): every level, tapping and dragging letters on, between and off the grid, the squiggle, Hint, finishing, switching levels and games, reloading mid-puzzle.
 

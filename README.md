@@ -4,10 +4,12 @@ Calm, large-print word games for Mom's iPad:
 
 - **Word Circle**, in the style of Word Cookies.
 - **Word Guess**, a big-print Wordle with no losing, plus the real daily Wordle word each morning.
+- **Word Grid**, a big-print Knotwords: a crossword split into outlined sections, each with its own letters, which she taps or drags in from a tray on top. Every puzzle has exactly one answer.
 
 The **Games** button beside the clock switches between them, and each keeps her place.
+The buttons are in the same places in every game: **Hint** at the top left (with the game's own purple button beside it), **Easy / Medium / Hard** along the bottom left, **Games** and the clock at the top right.
 
-- Design: `docs/superpowers/specs/2026-10-19-word-circle-design.md` and `docs/superpowers/specs/2026-10-19-word-guess-design.md`
+- Design: `docs/superpowers/specs/2026-10-19-word-circle-design.md`, `docs/superpowers/specs/2026-10-19-word-guess-design.md` and `docs/superpowers/specs/2026-10-19-word-grid-design.md`
 - Setting up her iPad: `docs/setup-her-ipad.md`
 - Live app: https://skimmer747.github.io/word-circle/
 
@@ -66,11 +68,13 @@ The first new word she starts that day is today's Wordle, marked **Today's Wordl
 
 ## Changing the words
 
-1. Add any word she shouldn't see to `words/blocklist.txt` (one per line). It won't appear anywhere, in either game, not even as an extra word.
-   If a plural or other word ending shows up in the word slots, add it to `words/not-plain.txt` instead; it will still count as an extra word.
-   To keep a word from ever being the **Word Guess** answer while still letting her type it as a guess (and without touching Word Circle), add it to `words/guess-skip.txt`.
-2. Run `npm run puzzles`. This rebuilds all three Word Circle levels in `src/data/puzzles.json`, Word Guess's lists in `src/data/guess-words.json`, and the sample page `docs/puzzle-sample.html` (which lists every Word Guess answer at the bottom).
-3. Look over `docs/puzzle-sample.html`, then commit and push. GitHub Pages republishes automatically, and her iPad picks up the change after her next finished puzzle or word.
+1. Add any word she shouldn't see to `words/blocklist.txt` (one per line). It won't appear anywhere, in any game, not even as an extra word.
+   If a plural or other word ending shows up in Word Circle's word slots, add it to `words/not-plain.txt` instead; it will still count as an extra word.
+   To keep a touchy word from ever being an answer in **Word Guess** or **Word Grid** while it still counts if she types or spells it (and without touching Word Circle), add it to `words/guess-skip.txt`.
+2. Rebuild:
+   - `npm run puzzles` rebuilds all three Word Circle levels in `src/data/puzzles.json`, Word Guess's lists in `src/data/guess-words.json`, and the sample page `docs/puzzle-sample.html` (which lists every Word Guess answer at the bottom).
+   - `npm run grid-puzzles` rebuilds Word Grid: 500 puzzles per level in `src/data/grid-puzzles.json`, its list of real words in `src/data/grid-words.json`, and the review page `docs/grid-sample.html` (the first puzzles of each level, solved, and every answer word used). It takes a couple of minutes, and it fails rather than ship a puzzle with more than one answer.
+3. Look over the sample pages, then commit and push. GitHub Pages republishes automatically, and her iPad picks up the change after her next finished puzzle or word.
 
 Regenerating can change the order, so she may start a fresh puzzle or word at her current position.
 

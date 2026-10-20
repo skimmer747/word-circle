@@ -1,7 +1,7 @@
 # Word Circle — Design
 
 **Date:** 2026-10-19
-**Status:** Built. Since 2026-10-19 the site also has a second game, Word Guess, and a Games button beside the clock; see `2026-10-19-word-guess-design.md`. That spec also describes the shared frame Word Circle now runs in.
+**Status:** Built. Since 2026-10-19 the site also has Word Guess and Word Grid, and a Games button beside the clock; see `2026-10-19-word-guess-design.md` (which also describes the shared frame Word Circle now runs in) and `2026-10-19-word-grid-design.md`. With Word Grid, the three games' buttons were put in the same places (Word Grid spec, "Shared layout"): Word Circle's Hint and Shuffle moved to the top left and its level buttons to the bottom left, as described below.
 
 ## Purpose
 
@@ -25,22 +25,22 @@ Layout "B": word slots on the left, letter circle on the right. Landscape only.
 
 ```
 ┌──────┬──────────────────────┬───────────────────────────┬──────┐
-│      │   [O][N][E]          │        ( S T O )          │      │
-│ safe │   [ ][ ][ ]          │          ⓢ                │ safe │
-│ zone │   [ ][ ][ ]          │      ⓔ       ⓣ            │ zone │
-│      │   [N][O][T][E]       │                           │      │
+│      │ [Hint] [Shuffle]     │        ( S T O )          │      │
+│      │   [O][N][E]          │          ⓢ                │      │
+│ safe │   [ ][ ][ ]          │      ⓔ       ⓣ            │ safe │
+│ zone │   [N][O][T][E]       │                           │ zone │
 │      │   [ ][ ][ ][ ]       │       ⓝ     ⓞ             │      │
 │      │   [ ][ ][ ][ ][ ]    │                           │      │
-│      │  [Shuffle]  [Hint]   │                           │      │
+│      │ [Easy][Medium][Hard] │                           │      │
 └──────┴──────────────────────┴───────────────────────────┴──────┘
 ```
 
 - **Safe zones:** a band on the left and right edges, full screen height, rendered as plain background (invisible); nothing is ever drawn in them. The right band is 130 CSS px (about one inch on a standard iPad). Her left thumb rests on the screen, so the left band is 200 CSS px (about 1.5 inches) wherever the screen has room, shrinking toward 130 only on the narrowest iPads (it is `screen width − 130 − 760`, clamped to 130–200; 760 px is what a Hard puzzle needs at minimum sizes).
 - **Play area:** the space between the safe zones, split roughly 45% left column / 55% right column.
 - **Left column:**
-  - **Level buttons** at the top: three small buttons, **Easy**, **Medium** and **Hard** (48 px tall, at most 120 px wide). The current level has a thick purple border and a check mark.
+  - At the top, two buttons side by side, each with an icon *and* a word label: **Hint** in the top-left corner (130 × 96 px, where Hint is in every game), and **Shuffle** beside it, the same size.
   - One row per answer word, sorted by length then alphabetically (as Word Cookies does).
-  - At the bottom, two buttons side by side: **Shuffle** and **Hint**, each with an icon *and* a word label.
+  - **Level buttons** along the bottom: **Easy**, **Medium** and **Hard** in a row (each 100 × 64 px, where every game puts them). The current level has a thick purple border and a check mark above the word.
 - **Right column:**
   - **Extra words** at the top: an "Extra words" label over blue-outlined chips, one per extra word found in this puzzle, oldest first. Room for two rows; when more are found, the oldest chips drop off screen (all stay saved). Hidden until the first extra word is found.
   - **Current-word bar** below it: a white pill with an orange border showing the letters selected so far in large type. Hidden when nothing is selected.
@@ -63,9 +63,9 @@ Layout "B": word slots on the left, letter circle on the right. Landscape only.
   | Current-word bar | white, 4px orange border, letters `#141414` |
   | Empty word slot | white, 3px border `#7A8CA0` |
   | Hinted letter in slot | dark blue `#1B3A6B` letter on white slot |
-  | Found word slot | white, 4px green border `#2E9E4F`, dark green letter `#1F6B35` |
+  | Found word slot | light green fill `#CDECCF`, 5px green border `#2E9E4F`, letter `#141414` (as finished words in the other games) |
   | Shuffle / Hint | white, 4px purple `#6A4FB3` / gold `#B8860B` border and icon, text `#141414` |
-  | Level buttons | white, 2px gray border, text `#141414`; current level 4px purple border + check |
+  | Level buttons | white, 3px gray border `#7A8CA0`, text `#141414`; current level 6px purple border + check |
   | "Good!" / "Well done!" | white bubble, green border, dark green text |
 
   Orange stands out for aging eyes (blue and purple get harder to tell apart with age), so her selection is the most visible thing on screen.
