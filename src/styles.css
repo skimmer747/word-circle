@@ -1514,3 +1514,30 @@ body {
   margin: 0 0 16px;
   color: var(--label);
 }
+
+.settings-intro {
+  margin: 6px 0 0;
+}
+
+/* "Keep them in the game": folded until tapped. */
+.settings-keep summary {
+  min-height: 48px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 48px;
+  cursor: pointer;
+}
+
+.settings-keep ol {
+  margin: 0;
+  padding-left: 1.4em;
+  line-height: 1.4;
+}
+
+.settings-keep li + li {
+  margin-top: 8px;
+}
+
+.settings-keep p {
+  line-height: 1.4;
+}

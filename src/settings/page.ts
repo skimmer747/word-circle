@@ -24,6 +24,21 @@ const LEVEL_LABELS: Record<StartLevel, string> = { easy: 'Easy', medium: 'Medium
 const REPEATS: readonly RepeatChoice[] = ['once', 'daily', 'days'];
 const REPEAT_LABELS: Record<RepeatChoice, string> = { once: 'Once', daily: 'Every day', days: 'Some days' };
 
+/** The optional iPad steps that keep them in the game, from the owner's guide for Mom's iPad. Fixed text, no user input. */
+const KEEP_IN_GAME = `
+<h3>Lock the screen sideways</h3>
+<p>Swipe down from the top-right corner to open Control Center, then tap <b>Rotation Lock</b> (a padlock inside a circular arrow).</p>
+<h3>Guided Access</h3>
+<p>It keeps them inside Word Circle, so swipes from the edges can't take them elsewhere.</p>
+<ol>
+  <li>Open <b>Settings › Accessibility › Guided Access</b> and turn it on.</li>
+  <li>Tap <b>Passcode Settings › Set Guided Access Passcode</b> and choose a passcode only you know.</li>
+  <li>Tap <b>Display Auto-Lock</b> and choose <b>15 Minutes</b>.</li>
+  <li>Open Word Circle, quickly press the <b>top button</b> three times, then tap <b>Start</b>.</li>
+</ol>
+<p>To leave Guided Access, press the top button three times, enter the passcode, and tap <b>End</b>. On an iPad with a round Home button, triple-click the Home button instead.</p>
+`;
+
 function section(parent: HTMLElement, title: string): HTMLElement {
   const box = el('section', 'settings-section', parent);
   el('h2', '', box).textContent = title;
@@ -115,6 +130,9 @@ export function openSettingsPage(root: HTMLElement, settings: Settings, options:
 
   // Only text up here: the finger that held the clock lifts over this corner.
   el('h1', 'settings-title', sheet).textContent = options.firstTime ? 'Set up Word Circle' : 'Settings';
+  if (options.firstTime) {
+    el('p', 'settings-intro', sheet).textContent = 'A few questions about who will play. You can change any of this later.';
+  }
   el('p', 'settings-tip', sheet).textContent = 'To come back here, hold the clock for 3 seconds.';
 
   const nameBox = section(sheet, 'Name');
@@ -257,6 +275,11 @@ export function openSettingsPage(root: HTMLElement, settings: Settings, options:
   });
   showCount();
 
+  const keep = el('details', 'settings-section settings-keep', sheet);
+  el('summary', '', keep).textContent = 'Keep them in the game (optional)';
+  keep.insertAdjacentHTML('beforeend', KEEP_IN_GAME);
+
+  el('p', 'settings-privacy', sheet).textContent = 'Everything on this page stays on this iPad.';
   const actions = el('div', 'settings-actions', sheet);
   if (!options.firstTime) {
     button(
