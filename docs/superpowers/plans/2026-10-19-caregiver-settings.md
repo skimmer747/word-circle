@@ -19,7 +19,7 @@
 | File | What it does |
 |---|---|
 | `src/shared/avoid.ts` (new) | Parse the avoid box, `avoidChecker`, `firstAllowed` (skip to the next allowed puzzle) |
-| `src/settings/name.ts` (new) | `cleanName`, `greeting`, `wellDoneTitle` |
+| `src/settings/name.ts` (new) | `cleanName`, `wellDoneTitle` (the greeting ended up in `src/clock/clock.ts`; see the end) |
 | `src/settings/schedule-form.ts` (new) | Form entry → `schedule.txt` line, line → list row, drop past one-time events |
 | `src/settings/settings.ts` (new) | `Settings` type, new-iPad and Mom's-iPad defaults, `loadSettings`, `saveSettings` |
 | `src/settings/page.ts` (new) | The settings page (DOM) |
@@ -2531,3 +2531,15 @@ git commit -m "docs: caregiver settings in the README; spec marked built"
 - [ ] **Step 5: Don't push**
 
 Tell the owner it's ready and ask before pushing. Pushing to main updates Mom's iPad; per the publishing conventions, they decide when.
+
+---
+
+## Changes made while building
+
+Reviews during the build changed a few things from the code above. The code in the repository is the record; this list says what differs and why.
+
+- **Task 1:** `parseAvoidWords` splits only at spaces, commas, semicolons and new lines, then drops non-letters inside each word, so "can't" avoids "cant" rather than "can" and "t". `avoidChecker` lowercases its list. More `firstAllowed` fallback tests.
+- **Task 2:** `greeting(name, now)` lives in `src/clock/clock.ts` and follows `partOfDay`, saying "Hello, Ruth" at night (9 PM–5 AM) so it never disagrees with "at night". `cleanName` cuts by character, so an emoji is never split. More boundary tests.
+- **Task 10:** the date and time fields also listen for `change`, since the iPad's pickers may only report that when Done is tapped.
+- **Task 11:** the settings page's text fields turn the iPad's press-and-hold menu back on, so Paste works.
+- **Task 12:** the preview tool reads the main checkout's `.claude/launch.json`, so checking a worktree needs a temporary entry there that runs `npm --prefix <worktree> run dev` on another port.

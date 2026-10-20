@@ -13,6 +13,11 @@ The buttons are in the same places in every game: **Hint** at the top left (with
 - Setting up her iPad: `docs/setup-her-ipad.md`
 - Live app: https://skimmer747.github.io/word-circle/
 
+## Settings (for a caregiver)
+
+Hold the clock button for 3 seconds to open the settings page: her name, which thumb rests on the screen, which games show, the starting level, Word Guess's Share button, her schedule and words to avoid. **Done** saves and restarts the app; nothing she's played is lost.
+A new iPad shows this page the first time. Mom's iPad skipped it and still reads its schedule from `public/schedule.txt` (below); every other iPad keeps its schedule on the iPad itself.
+
 ## Commands
 
 ```bash

@@ -1,7 +1,7 @@
 # Caregiver Settings — Design
 
 **Date:** 2026-10-19
-**Status:** Design approved in brainstorming; not built yet.
+**Status:** Built 2026-10-19 (plan: `docs/superpowers/plans/2026-10-19-caregiver-settings.md`). Review during the build changed three details, written into this spec: the greeting says "Hello" at night, names are cut by character, and the avoid box splits only at spaces, commas, semicolons and new lines.
 **Builds on:** `2026-10-19-word-circle-design.md` (player, touch rules, safe zones), `2026-10-19-word-guess-design.md` (the shared frame, clock pop-up, "Well done!" card, saving) and `2026-10-19-word-grid-design.md` (shared button layout)
 
 ## Purpose
@@ -32,7 +32,7 @@ One object, saved under `word-games:settings:v1` next to the games' progress.
 
 | Setting | What it does | New iPad | Mom's iPad |
 |---|---|---|---|
-| `name` | "Well done, Ruth!" as the card's title and "Good morning, Ruth" (afternoon, evening by the hour) at the top of the clock pop-up. At most 16 letters; the card title shrinks to fit. Blank: today's wording. | blank | blank |
+| `name` | "Well done, Ruth!" as the card's title and "Good morning, Ruth" (afternoon and evening by the clock's own part of the day, and "Hello, Ruth" at night so it never disagrees with "at night") at the top of the clock pop-up. At most 16 characters; the card title shrinks to fit. Blank: today's wording. | blank | blank |
 | `thumb` | `left`, `right` or `none`: which side gets the wider safe zone (§4) | `left` | `left` |
 | `games` | Which games appear, in the usual order; at least one | all three | all three |
 | `startLevel` | `easy`, `medium` or `hard`: where Word Circle and Word Grid open the first time. After that her own last level is kept. | `medium` | `easy` (Word Grid already starts there for her; Word Circle has her level saved) |
@@ -66,7 +66,7 @@ From top to bottom:
 3. **Thumb:** "Does a thumb rest on the screen while they play?" Three buttons, **Left**, **Right**, **Neither**, each with a small drawing of the screen showing where the wide safe zone goes.
 4. **Games:** a checkbox for each game (unticking the last one is refused, with "Keep at least one game"). **Starting level:** Easy, Medium, Hard. **Share today's Wordle:** on or off.
 5. **Schedule** (§3).
-6. **Words to avoid:** a text box, words separated by commas, spaces or new lines, with a count under it ("3 words"). Anything that isn't letters is dropped; words are saved lowercase and without repeats.
+6. **Words to avoid:** a text box, words separated by commas, semicolons, spaces or new lines, with a count under it ("3 words"). Anything inside a word that isn't a letter is dropped ("can't" becomes "cant", so "can" isn't avoided by accident); words are saved lowercase and without repeats.
 7. **Buttons:** **Done** (first time: **Start playing**) and **Cancel** (not shown the first time).
 
 **Done** saves and reloads the app (§5). **Start playing** saves and goes straight into the first game without a reload, so an iPad that can't save still gets to play instead of seeing setup again. **Cancel** closes the page and throws away the changes. If the page is left untouched for 5 minutes it closes as if Cancel was tapped, so a page opened by accident doesn't sit on her screen. That timer doesn't apply to first-time setup.
@@ -115,7 +115,7 @@ New folder `src/settings/`:
 
 - `settings.ts`: the `Settings` type, defaults, `loadSettings(store)` (including the Mom's-iPad rule and damaged saves), `saveSettings`.
 - `schedule-form.ts`: form entry → `schedule.txt` line, line → list row, dropping past one-time events. No DOM.
-- `name.ts`: tidying the name, the clock greeting and the card title.
+- `name.ts`: tidying the name and the card title. (The clock greeting lives in `src/clock/clock.ts`, next to the part of the day it follows.)
 - `page.ts`: the settings page (DOM). Everything it decides is in the files above, so it can be tested without a browser.
 
 Also new: `src/shared/avoid.ts` (parsing the avoid box, the `avoided(word)` check, and skipping to the next allowed puzzle), used by all three games. Each game's own "is this puzzle avoided" check lives in its storage file.
