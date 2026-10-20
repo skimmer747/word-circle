@@ -1,11 +1,13 @@
 import { clockFace, upcomingEvents } from '../clock/clock';
 import { cachedSchedule, refreshSchedule } from '../clock/loader';
-import type { ScheduledEvent } from '../clock/schedule';
+import { parseSchedule, type ScheduledEvent } from '../clock/schedule';
 import { LetterTracer, type ButtonGeometry, type PointerInput, type TileGeometry } from '../input/touch';
 import { dayKey, recordPlayDay as countPlayDay, type PlayDays } from '../shared/days';
+import { wellDoneTitle } from '../settings/name';
+import type { ScheduleSetting } from '../settings/settings';
 import type { KeyValueStore } from '../shared/store';
 import type { FrameHost, GameId, GameScreen, GameTargets } from './games';
-import { computeFrameLayout, type FrameLayout } from './layout';
+import { computeFrameLayout, type FrameLayout, type Thumb } from './layout';
 import { loadSavedFrame, saveSavedFrame, type SavedFrame } from './storage';
 import { FrameView, type CelebrationCard } from './view';
 
@@ -17,6 +19,22 @@ const GAMES_OPEN_MS = 60_000;
 const CLOCK_MAX_EVENTS = 20;
 /** How often to check the online schedule for changes. */
 const SCHEDULE_REFRESH_MS = 5 * 60_000;
+/** Holding the clock this long opens the settings page... */
+const HOLD_OPEN_MS = 3000;
+/** ...and a ring starts filling around it after this long, so a quick tap looks just as before. */
+const HOLD_RING_MS = 500;
+
+/** What this iPad's settings tell the frame. */
+export interface FrameOptions {
+  /** Her first name, for the card and the clock greeting; '' for none. */
+  name: string;
+  /** Which side gets the wider safe zone. */
+  thumb: Thumb;
+  /** schedule.txt from the site (Mom's iPad), or events typed on this iPad. */
+  schedule: ScheduleSetting;
+  /** Shows the settings page. It calls `closed` on Cancel; Done reloads the app. */
+  openSettings(closed: () => void): void;
+}
 
 export interface Updates {
   /** Applies a waiting update (reloading the page). Returns true if it did. */
@@ -48,6 +66,9 @@ export class Frame implements FrameHost {
   private clockAutoClose = 0;
   private gamesOpen = false;
   private gamesAutoClose = 0;
+  private settingsOpen = false;
+  private holdRing = 0;
+  private holdOpen = 0;
   private readonly view: FrameView;
   private readonly tracer: LetterTracer;
 
@@ -58,6 +79,7 @@ export class Frame implements FrameHost {
     private readonly updates: Updates,
     private readonly games: readonly GameScreen[],
     private readonly seed: PlayDays,
+    private readonly options: FrameOptions,
   ) {
     this.view = new FrameView(root);
     this.game = games[0];
@@ -75,6 +97,8 @@ export class Frame implements FrameHost {
       dragMoved: (id, x, y) => this.game.dragMoved?.(id, x, y),
       dragEnded: (id, x, y) => this.game.dragEnded?.(id, x, y),
       dragCancelled: (id) => this.game.dragCancelled?.(id),
+      holdStarted: (id) => this.holdStarted(id),
+      holdEnded: (id) => this.holdEnded(id),
     });
   }
 
@@ -89,7 +113,8 @@ export class Frame implements FrameHost {
   start(): void {
     this.saved = loadSavedFrame(this.store, this.seed);
     this.game = this.games.find((game) => game.id === this.saved.current) ?? this.games[0];
-    this.schedule = cachedSchedule(this.store);
+    const { schedule } = this.options;
+    this.schedule = schedule.source === 'web' ? cachedSchedule(this.store) : parseSchedule(schedule.lines.join('\n'));
     for (const game of this.games) game.start(this);
     // Only the game on screen runs its timers.
     for (const game of this.games) if (game !== this.game) game.pause();
@@ -115,7 +140,7 @@ export class Frame implements FrameHost {
         resolve();
       };
       this.celebration = { card, done, timeout: window.setTimeout(done, card.timeoutMs) };
-      if (this.layout) this.view.showCelebration(card, this.layout);
+      if (this.layout) this.view.showCelebration(card, this.layout, wellDoneTitle(this.options.name));
       this.updateTouchTargets();
     });
   }
@@ -157,6 +182,7 @@ export class Frame implements FrameHost {
   private blocked(): boolean {
     return (
       this.celebration !== null ||
+      this.settingsOpen ||
       this.clockOpen ||
       this.gamesOpen ||
       this.game.busy ||
@@ -211,6 +237,8 @@ export class Frame implements FrameHost {
 
   /** Picks up changes to the online schedule; keeps the last copy when offline. */
   private async refreshSchedule(): Promise<void> {
+    // Only Mom's iPad reads schedule.txt; others have their events typed in.
+    if (this.options.schedule.source !== 'web') return;
     const url = `${import.meta.env.BASE_URL}schedule.txt?v=${Date.now()}`;
     const events = await refreshSchedule(async () => {
       const response = await fetch(url, { cache: 'no-store' });
@@ -225,7 +253,7 @@ export class Frame implements FrameHost {
   private openClock(): void {
     if (this.blocked() || !this.layout) return;
     this.clockOpen = true;
-    this.view.showClock(clockFace(new Date()), upcomingEvents(this.schedule, new Date(), CLOCK_MAX_EVENTS), this.layout);
+    this.view.showClock(clockFace(new Date(), this.options.name), upcomingEvents(this.schedule, new Date(), CLOCK_MAX_EVENTS), this.layout);
     this.clockTick = window.setInterval(() => this.updateClock(), 1000);
     this.keepClockOpen();
     this.updateTouchTargets();
@@ -240,7 +268,7 @@ export class Frame implements FrameHost {
 
   private updateClock(): void {
     const now = new Date();
-    this.view.updateClock(clockFace(now), upcomingEvents(this.schedule, now, CLOCK_MAX_EVENTS));
+    this.view.updateClock(clockFace(now, this.options.name), upcomingEvents(this.schedule, now, CLOCK_MAX_EVENTS));
   }
 
   private closeClock(): void {
@@ -252,8 +280,45 @@ export class Frame implements FrameHost {
     this.updateTouchTargets();
   }
 
+  /** A finger came down on the clock: after a moment a ring fills, and when it's full the settings page opens. */
+  private holdStarted(id: string): void {
+    if (id !== 'clock') return;
+    this.cancelHold();
+    this.holdRing = window.setTimeout(() => {
+      if (this.layout) this.view.showHoldRing(this.layout, HOLD_OPEN_MS - HOLD_RING_MS);
+    }, HOLD_RING_MS);
+    this.holdOpen = window.setTimeout(() => this.openSettings(), HOLD_OPEN_MS);
+  }
+
+  private holdEnded(id: string): void {
+    if (id === 'clock') this.cancelHold();
+  }
+
+  private cancelHold(): void {
+    window.clearTimeout(this.holdRing);
+    window.clearTimeout(this.holdOpen);
+    this.view.hideHoldRing();
+  }
+
+  /** Pauses the game and hands the screen to the settings page until it's cancelled (Done reloads the app). */
+  private openSettings(): void {
+    this.cancelHold();
+    if (this.blocked()) return;
+    this.settingsOpen = true;
+    this.tracer.setEnabled(false);
+    this.game.pause();
+    this.options.openSettings(() => this.settingsClosed());
+  }
+
+  private settingsClosed(): void {
+    this.settingsOpen = false;
+    this.game.resume();
+    this.updateTouchTargets();
+  }
+
   private listen(): void {
     const forward = (type: PointerInput['type']) => (event: PointerEvent) => {
+      if (this.settingsOpen) return;
       if (type === 'down') this.interacted = true;
       if (type !== 'move') this.game.activity?.();
       this.tracer.handle({ type, id: event.pointerId, x: event.clientX, y: event.clientY, time: event.timeStamp });
@@ -264,7 +329,14 @@ export class Frame implements FrameHost {
     window.addEventListener('pointercancel', forward('cancel'));
 
     const block = (event: Event) => event.preventDefault();
-    document.addEventListener('touchmove', block, { passive: false });
+    // The settings page scrolls; nothing else does.
+    document.addEventListener(
+      'touchmove',
+      (event) => {
+        if (!this.settingsOpen) event.preventDefault();
+      },
+      { passive: false },
+    );
     document.addEventListener('gesturestart', block);
     document.addEventListener('contextmenu', block);
     document.addEventListener('dblclick', block);
@@ -274,7 +346,7 @@ export class Frame implements FrameHost {
       if (document.hidden) {
         this.game.pause();
       } else {
-        this.game.resume();
+        if (!this.settingsOpen) this.game.resume();
         void this.refreshSchedule();
       }
     });
@@ -295,9 +367,9 @@ export class Frame implements FrameHost {
       this.tracer.setEnabled(false);
       return;
     }
-    const layout = computeFrameLayout(width, height, this.games.length);
+    const layout = computeFrameLayout(width, height, this.games.length, this.options.thumb);
     this.layout = layout;
-    this.view.renderCorner(layout);
+    this.view.renderCorner(layout, this.games.length > 1);
     this.targets = this.game.render(this.view.gameLayer, layout, animateIn);
     this.updateTouchTargets();
   }
@@ -329,7 +401,9 @@ export class Frame implements FrameHost {
     } else {
       tiles = this.targets.tiles;
       draggables = this.targets.draggables ?? [];
-      buttons = [...this.targets.buttons, { id: 'games', ...layout.gamesButton }, { id: 'clock', ...layout.clockButton }];
+      buttons = [...this.targets.buttons, { id: 'clock', ...layout.clockButton }];
+      // With one game there's no Games button.
+      if (this.games.length > 1) buttons.push({ id: 'games', ...layout.gamesButton });
     }
     this.tracer.setGeometry({
       screenWidth: layout.width,
@@ -338,12 +412,13 @@ export class Frame implements FrameHost {
       tiles,
       buttons,
       draggables,
+      holdButtons: ['clock'],
       // A finger dragged anywhere on the clock card scrolls its countdowns.
       scrollAreas: this.clockOpen ? [{ id: 'clock', ...layout.card }] : [],
     });
     if (this.celebration) this.view.placeCelebration(layout);
     if (this.clockOpen) this.view.placeClock(layout);
     if (this.gamesOpen) this.view.placeGames(layout);
-    this.tracer.setEnabled(true);
+    this.tracer.setEnabled(!this.settingsOpen);
   }
 }

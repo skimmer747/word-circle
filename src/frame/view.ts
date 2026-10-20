@@ -102,13 +102,15 @@ export class FrameView {
     this.rotate.innerHTML = `${SIDEWAYS_IPAD}<div>Please turn the iPad sideways</div>`;
   }
 
-  /** The Games and Clock buttons in the top-right corner. */
-  renderCorner(layout: FrameLayout): void {
+  /** The Games button (only with more than one game) and the Clock button in the top-right corner. */
+  renderCorner(layout: FrameLayout, showGames: boolean): void {
     this.corner.replaceChildren();
-    const games = el('button', 'games-button', this.corner);
-    games.type = 'button';
-    games.innerHTML = `${GAMES_ICON}<span>Games</span>`;
-    place(games, layout.gamesButton);
+    if (showGames) {
+      const games = el('button', 'games-button', this.corner);
+      games.type = 'button';
+      games.innerHTML = `${GAMES_ICON}<span>Games</span>`;
+      place(games, layout.gamesButton);
+    }
     const clock = el('button', 'clock-button', this.corner);
     clock.type = 'button';
     clock.setAttribute('aria-label', 'Clock');
@@ -116,16 +118,29 @@ export class FrameView {
     place(clock, layout.clockButton);
   }
 
+  /** A ring that fills around the clock over `ms` while it's held; the settings page opens when it's full. */
+  showHoldRing(layout: FrameLayout, ms: number): void {
+    this.hideHoldRing();
+    const ring = el('div', 'hold-ring', this.corner);
+    ring.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" pathLength="100"/></svg>';
+    ring.style.setProperty('--hold-ms', `${ms}ms`);
+    place(ring, layout.clockButton);
+  }
+
+  hideHoldRing(): void {
+    this.corner.querySelector('.hold-ring')?.remove();
+  }
+
   showRotate(on: boolean): void {
     this.rotate.classList.toggle('visible', on);
   }
 
   /** The "Well done!" card with her good news. Its buttons are tapped through the touch tracker. */
-  showCelebration(card: CelebrationCard, layout: FrameLayout): void {
+  showCelebration(card: CelebrationCard, layout: FrameLayout, title: string): void {
     this.celebrate.replaceChildren();
     el('div', 'celebrate-dim', this.celebrate);
     const box = el('div', card.word ? 'card with-word' : 'card', this.celebrate);
-    el('div', 'card-title', box).textContent = 'Well done!';
+    el('div', 'card-title', box).textContent = title;
     if (card.word) {
       const word = el('div', 'card-word', box);
       for (const letter of card.word) el('span', '', word).textContent = letter.toUpperCase();
@@ -162,6 +177,7 @@ export class FrameView {
     if (share) place(share, layout.shareButton);
     if (next) place(next, share ? layout.nextWordButton : layout.nextButton);
     this.fitCelebrationRows();
+    this.fitCelebrationTitle();
   }
 
   hideCelebration(): void {
@@ -214,6 +230,7 @@ export class FrameView {
     this.clockPopup.replaceChildren();
     el('div', 'celebrate-dim', this.clockPopup);
     const card = el('div', 'clock-card', this.clockPopup);
+    el('div', 'clock-greeting', card);
     el('div', 'clock-time', card);
     el('div', 'clock-part', card);
     el('div', 'clock-date', card);
@@ -237,6 +254,7 @@ export class FrameView {
       const node = this.clockPopup.querySelector(selector);
       if (node && node.textContent !== text) node.textContent = text;
     };
+    set('.clock-greeting', face.greeting);
     set('.clock-time', face.time);
     set('.clock-part', face.part);
     set('.clock-date', face.date);
@@ -294,6 +312,18 @@ export class FrameView {
     const widest = Math.max(0, ...rows.map((row) => row.scrollWidth + (row.offsetWidth - row.clientWidth)));
     const scale = fitFontScale(widest, room);
     if (scale < 1) list.style.fontSize = `${parseFloat(getComputedStyle(list).fontSize) * scale * FIT_SPARE}px`;
+  }
+
+  /** Shrinks "Well done, …!" to one line if her name makes it too wide. */
+  private fitCelebrationTitle(): void {
+    const box = this.celebrate.querySelector<HTMLElement>('.card');
+    const title = this.celebrate.querySelector<HTMLElement>('.card-title');
+    if (!box || !title) return;
+    title.style.fontSize = '';
+    const boxStyle = getComputedStyle(box);
+    const room = box.clientWidth - parseFloat(boxStyle.paddingLeft) - parseFloat(boxStyle.paddingRight) - 1;
+    const scale = fitFontScale(title.scrollWidth, room, 0.4);
+    if (scale < 1) title.style.fontSize = `${parseFloat(getComputedStyle(title).fontSize) * scale * FIT_SPARE}px`;
   }
 
   /** Shrinks any event line too wide for one line. Events that don't all fit are scrolled to. */
