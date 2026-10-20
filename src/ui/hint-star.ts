@@ -56,49 +56,56 @@ export function sparkOffsets(count = SPARKS, reach = SPARK_REACH): Point[] {
 
 /**
  * A gold star flies from the Hint button to the square, spinning, then bursts into sparkles.
- * Resolves when the star lands (the sparkles finish by themselves). With Reduce Motion, resolves at once.
+ * Resolves when the star lands (the sparkles finish by themselves). With Reduce Motion, resolves at once. Never throws.
  */
 export async function flyHintStar(from: HTMLElement, to: HTMLElement): Promise<void> {
   if (reduceMotion()) return;
   // Older iPads (iPadOS 15) can't fly an element along a path: skip the star there.
   if (typeof CSS === 'undefined' || !CSS.supports('offset-path', 'path("M 0 0")')) return;
-  from.animate([{ transform: 'scale(1)' }, { transform: 'scale(0.9)' }, { transform: 'scale(1)' }], { duration: 200, easing: 'ease-out' });
-  const path = starPath(from.getBoundingClientRect(), to.getBoundingClientRect());
-  const layer = document.createElement('div');
-  layer.className = 'hint-star-layer';
-  document.body.appendChild(layer);
+  let layer: HTMLElement | null = null;
+  try {
+    from.animate([{ transform: 'scale(1)' }, { transform: 'scale(0.9)' }, { transform: 'scale(1)' }], { duration: 200, easing: 'ease-out' });
+    const path = starPath(from.getBoundingClientRect(), to.getBoundingClientRect());
+    layer = document.createElement('div');
+    layer.className = 'hint-star-layer';
+    document.body.appendChild(layer);
 
-  const star = document.createElement('div');
-  star.className = 'hint-star';
-  star.innerHTML = STAR_ICON;
-  star.style.setProperty('offset-path', `path("${starPathD(path)}")`);
-  layer.appendChild(star);
-  const flight = star.animate(
-    [
-      { offsetDistance: '0%', transform: 'scale(0.6) rotate(0turn)' },
-      { offsetDistance: '50%', transform: 'scale(1.3) rotate(0.5turn)' },
-      { offsetDistance: '100%', transform: 'scale(1) rotate(1turn)' },
-    ],
-    { duration: FLY_MS, easing: 'ease-in-out', fill: 'forwards' },
-  );
-  // A cancelled flight rejects, and a page in the background may never finish it: land anyway.
-  await Promise.race([flight.finished.catch(() => undefined), wait(FLY_MS + 250)]);
-  star.remove();
-
-  const { end } = path;
-  for (const offset of sparkOffsets()) {
-    const spark = document.createElement('div');
-    spark.className = 'hint-spark';
-    layer.appendChild(spark);
-    spark.animate(
+    const star = document.createElement('div');
+    star.className = 'hint-star';
+    star.innerHTML = STAR_ICON;
+    star.style.setProperty('offset-path', `path("${starPathD(path)}")`);
+    layer.appendChild(star);
+    const flight = star.animate(
       [
-        { transform: `translate(${end.x}px, ${end.y}px) translate(-50%, -50%) scale(1)`, opacity: 1 },
-        { transform: `translate(${end.x + offset.x}px, ${end.y + offset.y}px) translate(-50%, -50%) scale(0.3)`, opacity: 0 },
+        { offsetDistance: '0%', transform: 'scale(0.6) rotate(0turn)' },
+        { offsetDistance: '50%', transform: 'scale(1.3) rotate(0.5turn)' },
+        { offsetDistance: '100%', transform: 'scale(1) rotate(1turn)' },
       ],
-      { duration: BURST_MS, easing: 'ease-out', fill: 'forwards' },
+      { duration: FLY_MS, easing: 'ease-in-out', fill: 'forwards' },
     );
+    // A cancelled flight rejects, and a page in the background may never finish it: land anyway.
+    await Promise.race([flight.finished.catch(() => undefined), wait(FLY_MS + 250)]);
+    star.remove();
+
+    const { end } = path;
+    for (const offset of sparkOffsets()) {
+      const spark = document.createElement('div');
+      spark.className = 'hint-spark';
+      layer.appendChild(spark);
+      spark.animate(
+        [
+          { transform: `translate(${end.x}px, ${end.y}px) translate(-50%, -50%) scale(1)`, opacity: 1 },
+          { transform: `translate(${end.x + offset.x}px, ${end.y + offset.y}px) translate(-50%, -50%) scale(0.3)`, opacity: 0 },
+        ],
+        { duration: BURST_MS, easing: 'ease-out', fill: 'forwards' },
+      );
+    }
+    const done = layer;
+    window.setTimeout(() => done.remove(), BURST_MS);
+  } catch {
+    // Something went wrong drawing the star: land the letter anyway.
+    layer?.remove();
   }
-  window.setTimeout(() => layer.remove(), BURST_MS);
 }
 
 /** The hinted letter lands with a bounce (a small pop with Reduce Motion). Pass the element that shows the letter. */

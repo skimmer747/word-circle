@@ -50,8 +50,8 @@ export class GuessScreen implements GameScreen {
   private layout: GuessLayout | null = null;
   private dailyWords: DailyWord[] = [];
   private allLetters = false;
-  /** While the hint star flies: the square it's flying to (hidden until it lands), and how many guesses she had. */
-  private hiddenHint: { guesses: number; position: number } | null = null;
+  /** While the hint star flies: the word and square it's flying to (hidden until it lands), and how many guesses she had. */
+  private hiddenHint: { game: GuessGame; guesses: number; position: number } | null = null;
   private shown = false;
   private idleTimer = 0;
   private timer = new PlayTimer();
@@ -212,7 +212,8 @@ export class GuessScreen implements GameScreen {
 
   private currentRow(): SquareView[] {
     const next = this.game.nextSquare();
-    const hidden = this.hiddenHint?.guesses === this.game.guesses.length ? this.hiddenHint.position : -1;
+    const hidden =
+      this.hiddenHint?.game === this.game && this.hiddenHint.guesses === this.game.guesses.length ? this.hiddenHint.position : -1;
     return this.game.row.map((square, i) =>
       i === hidden
         ? { letter: '', look: 'empty' }
@@ -273,15 +274,17 @@ export class GuessScreen implements GameScreen {
     this.resetIdle();
     // A hint that finishes the word: nothing more to do until "Well done!".
     if (result.solved) this.busy = true;
-    const guesses = this.game.guesses.length;
+    const game = this.game;
+    const guesses = game.guesses.length;
     const row = this.currentRowIndex();
-    this.hiddenHint = { guesses, position: result.position };
+    this.hiddenHint = { game, guesses, position: result.position };
     this.view?.setRow(row, this.currentRow());
     await this.view?.flyStar(row, result.position);
     this.hiddenHint = null;
-    this.refreshKeys();
-    // She checked a guess while the star flew: that row already shows the letter.
-    if (this.game.guesses.length !== guesses) return;
+    // Only the colors change: a hint never changes which keys can be tapped.
+    this.view?.setKeys(this.game.keyStates(), this.allLetters);
+    // She checked a guess (or a new word came up) while the star flew: nothing to redraw.
+    if (this.game !== game || this.game.guesses.length !== guesses) return;
     this.view?.setRow(row, this.currentRow());
     this.view?.landSquare(row, result.position);
     if (result.solved) void this.finish();
