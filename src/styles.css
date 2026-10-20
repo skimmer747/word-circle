@@ -725,6 +725,7 @@ body {
    view on the pop-up). */
 .games-popup {
   --u: 7.4px;
+  --pu: 7.4px;
   position: absolute;
   inset: 0;
   display: none;
@@ -812,8 +813,8 @@ body {
 /* Small pictures of each game. */
 .pic-circle {
   position: relative;
-  width: calc(var(--u) * 26);
-  height: calc(var(--u) * 26);
+  width: calc(var(--pu) * 26);
+  height: calc(var(--pu) * 26);
   border-radius: 50%;
   background: var(--backing);
 }
@@ -823,35 +824,35 @@ body {
   left: 50%;
   top: 50%;
   box-sizing: border-box;
-  width: calc(var(--u) * 8);
-  height: calc(var(--u) * 8);
-  margin: calc(var(--u) * -4) 0 0 calc(var(--u) * -4);
+  width: calc(var(--pu) * 8);
+  height: calc(var(--pu) * 8);
+  margin: calc(var(--pu) * -4) 0 0 calc(var(--pu) * -4);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: #fff;
   border: 3px solid var(--navy);
-  font-size: calc(var(--u) * 4.6);
-  transform: rotate(calc(var(--i) * 72deg - 90deg)) translate(calc(var(--u) * 8.6)) rotate(calc(90deg - var(--i) * 72deg));
+  font-size: calc(var(--pu) * 4.6);
+  transform: rotate(calc(var(--i) * 72deg - 90deg)) translate(calc(var(--pu) * 8.6)) rotate(calc(90deg - var(--i) * 72deg));
 }
 
 .pic-guess {
   display: grid;
-  grid-template-columns: repeat(5, calc(var(--u) * 6.4));
-  gap: calc(var(--u) * 0.8);
+  grid-template-columns: repeat(5, calc(var(--pu) * 6.4));
+  gap: calc(var(--pu) * 0.8);
 }
 
 .pic-guess span {
   box-sizing: border-box;
-  height: calc(var(--u) * 6.4);
+  height: calc(var(--pu) * 6.4);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 6px;
   background: #fff;
   border: 3px solid var(--slot-border);
-  font-size: calc(var(--u) * 3.8);
+  font-size: calc(var(--pu) * 3.8);
 }
 
 .pic-guess .right {
@@ -867,6 +868,27 @@ body {
 .pic-guess .absent {
   border-color: var(--absent);
   background: var(--absent-fill);
+}
+
+.pic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, calc(var(--pu) * 6.4));
+  grid-auto-rows: calc(var(--pu) * 6.4);
+}
+
+.pic-grid span {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-style: solid;
+  border-color: var(--navy);
+  font-size: calc(var(--pu) * 3.8);
+}
+
+.pic-grid .gap {
+  visibility: hidden;
 }
 
 /* Word Guess's "Well done!" card also shows her word, so its title and lines are a little smaller. */

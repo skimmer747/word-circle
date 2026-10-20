@@ -71,6 +71,10 @@ export class Frame implements FrameHost {
       buttonPressed: (id) => this.game.buttonPressed?.(id),
       buttonReleased: (id) => this.game.buttonReleased?.(id),
       scrolled: (id, dy) => this.scrolled(id, dy),
+      dragStarted: (id) => this.game.dragStarted?.(id),
+      dragMoved: (id, x, y) => this.game.dragMoved?.(id, x, y),
+      dragEnded: (id, x, y) => this.game.dragEnded?.(id, x, y),
+      dragCancelled: (id) => this.game.dragCancelled?.(id),
     });
   }
 
@@ -149,10 +153,16 @@ export class Frame implements FrameHost {
     else this.game.buttonTapped(id);
   }
 
-  /** Pop-ups wait while she's tracing a word, the game is busy, or another pop-up is up. */
+  /** Pop-ups wait while she's tracing a word or holding a letter, the game is busy, or another pop-up is up. */
   private blocked(): boolean {
     return (
-      this.celebration !== null || this.clockOpen || this.gamesOpen || this.game.busy || this.tracer.isTracing || !this.layout
+      this.celebration !== null ||
+      this.clockOpen ||
+      this.gamesOpen ||
+      this.game.busy ||
+      this.tracer.isTracing ||
+      this.tracer.isDragging ||
+      !this.layout
     );
   }
 
@@ -300,6 +310,7 @@ export class Frame implements FrameHost {
     const layout = this.layout;
     if (!layout) return;
     let tiles: TileGeometry[] = [];
+    let draggables: ButtonGeometry[] = [];
     let buttons: ButtonGeometry[];
     if (this.celebration) {
       buttons = this.celebration.card.share
@@ -317,6 +328,7 @@ export class Frame implements FrameHost {
       ];
     } else {
       tiles = this.targets.tiles;
+      draggables = this.targets.draggables ?? [];
       buttons = [...this.targets.buttons, { id: 'games', ...layout.gamesButton }, { id: 'clock', ...layout.clockButton }];
     }
     this.tracer.setGeometry({
@@ -325,6 +337,7 @@ export class Frame implements FrameHost {
       safeZoneRight: layout.safeZoneRight,
       tiles,
       buttons,
+      draggables,
       // A finger dragged anywhere on the clock card scrolls its countdowns.
       scrollAreas: this.clockOpen ? [{ id: 'clock', ...layout.card }] : [],
     });

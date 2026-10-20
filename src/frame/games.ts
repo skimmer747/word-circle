@@ -2,13 +2,15 @@ import type { ButtonGeometry, TileGeometry } from '../input/touch';
 import type { FrameLayout } from './layout';
 import type { CelebrationCard } from './view';
 
-export const GAME_IDS = ['circle', 'guess'] as const;
+export const GAME_IDS = ['circle', 'guess', 'grid'] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 /** What the touch tracker listens for in a game: its letter tiles (for tracing words) and its buttons. */
 export interface GameTargets {
   tiles: TileGeometry[];
   buttons: ButtonGeometry[];
+  /** Letters she can tap, or pick up and drag (Word Grid). */
+  draggables?: ButtonGeometry[];
 }
 
 /** What the frame lends the game on screen. */
@@ -50,6 +52,14 @@ export interface GameScreen {
   letterRemoved?(): void;
   selectionCleared?(): void;
   wordSubmitted?(tiles: readonly number[]): void;
+  /** She picked up a draggable letter... */
+  dragStarted?(id: string): void;
+  /** ...moved it... */
+  dragMoved?(id: string, x: number, y: number): void;
+  /** ...and let go there. */
+  dragEnded?(id: string, x: number, y: number): void;
+  /** The drag was cancelled; put the letter back. */
+  dragCancelled?(id: string): void;
   /** A finger touched down or lifted (for play time). */
   activity?(): void;
   /** She left it: she picked another game, or the app went to the background. Save and stop timers. */

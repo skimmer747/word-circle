@@ -15,6 +15,12 @@ describe('saving which game is on screen', () => {
     expect(loadSavedFrame(store, SEED)).toEqual({ current: 'guess', streakDays: 2, lastPlayedDay: '2026-10-20' });
   });
 
+  it('remembers Word Grid', () => {
+    const store = new MemoryStore();
+    saveSavedFrame(store, { current: 'grid', streakDays: 1, lastPlayedDay: '2026-10-20' });
+    expect(loadSavedFrame(store, SEED).current).toBe('grid');
+  });
+
   it('falls back to Word Circle and the carried-over days if the save is damaged', () => {
     const damaged = [
       'not json',

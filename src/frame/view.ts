@@ -46,8 +46,30 @@ const MORE_UP_ICON = `<svg ${ICON_ATTRS}><path d="M4 17h16l-8 -11z" fill="curren
 
 const SIDEWAYS_IPAD =`<svg width="240" height="170" viewBox="0 0 240 170" aria-hidden="true"><rect x="10" y="10" width="220" height="150" rx="18" fill="#fff" stroke="#141414" stroke-width="8"/><circle cx="208" cy="85" r="6" fill="#141414"/></svg>`;
 
+/** The widest game picture, in picture units (Word Guess's five squares and their gaps)... */
+const PICTURE_UNITS = 36;
+/** ...and the room a game card's padding and border take from its width. */
+const PICTURE_MARGIN = 40;
+
 const pictureRow = (letters: string, looks: readonly string[]) =>
   [...letters].map((letter, i) => `<span class="${looks[i]}">${letter.trim()}</span>`).join('');
+
+/** A finished little Word Grid: its letters, with thick lines around each section and thin ones inside. */
+function gridPicture(rows: readonly string[], sections: readonly string[]): string {
+  const sectionAt = (r: number, c: number) => sections[r]?.[c] ?? '.';
+  return rows
+    .map((row, r) =>
+      [...row]
+        .map((letter, c) => {
+          const section = sectionAt(r, c);
+          if (section === '.') return '<span class="gap"></span>';
+          const side = (rr: number, cc: number) => (sectionAt(rr, cc) === section ? '1px' : '3px');
+          return `<span style="border-width:${side(r - 1, c)} ${side(r, c + 1)} ${side(r + 1, c)} ${side(r, c - 1)}">${letter}</span>`;
+        })
+        .join(''),
+    )
+    .join('');
+}
 
 /** A small picture of each game for its card in the Games pop-up. */
 const GAME_PICTURES: Record<GameId, string> = {
@@ -56,6 +78,7 @@ const GAME_PICTURES: Record<GameId, string> = {
     'SLATE',
     ['right', 'right', 'right', 'right', 'right'],
   )}${pictureRow('     ', ['', '', '', '', ''])}</span>`,
+  grid: `<span class="pic-grid">${gridPicture(['GNAT', 'NO.A', 'ANTS', 'WE.K'], ['aabb', 'aa.c', 'dddc', 'ee.c'])}</span>`,
 };
 
 /** Draws what every game shares: the top-right buttons, the pop-ups and the "Well done!" card. */
@@ -168,8 +191,12 @@ export class FrameView {
   }
 
   placeGames(layout: FrameLayout): void {
-    // Text and pictures are multiples of 1% of the card's height.
-    this.gamesPopup.style.setProperty('--u', `${layout.card.h / 100}px`);
+    // Text and pictures are multiples of 1% of the card's height...
+    const u = layout.card.h / 100;
+    this.gamesPopup.style.setProperty('--u', `${u}px`);
+    // ...but three cards can be narrower than the pictures, so the pictures (not the names) shrink to fit.
+    const cardWidth = layout.gameCards[0]?.w ?? 0;
+    this.gamesPopup.style.setProperty('--pu', `${Math.min(u, (cardWidth - PICTURE_MARGIN) / PICTURE_UNITS)}px`);
     const card = this.gamesPopup.querySelector<HTMLElement>('.games-card');
     if (card) place(card, layout.card);
     this.gamesPopup.querySelectorAll<HTMLElement>('.game-choice').forEach((choice, i) => place(choice, layout.gameCards[i]));

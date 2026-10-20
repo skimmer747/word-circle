@@ -3,7 +3,7 @@ import { computeFrameLayout, SAFE_ZONE_LEFT_MIN, SAFE_ZONE_LEFT_TARGET, SAFE_ZON
 import { SCREENS, inPlayArea } from './screens';
 
 describe.each(SCREENS)('frame layout on a %i×%i screen', (width, height) => {
-  const frame = computeFrameLayout(width, height);
+  const frame = computeFrameLayout(width, height, 3);
 
   it('gives her left thumb a wider safe zone where the screen has room', () => {
     expect(frame.safeZoneRight).toBe(SAFE_ZONE_RIGHT);
@@ -73,10 +73,10 @@ describe.each(SCREENS)('frame layout on a %i×%i screen', (width, height) => {
 
   it('gives the Games pop-up one big card per game, below its title and above Close', () => {
     const { gameCards, closeButton, card } = frame;
-    expect(gameCards).toHaveLength(2);
+    expect(gameCards).toHaveLength(3);
     gameCards.forEach((game, i) => {
       expect(inPlayArea(game, frame), JSON.stringify(game)).toBe(true);
-      expect(game.w).toBeGreaterThanOrEqual(300);
+      expect(game.w).toBeGreaterThanOrEqual(220);
       expect(game.h).toBeGreaterThanOrEqual(360);
       expect(game.y).toBeGreaterThanOrEqual(card.y + 100);
       expect(game.y + game.h).toBeLessThanOrEqual(closeButton.y - 16);
