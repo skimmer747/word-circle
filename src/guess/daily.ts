@@ -1,3 +1,4 @@
+import { NOTHING_AVOIDED, type AvoidCheck } from '../shared/avoid';
 import type { KeyValueStore } from '../shared/store';
 import { listWord, type SavedGuess } from './storage';
 import type { GuessWords } from './words';
@@ -66,10 +67,17 @@ export function swapInDaily(saved: SavedGuess, today: DailyWord | null, untouche
  * After she finishes her word on `day`: remembers a finished daily word (with its share text) and picks what
  * comes next, which is today's daily word if she hasn't played it, otherwise the next list word.
  */
-export function finishWord(saved: SavedGuess, words: GuessWords, day: string, share: string, today: DailyWord | null): SavedGuess {
+export function finishWord(
+  saved: SavedGuess,
+  words: GuessWords,
+  day: string,
+  share: string,
+  today: DailyWord | null,
+  avoided: AvoidCheck = NOTHING_AVOIDED,
+): SavedGuess {
   const finishedToday = saved.daily?.date === day;
   const index = saved.daily === null ? saved.index + 1 : saved.index;
   const dailyDone = finishedToday ? { date: day, share } : saved.dailyDone;
-  const next = listWord({ ...saved, dailyDone }, words, index);
+  const next = listWord({ ...saved, dailyDone }, words, index, avoided);
   return swapInDaily(next, today, true) ?? next;
 }

@@ -1,6 +1,7 @@
 import type { FrameHost, GameScreen, GameTargets } from '../frame/games';
 import type { FrameLayout } from '../frame/layout';
 import type { CelebrationCard } from '../frame/view';
+import { NOTHING_AVOIDED, type AvoidCheck } from '../shared/avoid';
 import { dayKey } from '../shared/days';
 import type { KeyValueStore } from '../shared/store';
 import { guessLines } from './celebration';
@@ -26,6 +27,8 @@ export interface GuessOptions {
   fetchDaily: () => Promise<string>;
   /** Opens the iPad's share sheet with the text (straight from her tap), or null if there is none. */
   share: ((text: string) => Promise<void>) | null;
+  /** Words she should never see: never an answer (not even today's Wordle) and not accepted as guesses. */
+  avoided?: AvoidCheck;
   /** The current time; tests can pass a fixed one. */
   now?: () => Date;
 }
@@ -48,6 +51,7 @@ export class GuessScreen implements GameScreen {
   private shown = false;
   private idleTimer = 0;
   private readonly isAccepted: (word: string) => boolean;
+  private readonly avoided: AvoidCheck;
   private readonly now: () => Date;
 
   constructor(
@@ -55,13 +59,15 @@ export class GuessScreen implements GameScreen {
     private readonly store: KeyValueStore,
     private readonly options: GuessOptions,
   ) {
-    this.isAccepted = acceptedChecker(words);
+    this.avoided = options.avoided ?? NOTHING_AVOIDED;
+    const accepted = acceptedChecker(words);
+    this.isAccepted = (word) => accepted(word) && !this.avoided(word);
     this.now = options.now ?? (() => new Date());
   }
 
   start(host: FrameHost): void {
     this.host = host;
-    this.saved = loadSavedGuess(this.store, this.words);
+    this.saved = loadSavedGuess(this.store, this.words, this.avoided);
     this.dailyWords = cachedDailyWords(this.store);
     const untouched = this.saved.guesses.length === 0 && this.saved.hinted.length === 0;
     this.saved = swapInDaily(this.saved, this.today(), untouched) ?? this.saved;
@@ -121,8 +127,10 @@ export class GuessScreen implements GameScreen {
     return today && this.saved.dailyDone?.date !== today.date ? "Today's Wordle is ready" : null;
   }
 
+  /** Today's Wordle, unless it's a word she should never see (then she gets list words, as with the blocklist). */
   private today(): DailyWord | null {
-    return dailyFor(this.dailyWords, dayKey(this.now()));
+    const today = dailyFor(this.dailyWords, dayKey(this.now()));
+    return today && !this.avoided(today.word) ? today : null;
   }
 
   private loadWord(): void {
@@ -275,7 +283,7 @@ export class GuessScreen implements GameScreen {
     this.saved = { ...this.saved, stats: recordGuessSolve(this.saved.stats, day) };
     const streakDays = this.host.recordPlayDay();
     // Save the next word as her place now, so closing the app mid-celebration loses nothing.
-    this.saved = finishWord(this.saved, this.words, day, share, this.today());
+    this.saved = finishWord(this.saved, this.words, day, share, this.today(), this.avoided);
     this.loadWord();
     this.save();
     const card: CelebrationCard = {

@@ -11,6 +11,7 @@ import {
 } from '../src/guess/daily';
 import { emptyGuessStats, type SavedGuess } from '../src/guess/storage';
 import type { GuessWords } from '../src/guess/words';
+import { avoidChecker } from '../src/shared/avoid';
 import { MemoryStore } from './memory-store';
 
 const WORDS: GuessWords = { answers: ['crane', 'slate', 'house'], accepted: ['crane', 'house', 'slate'] };
@@ -119,5 +120,11 @@ describe('after she finishes a word', () => {
 
   it('wraps to the start of the list', () => {
     expect(finishWord({ ...ON_LIST, index: 2, word: 'house' }, WORDS, '2026-10-20', '', null)).toMatchObject({ index: 0, word: 'crane' });
+  });
+});
+
+describe('finishWord with words she should never see', () => {
+  it('skips an avoided list word after she finishes', () => {
+    expect(finishWord(ON_LIST, WORDS, '2026-10-20', '', null, avoidChecker(['house']))).toMatchObject({ index: 0, word: 'crane' });
   });
 });

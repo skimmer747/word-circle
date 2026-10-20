@@ -10,6 +10,7 @@ import {
   type SavedGuess,
 } from '../src/guess/storage';
 import type { GuessWords } from '../src/guess/words';
+import { avoidChecker } from '../src/shared/avoid';
 import { MemoryStore } from './memory-store';
 
 const WORDS: GuessWords = { answers: ['crane', 'slate', 'house'], accepted: ['crane', 'house', 'slate', 'stare'] };
@@ -75,5 +76,32 @@ describe('counting finished words', () => {
 
   it("starts today's count over on a new day", () => {
     expect(recordGuessSolve(SAVED.stats, '2026-10-20')).toEqual({ totalSolved: 13, todaySolved: 1, lastPlayedDay: '2026-10-20' });
+  });
+});
+
+describe('words she should never see', () => {
+  const avoided = avoidChecker(['slate']);
+
+  it('skips an avoided word when moving to a place', () => {
+    expect(listWord(SAVED, WORDS, 1, avoided)).toMatchObject({ index: 2, word: 'house' });
+  });
+
+  it('moves her off a word that has just been avoided, fresh', () => {
+    expect(loadSavedGuess(stored(SAVED), WORDS, avoided)).toEqual({ ...SAVED, index: 2, word: 'house', guesses: [], hinted: [] });
+  });
+
+  it('moves her off an avoided daily word onto her list word', () => {
+    const daily: SavedGuess = { ...SAVED, word: 'grave', daily: { date: '2026-10-20', number: 1949 } };
+    expect(loadSavedGuess(stored(daily), WORDS, avoidChecker(['grave']))).toEqual({
+      ...SAVED,
+      word: 'slate',
+      daily: null,
+      guesses: [],
+      hinted: [],
+    });
+  });
+
+  it('starts a new player on the first word not avoided', () => {
+    expect(loadSavedGuess(new MemoryStore(), WORDS, avoidChecker(['crane'])).word).toBe('slate');
   });
 });

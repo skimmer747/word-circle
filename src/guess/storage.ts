@@ -1,3 +1,4 @@
+import { NOTHING_AVOIDED, firstAllowed, type AvoidCheck } from '../shared/avoid';
 import type { KeyValueStore } from '../shared/store';
 import type { GuessWords } from './words';
 
@@ -43,9 +44,9 @@ export function freshGuess(words: GuessWords): SavedGuess {
   return { index: 0, word: words.answers[0], daily: null, guesses: [], hinted: [], dailyDone: null, stats: emptyGuessStats() };
 }
 
-/** Her place moved to the list word at `index` (wrapping at the end), with nothing guessed yet. */
-export function listWord(saved: SavedGuess, words: GuessWords, index: number): SavedGuess {
-  const i = index % words.answers.length;
+/** Her place moved to the list word at `index` (wrapping at the end, skipping avoided words), with nothing guessed yet. */
+export function listWord(saved: SavedGuess, words: GuessWords, index: number, avoided: AvoidCheck = NOTHING_AVOIDED): SavedGuess {
+  const i = firstAllowed(words.answers, index % words.answers.length, avoided);
   return { ...saved, index: i, word: words.answers[i], daily: null, guesses: [], hinted: [] };
 }
 
@@ -99,21 +100,23 @@ function readSavedGuess(value: unknown): SavedGuess | null {
   };
 }
 
-export function loadSavedGuess(store: KeyValueStore, words: GuessWords): SavedGuess {
+export function loadSavedGuess(store: KeyValueStore, words: GuessWords, avoided: AvoidCheck = NOTHING_AVOIDED): SavedGuess {
   try {
     const raw = store.getItem(GUESS_KEY);
     const saved = raw === null ? null : readSavedGuess(JSON.parse(raw));
     if (saved) {
+      // A word she should never see (just added on the settings page): move on to the next list word, fresh.
+      if (avoided(saved.word)) return listWord(saved, words, saved.index, avoided);
       // A regenerated list may have a different word at her place: start that place fresh, as Word Circle does.
       if (saved.daily === null && words.answers[saved.index % words.answers.length] !== saved.word) {
-        return listWord(saved, words, saved.index);
+        return listWord(saved, words, saved.index, avoided);
       }
       return { ...saved, index: saved.index % words.answers.length };
     }
   } catch {
     // Unreadable save: start fresh.
   }
-  return freshGuess(words);
+  return listWord(freshGuess(words), words, 0, avoided);
 }
 
 export function saveSavedGuess(store: KeyValueStore, saved: SavedGuess): void {
