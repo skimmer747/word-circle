@@ -1,7 +1,7 @@
 # Stats — Design
 
 **Date:** 2026-10-20
-**Status:** Design approved in brainstorming; not built yet.
+**Status:** Built 2026-10-20 (plan: `docs/superpowers/plans/2026-10-20-stats.md`). While building: the family section is titled with her name when one is set ("How Ruth is doing"), otherwise "How they're doing", since the settings page speaks of "them" for any family; the table's "Days played" row waits until the earlier 4 weeks are fully inside the log; card 1's total also arrives by a timer, in case animation frames stall.
 **Builds on:** `2026-10-19-word-guess-design.md` (the frame, pop-ups, "Well done!" card), `2026-10-19-caregiver-settings-design.md` (the settings page, one-game mode), and each game's design.
 
 ## Purpose

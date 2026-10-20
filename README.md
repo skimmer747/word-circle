@@ -19,6 +19,10 @@ Hold the clock button for 3 seconds to open the settings page: her name, which t
 A new iPad shows this page the first time. Mom's iPad skipped it and still reads its schedule from `public/schedule.txt` (below); every other iPad keeps its schedule on the iPad itself.
 For another family, just send them the link https://skimmer747.github.io/word-circle/. Opened in Safari on their iPad, it tells them to add it to the Home Screen first, then asks its setup questions when they open it from there.
 
+## Stats
+
+**Games › Your stats** opens her stats: five big, cheerful cards (her total, her favorite game, her bests and Word Guess chart, a garden of the days she played, and a fun fact), with confetti when something's new. With only one game turned on, the corner's Stats button opens them. Every finished puzzle or word is logged on the iPad (13 months of detail, plus lifetime figures). The caregiver settings page has **How they're doing**: honest weekly charts of speed, hints, tries and play, after about 2 weeks of play.
+
 ## Commands
 
 ```bash
