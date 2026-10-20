@@ -1,7 +1,7 @@
-# Words that are never the Word Guess answer (one per line).
-# They still count if she types one as a guess, and Word Circle is not affected.
-# To keep a word out of both games entirely, use words/blocklist.txt instead.
-# After changing this file, run: npm run puzzles
+# Words that are never an answer in Word Guess or Word Grid (one per line).
+# They still count if she types or spells one, and Word Circle is not affected.
+# To keep a word out of every game entirely, use words/blocklist.txt instead.
+# After changing this file, run: npm run puzzles (Word Guess) and npm run grid-puzzles (Word Grid)
 
 # Death
 skull
@@ -84,3 +84,17 @@ shame
 slave
 exile
 bribe
+
+# Word Grid: odd or unpleasant short words (chosen at Word Grid's first review, 2026-10-19)
+hes
+sic
+ugh
+huh
+sod
+gin
+con
+ken
+mod
+cam
+ion
+scum
