@@ -49,6 +49,12 @@ export class CircleScreen implements GameScreen {
   private timer = new PlayTimer();
   private ringOrder: number[] = [];
   private idleTimer = 0;
+  /** True while the hint star flies; Hint taps are ignored until it lands. */
+  private hintFlying = false;
+  /** The letter the hint star is flying to: hidden until it lands. */
+  private hiddenHint: { word: string; index: number } | null = null;
+  /** True while Word Circle is on screen (between resume and pause). */
+  private shown = false;
   private layout: Layout | null = null;
   /** Created on the first render; taps and words can only arrive after that. */
   private view!: View;
@@ -97,7 +103,7 @@ export class CircleScreen implements GameScreen {
 
   buttonTapped(id: string): void {
     if (id === 'shuffle') this.shuffle();
-    else if (id === 'hint') this.hint();
+    else if (id === 'hint') void this.hint();
     else if (id.startsWith('level:')) this.chooseLevel(id.slice('level:'.length) as Level);
   }
 
@@ -123,6 +129,7 @@ export class CircleScreen implements GameScreen {
 
   /** Play time stops while she's away. */
   pause(): void {
+    this.shown = false;
     this.timer.pause();
     window.clearTimeout(this.idleTimer);
     this.view?.setHintPulse(false);
@@ -130,8 +137,11 @@ export class CircleScreen implements GameScreen {
   }
 
   resume(): void {
+    this.shown = true;
     this.timer.resume(performance.now());
-    if (!this.busy) this.resetIdle();
+    // A puzzle completed while a hint star flew, just before she switched away, is celebrated when she's back.
+    if (this.game.isComplete() && !this.busy && !this.hintFlying) void this.finishPuzzle();
+    else if (!this.busy) this.resetIdle();
   }
 
   summary(): GameSummary {
@@ -146,6 +156,7 @@ export class CircleScreen implements GameScreen {
   }
 
   private loadPuzzle(start: StartPoint): void {
+    this.hiddenHint = null;
     this.index = start.index;
     this.game = new Game(
       withoutAvoidedBonus(this.puzzles[this.level][start.index], this.avoided),
@@ -173,7 +184,12 @@ export class CircleScreen implements GameScreen {
   }
 
   private rowState(word: string): RowState {
-    return { found: this.game.isFound(word), revealed: this.game.revealedIndices(word) };
+    const revealed = this.game.revealedIndices(word);
+    if (this.hiddenHint?.word === word) {
+      const hidden = this.hiddenHint.index;
+      return { found: false, revealed: revealed.filter((i) => i !== hidden) };
+    }
+    return { found: this.game.isFound(word), revealed };
   }
 
   private showSelection(): void {
@@ -218,8 +234,9 @@ export class CircleScreen implements GameScreen {
   }
 
   private async afterWordFound(): Promise<void> {
-    if (this.game.isComplete()) await this.finishPuzzle();
-    else void this.view.showMessage('Good!', 'circle', GOOD_MS);
+    if (!this.game.isComplete()) void this.view.showMessage('Good!', 'circle', GOOD_MS);
+    // If the hint star is still flying, it finishes the puzzle when it lands.
+    else if (!this.hintFlying) await this.finishPuzzle();
   }
 
   private async finishPuzzle(): Promise<void> {
@@ -263,15 +280,32 @@ export class CircleScreen implements GameScreen {
     this.resetIdle();
   }
 
-  private hint(): void {
-    if (this.busy || this.host.isTracing) return;
+  private async hint(): Promise<void> {
+    // One star at a time, so a double tap doesn't use two hints.
+    if (this.busy || this.host.isTracing || this.hintFlying) return;
     const result = this.game.hint();
     if (!result) return;
     this.save();
     this.resetIdle();
     const row = this.game.puzzle.words.indexOf(result.word);
+    this.hintFlying = true;
+    this.hiddenHint = { word: result.word, index: result.index };
     this.view.setRow(row, this.rowState(result.word));
-    if (result.completedWord) void this.afterWordFound();
+    await this.view.flyStar(row, result.index);
+    this.hintFlying = false;
+    // If she switched level while the star flew, that puzzle is gone from the screen.
+    const landed = this.hiddenHint?.word === result.word;
+    if (landed) {
+      this.hiddenHint = null;
+      this.view.setRow(row, this.rowState(result.word));
+      this.view.landSlot(row, result.index);
+    }
+    // A puzzle completed during the flight gets its "Well done!" now if she's here, or when she comes back (resume).
+    if (this.game.isComplete()) {
+      if (this.shown) await this.finishPuzzle();
+    } else if (landed && result.completedWord) {
+      void this.view.showMessage('Good!', 'circle', GOOD_MS);
+    }
   }
 
   private shuffle(): void {

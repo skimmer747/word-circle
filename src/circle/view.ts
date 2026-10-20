@@ -1,4 +1,5 @@
 import { el, place, restartAnimation, wait } from '../ui/dom';
+import { flyHintStar, landHintLetter } from '../ui/hint-star';
 import { CHECK_ICON, HINT_ICON, SHUFFLE_ICON } from '../ui/icons';
 import type { Layout, Rect } from './layout';
 import { LEVELS, type Level, type Puzzle } from './types';
@@ -208,6 +209,18 @@ export class View {
 
   pulseRow(row: number): void {
     this.rows[row].forEach((slot) => restartAnimation(slot, 'pulse'));
+  }
+
+  /** The hint star flies from Hint to the slot. Resolves when it lands. */
+  async flyStar(row: number, index: number): Promise<void> {
+    const slot = this.rows[row]?.[index];
+    if (slot) await flyHintStar(this.hintButton, slot);
+  }
+
+  /** The hinted letter lands in its slot with a bounce. */
+  landSlot(row: number, index: number): void {
+    const slot = this.rows[row]?.[index];
+    if (slot) landHintLetter(slot);
   }
 
   /** Shows extra words as chips, oldest first; drops the oldest when they don't fit. Pops in `newest`. */
