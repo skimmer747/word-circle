@@ -118,3 +118,13 @@ describe('words she should never see', () => {
     expect(loadSavedGrid(new MemoryStore(), 'hard').level).toBe('hard');
   });
 });
+
+describe('play time on a puzzle', () => {
+  it('keeps the time so far, and a fresh puzzle has none', () => {
+    const store = new MemoryStore();
+    const timed: SavedGrid = { ...SAVED, levels: { ...SAVED.levels, easy: { ...SAVED.levels.easy!, elapsedMs: 30_000 } } };
+    saveSavedGrid(store, timed);
+    expect(loadSavedGrid(store).levels.easy?.elapsedMs).toBe(30_000);
+    expect(nextPuzzle(timed, PUZZLES, 'easy').levels.easy?.elapsedMs).toBeUndefined();
+  });
+});

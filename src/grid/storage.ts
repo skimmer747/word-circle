@@ -15,6 +15,8 @@ export interface GridProgress {
   placed: string[];
   /** Squares filled by Hint. */
   hinted: number[];
+  /** Active play time on this puzzle so far (older saves don't have it). */
+  elapsedMs?: number;
 }
 
 export interface GridStats {
@@ -78,6 +80,7 @@ export function recordGridSolve(stats: GridStats, day: string): GridStats {
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 const isCount = (value: unknown): boolean => Number.isInteger(value) && (value as number) >= 0;
+const isTime = (value: unknown): boolean => typeof value === 'number' && Number.isFinite(value) && value >= 0;
 
 function readStats(value: unknown): GridStats {
   if (
@@ -101,7 +104,13 @@ function readProgress(value: unknown): GridProgress | null {
   if (!isCount(index) || typeof id !== 'string') return null;
   if (!Array.isArray(placed) || !placed.every((l) => typeof l === 'string' && LETTER_OR_EMPTY.test(l))) return null;
   if (!Array.isArray(hinted) || !hinted.every(isCount)) return null;
-  return { index: index as number, id, placed: placed as string[], hinted: hinted as number[] };
+  return {
+    index: index as number,
+    id,
+    placed: placed as string[],
+    hinted: hinted as number[],
+    ...(isTime(value.elapsedMs) ? { elapsedMs: value.elapsedMs as number } : {}),
+  };
 }
 
 /** A damaged level is dropped on its own, so it never costs her the others. */

@@ -1,9 +1,11 @@
-import { GAME_TITLES, type FrameHost, type GameScreen, type GameTargets } from '../frame/games';
+import { GAME_TITLES, type FrameHost, type GameScreen, type GameSummary, type GameTargets } from '../frame/games';
 import type { FrameLayout } from '../frame/layout';
 import type { CelebrationCard } from '../frame/view';
 import { NOTHING_AVOIDED, type AvoidCheck } from '../shared/avoid';
 import { dayKey } from '../shared/days';
 import type { KeyValueStore } from '../shared/store';
+import { PlayTimer } from '../shared/timer';
+import { guessRecord } from '../stats/records';
 import { guessLines } from './celebration';
 import { cachedDailyWords, dailyFor, finishWord, refreshDailyWords, swapInDaily, type DailyWord } from './daily';
 import { computeGuessLayout, type GuessLayout } from './layout';
@@ -50,6 +52,7 @@ export class GuessScreen implements GameScreen {
   private allLetters = false;
   private shown = false;
   private idleTimer = 0;
+  private timer = new PlayTimer();
   private readonly isAccepted: (word: string) => boolean;
   private readonly avoided: AvoidCheck;
   private readonly now: () => Date;
@@ -110,6 +113,7 @@ export class GuessScreen implements GameScreen {
   }
 
   pause(): void {
+    this.timer.pause();
     this.shown = false;
     window.clearTimeout(this.idleTimer);
     this.view?.setHintPulse(false);
@@ -117,8 +121,17 @@ export class GuessScreen implements GameScreen {
   }
 
   resume(): void {
+    this.timer.resume(performance.now());
     this.shown = true;
     if (!this.busy) this.resetIdle();
+  }
+
+  activity(): void {
+    this.timer.activity(performance.now());
+  }
+
+  summary(): GameSummary {
+    return { solved: this.saved.stats.totalSolved };
   }
 
   /** "Today's Wordle is ready" in the Games pop-up until she has finished it. */
@@ -136,10 +149,13 @@ export class GuessScreen implements GameScreen {
   private loadWord(): void {
     this.game = new GuessGame(this.saved.word, this.saved.guesses, this.saved.hinted, this.isAccepted);
     this.allLetters = false;
+    this.timer = new PlayTimer(this.saved.elapsedMs ?? 0);
+    if (document.hidden) this.timer.pause();
+    else this.timer.activity(performance.now());
   }
 
   private save(): void {
-    this.saved = { ...this.saved, guesses: [...this.game.guesses], hinted: [...this.game.hinted] };
+    this.saved = { ...this.saved, guesses: [...this.game.guesses], hinted: [...this.game.hinted], elapsedMs: this.timer.elapsedMs };
     saveSavedGuess(this.store, this.saved);
   }
 
@@ -276,15 +292,28 @@ export class GuessScreen implements GameScreen {
     this.busy = true;
     window.clearTimeout(this.idleTimer);
     this.view?.setHintPulse(false);
+    this.timer.activity(performance.now());
     const day = dayKey(this.now());
     const { answer, guesses, solvedByGuess } = this.game;
     const daily = this.saved.daily?.date === day ? this.saved.daily : null;
     const share = daily ? shareText(daily.number, answer, guesses, !solvedByGuess) : '';
     this.saved = { ...this.saved, stats: recordGuessSolve(this.saved.stats, day) };
     const streakDays = this.host.recordPlayDay();
+    this.host.logPlay(
+      guessRecord({
+        answer,
+        guesses,
+        hinted: this.game.hinted,
+        typed: solvedByGuess,
+        daily: daily !== null,
+        ms: this.timer.elapsedMs,
+        now: this.now(),
+      }),
+    );
     // Save the next word as her place now, so closing the app mid-celebration loses nothing.
     this.saved = finishWord(this.saved, this.words, day, share, this.today(), this.avoided);
     this.loadWord();
+    this.timer.pause();
     this.save();
     const card: CelebrationCard = {
       word: answer,
@@ -302,6 +331,7 @@ export class GuessScreen implements GameScreen {
     const shareSheet = this.options.share;
     if (daily && shareSheet) card.share = () => shareSheet(share);
     await this.host.celebrate(card);
+    this.timer.resume(performance.now());
     this.busy = false;
     this.host.redraw(true);
     this.resetIdle();

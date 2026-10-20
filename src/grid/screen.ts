@@ -1,9 +1,11 @@
-import { GAME_TITLES, type FrameHost, type GameScreen, type GameTargets } from '../frame/games';
+import { GAME_TITLES, type FrameHost, type GameScreen, type GameSummary, type GameTargets } from '../frame/games';
 import type { FrameLayout, Rect } from '../frame/layout';
 import type { ButtonGeometry } from '../input/touch';
 import { NOTHING_AVOIDED, type AvoidCheck } from '../shared/avoid';
 import { dayKey } from '../shared/days';
 import type { KeyValueStore } from '../shared/store';
+import { PlayTimer } from '../shared/timer';
+import { gridRecord } from '../stats/records';
 import { gridLines } from './celebration';
 import { computeGridLayout, trayTiles, type GridLayout } from './layout';
 import { GridGame, type TrayLetter } from './rules';
@@ -45,6 +47,7 @@ export class GridScreen implements GameScreen {
   private view: GridView | null = null;
   private layout: GridLayout | null = null;
   private idleTimer = 0;
+  private timer = new PlayTimer();
   private readonly isWord: (word: string) => boolean;
   private readonly startLevel: GridLevel;
   private readonly avoided: AvoidCheck;
@@ -156,6 +159,7 @@ export class GridScreen implements GameScreen {
   }
 
   pause(): void {
+    this.timer.pause();
     window.clearTimeout(this.idleTimer);
     this.view?.setHintPulse(false);
     if (this.held) this.dragCancelled();
@@ -163,7 +167,16 @@ export class GridScreen implements GameScreen {
   }
 
   resume(): void {
+    this.timer.resume(performance.now());
     if (!this.busy) this.resetIdle();
+  }
+
+  activity(): void {
+    this.timer.activity(performance.now());
+  }
+
+  summary(): GameSummary {
+    return { solved: this.saved.stats.totalSolved };
   }
 
   private loadPuzzle(): void {
@@ -172,12 +185,15 @@ export class GridScreen implements GameScreen {
     this.game = new GridGame(this.puzzles[level][progress.index], progress.placed, progress.hinted, this.isWord);
     this.saved = { ...this.saved, levels: { ...this.saved.levels, [level]: progress } };
     this.selected = this.game.firstEmpty();
+    this.timer = new PlayTimer(progress.elapsedMs ?? 0);
+    if (document.hidden) this.timer.pause();
+    else this.timer.activity(performance.now());
   }
 
   private save(): void {
     const level = this.saved.level;
     const progress = progressFor(this.saved, this.puzzles, level, this.avoided);
-    const current = { ...progress, placed: this.game.placed, hinted: this.game.hinted };
+    const current = { ...progress, placed: this.game.placed, hinted: this.game.hinted, elapsedMs: this.timer.elapsedMs };
     this.saved = { ...this.saved, levels: { ...this.saved.levels, [level]: current } };
     saveSavedGrid(this.store, this.saved);
   }
@@ -291,11 +307,23 @@ export class GridScreen implements GameScreen {
     this.view?.setHintPulse(false);
     await this.view?.finish(this.game.shape.runs);
     const hinted = this.game.hinted.length > 0;
+    this.timer.activity(performance.now());
+    const level = this.saved.level;
+    this.host.logPlay(
+      gridRecord({
+        puzzle: this.puzzles[level][progressFor(this.saved, this.puzzles, level, this.avoided).index],
+        hinted: this.game.hinted,
+        level,
+        ms: this.timer.elapsedMs,
+        now: this.now(),
+      }),
+    );
     this.saved = { ...this.saved, stats: recordGridSolve(this.saved.stats, dayKey(this.now())) };
     const streakDays = this.host.recordPlayDay();
     // Save the next puzzle as her place now, so closing the app mid-celebration loses nothing.
     this.saved = nextPuzzle(this.saved, this.puzzles, this.saved.level, this.avoided);
     this.loadPuzzle();
+    this.timer.pause();
     this.save();
     await this.host.celebrate({
       lines: gridLines({
@@ -307,6 +335,7 @@ export class GridScreen implements GameScreen {
       nextLabel: 'Next puzzle',
       timeoutMs: CELEBRATION_MS,
     });
+    this.timer.resume(performance.now());
     this.busy = false;
     this.host.redraw(true);
     this.resetIdle();

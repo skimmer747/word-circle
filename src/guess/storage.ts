@@ -28,6 +28,8 @@ export interface SavedGuess {
   guesses: string[];
   /** Squares filled by Hint. */
   hinted: number[];
+  /** Active play time on this word so far (older saves don't have it). */
+  elapsedMs?: number;
   /** The last daily word she finished, with its text for sharing. */
   dailyDone: { date: string; share: string } | null;
   stats: GuessStats;
@@ -47,7 +49,7 @@ export function freshGuess(words: GuessWords): SavedGuess {
 /** Her place moved to the list word at `index` (wrapping at the end, skipping avoided words), with nothing guessed yet. */
 export function listWord(saved: SavedGuess, words: GuessWords, index: number, avoided: AvoidCheck = NOTHING_AVOIDED): SavedGuess {
   const i = firstAllowed(words.answers, index % words.answers.length, avoided);
-  return { ...saved, index: i, word: words.answers[i], daily: null, guesses: [], hinted: [] };
+  return { ...saved, index: i, word: words.answers[i], daily: null, guesses: [], hinted: [], elapsedMs: undefined };
 }
 
 /** Counts a finished word; "today" starts over on a new day. */
@@ -63,6 +65,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> => typeof va
 const isCount = (value: unknown): boolean => Number.isInteger(value) && (value as number) >= 0;
 const isDay = (value: unknown): boolean => typeof value === 'string' && DAY.test(value);
 const isWord = (value: unknown): boolean => typeof value === 'string' && FIVE.test(value);
+const isTime = (value: unknown): boolean => typeof value === 'number' && Number.isFinite(value) && value >= 0;
 
 /** Damaged counts never cost her progress. */
 function readStats(value: unknown): GuessStats {
@@ -97,6 +100,7 @@ function readSavedGuess(value: unknown): SavedGuess | null {
     hinted: hinted as number[],
     dailyDone: dailyDone as SavedGuess['dailyDone'],
     stats: readStats(value.stats),
+    ...(isTime(value.elapsedMs) ? { elapsedMs: value.elapsedMs as number } : {}),
   };
 }
 

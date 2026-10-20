@@ -1,5 +1,6 @@
 import type { ButtonGeometry, TileGeometry } from '../input/touch';
 import type { FrameLayout } from './layout';
+import type { PlayRecord } from '../stats/log';
 import type { CelebrationCard } from './view';
 
 export const GAME_IDS = ['circle', 'guess', 'grid'] as const;
@@ -16,6 +17,14 @@ export interface GameTargets {
   draggables?: ButtonGeometry[];
 }
 
+/** A game's figures for her stats. */
+export interface GameSummary {
+  /** Puzzles or words she has finished, ever. */
+  solved: number;
+  /** Word Circle: her best time on each level. */
+  bestMs?: Partial<Record<'easy' | 'medium' | 'hard', number>>;
+}
+
 /** What the frame lends the game on screen. */
 export interface FrameHost {
   /** True while she's tracing a word through letter tiles. */
@@ -30,6 +39,8 @@ export interface FrameHost {
   updateTargets(targets: GameTargets): void;
   /** Marks today as played (in either game) and returns her days in a row. */
   recordPlayDay(): number;
+  /** Saves a finished puzzle or word to the play log. */
+  logPlay(record: PlayRecord): void;
 }
 
 /**
@@ -71,4 +82,6 @@ export interface GameScreen {
   resume(): void;
   /** A line under its name in the Games pop-up, or null. */
   note?(): string | null;
+  /** Its lifetime count (and Word Circle's best times), for her stats. */
+  summary(): GameSummary;
 }

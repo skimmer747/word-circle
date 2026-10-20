@@ -6,6 +6,7 @@ import { dayKey, recordPlayDay as countPlayDay, type PlayDays } from '../shared/
 import { wellDoneTitle } from '../settings/name';
 import type { ScheduleSetting } from '../settings/settings';
 import type { KeyValueStore } from '../shared/store';
+import { addPlay, type PlayRecord } from '../stats/log';
 import type { FrameHost, GameId, GameScreen, GameTargets } from './games';
 import { computeFrameLayout, type FrameLayout, type Thumb } from './layout';
 import { loadSavedFrame, saveSavedFrame, type SavedFrame } from './storage';
@@ -159,6 +160,10 @@ export class Frame implements FrameHost {
     this.saved = { ...this.saved, ...days };
     saveSavedFrame(this.store, this.saved);
     return days.streakDays;
+  }
+
+  logPlay(record: PlayRecord): void {
+    addPlay(this.store, record);
   }
 
   private scrolled(id: string, dy: number): void {

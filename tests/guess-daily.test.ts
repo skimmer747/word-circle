@@ -128,3 +128,9 @@ describe('finishWord with words she should never see', () => {
     expect(finishWord(ON_LIST, WORDS, '2026-10-20', '', null, avoidChecker(['house']))).toMatchObject({ index: 0, word: 'crane' });
   });
 });
+
+describe('play time and the daily word', () => {
+  it('starts the daily word at no time', () => {
+    expect(swapInDaily({ ...ON_LIST, elapsedMs: 5000 }, TODAY, true)?.elapsedMs).toBeUndefined();
+  });
+});

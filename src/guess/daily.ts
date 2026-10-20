@@ -60,7 +60,7 @@ export async function refreshDailyWords(fetchText: () => Promise<string>, store:
  */
 export function swapInDaily(saved: SavedGuess, today: DailyWord | null, untouched: boolean): SavedGuess | null {
   if (!today || !untouched || saved.daily?.date === today.date || saved.dailyDone?.date === today.date) return null;
-  return { ...saved, word: today.word, daily: { date: today.date, number: today.number }, guesses: [], hinted: [] };
+  return { ...saved, word: today.word, daily: { date: today.date, number: today.number }, guesses: [], hinted: [], elapsedMs: undefined };
 }
 
 /**

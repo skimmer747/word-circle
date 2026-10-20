@@ -1,4 +1,4 @@
-import { GAME_TITLES, type FrameHost, type GameScreen, type GameTargets } from '../frame/games';
+import { GAME_TITLES, type FrameHost, type GameScreen, type GameSummary, type GameTargets } from '../frame/games';
 import type { FrameLayout } from '../frame/layout';
 import type { KeyValueStore } from '../shared/store';
 import { circleLines } from './celebration';
@@ -19,6 +19,7 @@ import {
   type StartPoint,
 } from './storage';
 import { PlayTimer } from '../shared/timer';
+import { circleRecord } from '../stats/records';
 import { LEVELS, type Level, type PuzzleSet } from './types';
 import { View, type RowState } from './view';
 
@@ -133,6 +134,10 @@ export class CircleScreen implements GameScreen {
     if (!this.busy) this.resetIdle();
   }
 
+  summary(): GameSummary {
+    return { solved: this.saved.stats.totalSolved, bestMs: this.saved.stats.bestMs };
+  }
+
   /** Switches to a level's saved place (or its first puzzle). */
   private openLevel(level: Level): void {
     this.level = level;
@@ -226,6 +231,16 @@ export class CircleScreen implements GameScreen {
     this.timer.activity(performance.now());
     const { stats, celebration } = recordSolve(this.saved.stats, this.level, this.timer.elapsedMs, dayKey(new Date()));
     this.saved.stats = stats;
+    this.host.logPlay(
+      circleRecord({
+        words: this.game.puzzle.words,
+        extras: this.game.foundBonus(),
+        revealed: this.game.revealedRecord(),
+        level: this.level,
+        ms: this.timer.elapsedMs,
+        now: new Date(),
+      }),
+    );
     // Save the next puzzle as her place now, so closing the app mid-celebration loses nothing.
     this.loadPuzzle(
       skipAvoided(

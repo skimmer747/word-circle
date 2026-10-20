@@ -105,3 +105,15 @@ describe('words she should never see', () => {
     expect(loadSavedGuess(new MemoryStore(), WORDS, avoidChecker(['crane'])).word).toBe('slate');
   });
 });
+
+describe('play time on a word', () => {
+  it('keeps the time so far, and older saves load without it', () => {
+    expect(loadSavedGuess(stored({ ...SAVED, elapsedMs: 42_000 }), WORDS).elapsedMs).toBe(42_000);
+    expect(loadSavedGuess(stored(SAVED), WORDS).elapsedMs).toBeUndefined();
+    expect(loadSavedGuess(stored({ ...SAVED, elapsedMs: -5 }), WORDS).elapsedMs).toBeUndefined();
+  });
+
+  it('starts a new word at no time', () => {
+    expect(listWord({ ...SAVED, elapsedMs: 5000 }, WORDS, 0).elapsedMs).toBeUndefined();
+  });
+});
