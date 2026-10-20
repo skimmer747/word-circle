@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clockFace, upcomingEvents } from '../src/clock/clock';
+import { clockFace, greeting, upcomingEvents } from '../src/clock/clock';
 import { parseSchedule } from '../src/clock/schedule';
 
 // Monday, October 19, 2026 (local time).
@@ -17,11 +17,30 @@ describe('clockFace', () => {
   it('greets her by name when it has one', () => {
     expect(clockFace(at(10, 30), 'Ruth').greeting).toBe('Good morning, Ruth');
     expect(clockFace(at(18, 40), 'Ruth').greeting).toBe('Good evening, Ruth');
+    expect(clockFace(at(22, 0), 'Ruth').greeting).toBe('Hello, Ruth');
   });
 
   it('handles noon and midnight', () => {
     expect(clockFace(at(12, 0))).toMatchObject({ time: '12:00 PM', part: 'in the afternoon' });
     expect(clockFace(at(0, 7))).toMatchObject({ time: '12:07 AM', part: 'at night' });
+  });
+});
+
+describe('greeting', () => {
+  it('greets her by the clock\'s part of day, with a plain hello at night', () => {
+    expect(greeting('Ruth', at(5, 0))).toBe('Good morning, Ruth');
+    expect(greeting('Ruth', at(11, 59))).toBe('Good morning, Ruth');
+    expect(greeting('Ruth', at(12, 0))).toBe('Good afternoon, Ruth');
+    expect(greeting('Ruth', at(16, 59))).toBe('Good afternoon, Ruth');
+    expect(greeting('Ruth', at(17, 0))).toBe('Good evening, Ruth');
+    expect(greeting('Ruth', at(20, 59))).toBe('Good evening, Ruth');
+    expect(greeting('Ruth', at(21, 0))).toBe('Hello, Ruth');
+    expect(greeting('Ruth', at(3, 0))).toBe('Hello, Ruth');
+    expect(greeting('Ruth', at(4, 59))).toBe('Hello, Ruth');
+  });
+
+  it('says nothing without a name', () => {
+    expect(greeting('', at(9))).toBe('');
   });
 });
 

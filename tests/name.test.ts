@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_NAME_LENGTH, cleanName, greeting, wellDoneTitle } from '../src/settings/name';
+import { MAX_NAME_LENGTH, cleanName, wellDoneTitle } from '../src/settings/name';
 
 describe('cleanName', () => {
   it('tidies spaces', () => {
@@ -7,23 +7,20 @@ describe('cleanName', () => {
   });
 
   it('cuts a long name so the card title still fits', () => {
-    expect(cleanName('Grandmother Josephine')).toHaveLength(MAX_NAME_LENGTH);
+    expect(cleanName('Grandmother Josephine')).toBe('Grandmother Jose');
     expect(MAX_NAME_LENGTH).toBe(16);
   });
-});
 
-describe('greeting', () => {
-  it('greets her by the time of day', () => {
-    expect(greeting('Ruth', 5)).toBe('Good morning, Ruth');
-    expect(greeting('Ruth', 11)).toBe('Good morning, Ruth');
-    expect(greeting('Ruth', 12)).toBe('Good afternoon, Ruth');
-    expect(greeting('Ruth', 17)).toBe('Good evening, Ruth');
-    expect(greeting('Ruth', 23)).toBe('Good evening, Ruth');
-    expect(greeting('Ruth', 3)).toBe('Good evening, Ruth');
+  it('leaves no space dangling after the cut', () => {
+    expect(cleanName('Abcdefghijklmno Smith')).toBe('Abcdefghijklmno');
   });
 
-  it('says nothing without a name', () => {
-    expect(greeting('', 9)).toBe('');
+  it('keeps nothing from only spaces', () => {
+    expect(cleanName('   ')).toBe('');
+  });
+
+  it('cuts by character, so an emoji is never split', () => {
+    expect(cleanName('Grandma Ruthie 💖x')).toBe('Grandma Ruthie 💖');
   });
 });
 

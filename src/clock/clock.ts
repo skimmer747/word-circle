@@ -1,4 +1,3 @@
-import { greeting } from '../settings/name';
 import type { ScheduledEvent } from './schedule';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -13,7 +12,7 @@ const WEEK_AHEAD_DAYS = 7;
 const MINUTES_PER_DAY = 24 * 60;
 
 export interface ClockFace {
-  /** "Good morning, Ruth", or '' when no name is set. */
+  /** "Good morning, Ruth" ("Hello, Ruth" at night), or '' when no name is set. */
   greeting: string;
   /** "10:30 AM" */
   time: string;
@@ -37,9 +36,22 @@ function partOfDay(hour: number): string {
   return 'at night';
 }
 
+/** What the greeting says for each part of the day: "at night" is a plain hello, so it never disagrees with the clock. */
+const GREETINGS: Record<string, string> = {
+  'in the morning': 'Good morning',
+  'in the afternoon': 'Good afternoon',
+  'in the evening': 'Good evening',
+  'at night': 'Hello',
+};
+
+/** "Good morning, Ruth" ("Hello, Ruth" at night); '' without a name. */
+export function greeting(name: string, now: Date): string {
+  return name ? `${GREETINGS[partOfDay(now.getHours())]}, ${name}` : '';
+}
+
 export function clockFace(now: Date, name = ''): ClockFace {
   return {
-    greeting: greeting(name, now.getHours()),
+    greeting: greeting(name, now),
     time: formatTime(now.getHours() * 60 + now.getMinutes()),
     part: partOfDay(now.getHours()),
     date: `${DAY_NAMES[now.getDay()]}, ${MONTH_NAMES[now.getMonth()]} ${now.getDate()}`,
