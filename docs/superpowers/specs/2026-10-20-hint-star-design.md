@@ -34,7 +34,7 @@ The whole thing takes about 1.1 seconds. The star and sparkles float above every
 ## Code
 
 - **New `src/ui/hint-star.ts`:**
-  - `starPath(from, to)` (pure): the start, arc top and end points, from the centers of two rectangles. The arc top is halfway across and 80 px above the higher of the two points.
+  - `starPath(from, to)` (pure): the start and end (the centers of two rectangles) and the curve's bend point, halfway across and 80 px above the higher end, but never above the top of the screen (Hint sits near the top, so the star must not fly off it).
   - `flyHintStar(from: HTMLElement, to: HTMLElement): Promise<void>`: makes the star in a fixed-position, `pointer-events: none` layer on `document.body`, animates it with the Web Animations API along `starPath`, bursts the sparkles, and resolves when the star lands. With Reduce Motion (`matchMedia('(prefers-reduced-motion: reduce)')`), it resolves at once.
   - The star icon goes in `src/ui/icons.ts`, the star and sparkle styles in `src/styles.css`.
 - **Each game's view** gets a method that runs the star from its Hint button to a square and then shows that square's letter with the pop: `src/guess/view.ts`, `src/grid/view.ts`, `src/circle/view.ts`. Until it lands, the square is drawn empty. On landing, the square (or Word Circle's row) is redrawn from the game's current state, not the state at the tap, so anything she did during the flight (such as finding that word in Word Circle) still shows correctly.
@@ -43,6 +43,6 @@ The whole thing takes about 1.1 seconds. The star and sparkles float above every
 
 ## Testing
 
-- **Unit tests:** `starPath` (start and end at the two centers, arc top above both, halfway across); `flyHintStar` resolves at once under Reduce Motion.
+- **Unit tests:** `starPath` (start and end at the two centers, bend point halfway across and 80 px above the higher end, never above the screen); `flyHintStar` resolves at once under Reduce Motion.
 - **Browser check (dev):** in each game, tap Hint and watch the star land on the right square, the letter appear only on landing, a second tap mid-flight do nothing, and a hint that finishes the word wait for the star before "Well done!". (The built-in browser pane must be visible: while it's hidden, animations don't advance.)
 - **After the push:** the same check on the live site in one game.
