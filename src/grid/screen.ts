@@ -44,6 +44,12 @@ export class GridScreen implements GameScreen {
   private game!: GridGame;
   private selected = 0;
   private held: Held | null = null;
+  /** True while the hint star flies; Hint taps are ignored until it lands. */
+  private hintFlying = false;
+  /** The square the hint star is flying to: drawn empty until it lands. */
+  private hiddenSquare: number | null = null;
+  /** True while Word Grid is on screen (between resume and pause). */
+  private shown = false;
   private view: GridView | null = null;
   private layout: GridLayout | null = null;
   private idleTimer = 0;
@@ -82,7 +88,7 @@ export class GridScreen implements GameScreen {
 
   buttonTapped(id: string): void {
     if (this.busy) return;
-    if (id === 'hint') this.hint();
+    if (id === 'hint') void this.hint();
     else if (id.startsWith('level:')) this.chooseLevel(id.slice('level:'.length) as GridLevel);
     else if (id.startsWith('square:')) this.select(Number(id.slice('square:'.length)));
     else if (id.startsWith('tray:')) this.tapTray(Number(id.slice('tray:'.length)));
@@ -159,6 +165,7 @@ export class GridScreen implements GameScreen {
   }
 
   pause(): void {
+    this.shown = false;
     this.timer.pause();
     window.clearTimeout(this.idleTimer);
     this.view?.setHintPulse(false);
@@ -167,6 +174,7 @@ export class GridScreen implements GameScreen {
   }
 
   resume(): void {
+    this.shown = true;
     this.timer.resume(performance.now());
     if (!this.busy) this.resetIdle();
   }
@@ -180,6 +188,7 @@ export class GridScreen implements GameScreen {
   }
 
   private loadPuzzle(): void {
+    this.hiddenSquare = null;
     const level = this.saved.level;
     const progress = progressFor(this.saved, this.puzzles, level, this.avoided);
     this.game = new GridGame(this.puzzles[level][progress.index], progress.placed, progress.hinted, this.isWord);
@@ -215,8 +224,8 @@ export class GridScreen implements GameScreen {
     return {
       level: this.saved.level,
       shape,
-      letters: shape.open.map((_, square) => this.game.letterAt(square)),
-      hinted: new Set(this.game.hinted),
+      letters: shape.open.map((_, square) => (square === this.hiddenSquare ? '' : this.game.letterAt(square))),
+      hinted: new Set(this.game.hinted.filter((square) => square !== this.hiddenSquare)),
       selected: this.selected,
       tray: this.trayLetters(),
       corners: shape.sections.map((_, section) => this.game.tray(section)),
@@ -264,7 +273,8 @@ export class GridScreen implements GameScreen {
     this.save();
     this.resetIdle();
     this.refresh();
-    if (this.game.solved) void this.finish();
+    // If the hint star is still flying, it finishes the puzzle when it lands.
+    if (this.game.solved && !this.hintFlying) void this.finish();
   }
 
   private select(square: number): void {
@@ -282,12 +292,31 @@ export class GridScreen implements GameScreen {
     this.view?.popSquare(square);
   }
 
-  private hint(): void {
+  private async hint(): Promise<void> {
+    // One star at a time, so a double tap doesn't use two hints.
+    if (this.hintFlying) return;
     const square = this.game.hint(this.selected);
     if (square === null) return;
     this.selected = this.game.nextEmptyInSection(square) ?? square;
+    this.hintFlying = true;
+    this.hiddenSquare = square;
+    // A hint that finishes the puzzle: nothing more to do until "Well done!".
+    if (this.game.solved) this.busy = true;
+    this.save();
+    this.resetIdle();
+    this.refresh();
+    await this.view?.flyStar(square);
+    this.hintFlying = false;
+    // She switched level while the star flew: that puzzle is gone from the screen.
+    if (this.hiddenSquare !== square) return;
+    this.hiddenSquare = null;
+    if (!this.shown && !this.game.solved) {
+      // She left Word Grid while the star flew: draw the letter, but leave the touch targets to what's on screen.
+      this.view?.update(this.viewState());
+      return;
+    }
     this.changed();
-    this.view?.popSquare(square);
+    this.view?.landSquare(square);
   }
 
   /** Each level keeps its own puzzle and letters, so switching never loses anything. */

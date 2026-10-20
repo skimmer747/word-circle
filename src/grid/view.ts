@@ -1,5 +1,6 @@
 import type { Rect } from '../frame/layout';
 import { el, place, restartAnimation, wait } from '../ui/dom';
+import { flyHintStar, landHintLetter } from '../ui/hint-star';
 import { CHECK_ICON, HINT_ICON } from '../ui/icons';
 import { trayTiles, type GridLayout } from './layout';
 import type { GridShape } from './puzzle';
@@ -139,6 +140,18 @@ export class GridView {
   popSquare(square: number): void {
     const cell = this.cells.get(square)?.cell;
     if (cell) restartAnimation(cell, 'pop');
+  }
+
+  /** The hint star flies from Hint to the square. Resolves when it lands. */
+  async flyStar(square: number): Promise<void> {
+    const cell = this.cells.get(square)?.cell;
+    if (this.hintButton && cell) await flyHintStar(this.hintButton, cell);
+  }
+
+  /** The hinted letter lands in its square with a bounce. */
+  landSquare(square: number): void {
+    const letter = this.cells.get(square)?.letter;
+    if (letter) landHintLetter(letter);
   }
 
   setPressed(id: string, on: boolean): void {

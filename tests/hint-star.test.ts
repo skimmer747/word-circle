@@ -54,7 +54,15 @@ describe('Reduce Motion', () => {
 
   it('skips the star and resolves at once', async () => {
     vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === '(prefers-reduced-motion: reduce)' }));
-    // No DOM in these tests: touching the elements would throw, so resolving proves nothing was drawn.
-    await expect(flyHintStar({} as HTMLElement, {} as HTMLElement)).resolves.toBeUndefined();
+    // Pretend offset-path is supported, so only Reduce Motion can explain the skip.
+    vi.stubGlobal('CSS', { supports: () => true });
+    const from = { animate: vi.fn(), getBoundingClientRect: vi.fn() } as unknown as HTMLElement;
+    const to = { animate: vi.fn(), getBoundingClientRect: vi.fn() } as unknown as HTMLElement;
+    await expect(flyHintStar(from, to)).resolves.toBeUndefined();
+    // Nothing was measured or animated.
+    for (const element of [from, to]) {
+      expect(element.animate).not.toHaveBeenCalled();
+      expect(element.getBoundingClientRect).not.toHaveBeenCalled();
+    }
   });
 });
