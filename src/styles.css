@@ -2036,3 +2036,75 @@ body {
   line-height: 48px;
   cursor: pointer;
 }
+
+/* The Hint star: flies from Hint to the hinted square, then bursts into sparkles. */
+.hint-star-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+}
+
+.hint-star {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 48px;
+  offset-rotate: 0deg;
+  color: var(--hint);
+}
+
+.hint-star svg {
+  width: 100%;
+  height: 100%;
+  fill: #ef9f27;
+}
+
+.hint-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ef9f27;
+}
+
+.button.hint.tapped {
+  animation: hint-tap 200ms ease-out;
+}
+
+@keyframes hint-tap {
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+/* The hinted letter lands. */
+.square.hint-land,
+.slot.hint-land,
+.cell.hint-land .cell-letter {
+  animation: hint-land 400ms ease-out;
+}
+
+@keyframes hint-land {
+  0% {
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Reduce Motion: no star (see hint-star.ts), and the letter gets the small pop. */
+@media (prefers-reduced-motion: reduce) {
+  .square.hint-land,
+  .slot.hint-land,
+  .cell.hint-land .cell-letter {
+    animation: pop-letter 150ms ease-out;
+  }
+}
