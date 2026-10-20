@@ -19,3 +19,6 @@ export const KEYBOARD_ICON = `<svg ${ICON_ATTRS}><path d="M2 6m0 2a2 2 0 0 1 2 -
 export const TARGET_ICON = `<svg ${ICON_ATTRS}><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/></svg>`;
 export const NEWS_ICON = `<svg ${ICON_ATTRS}><path d="M16 6h3a1 1 0 0 1 1 1v11a2 2 0 0 1 -4 0v-12a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1v12a3 3 0 0 0 3 3h11"/><path d="M8 8l4 0"/><path d="M8 12l4 0"/><path d="M8 16l4 0"/></svg>`;
 export const SHARE_ICON = `<svg ${ICON_ATTRS}><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 9l5 -5l5 5"/><path d="M12 4l0 12"/></svg>`;
+
+export const CROWN_ICON = `<svg ${ICON_ATTRS}><path d="M12 6l4 6l5 -4l-2 10h-14l-2 -10l5 4z"/></svg>`;
+export const SPARKLE_ICON = `<svg ${ICON_ATTRS}><path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6z"/></svg>`;
