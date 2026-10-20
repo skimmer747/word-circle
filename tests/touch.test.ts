@@ -560,3 +560,62 @@ describe('dragging letters', () => {
     expect(events).toEqual(['tap hint']);
   });
 });
+
+describe('holding the clock', () => {
+  const CLOCK = { id: 'clock', x: 960, y: 16, w: 72, h: 72 };
+  const clock = [996, 52] as const;
+
+  function holdSetup() {
+    const events: string[] = [];
+    const tracer = new LetterTracer({
+      letterAdded: () => {},
+      letterRemoved: () => {},
+      wordSubmitted: () => {},
+      selectionCleared: () => {},
+      buttonTapped: (id) => events.push(`tap ${id}`),
+      holdStarted: (id) => events.push(`hold ${id}`),
+      holdEnded: (id) => events.push(`end ${id}`),
+    });
+    tracer.setGeometry({ ...GEOMETRY, buttons: [...GEOMETRY.buttons, CLOCK], holdButtons: ['clock'] });
+    const send = (type: PointerInput['type'], id: number, x: number, y: number, time?: number) =>
+      tracer.handle({ type, id, x, y, time });
+    return { tracer, events, send };
+  }
+
+  it('reports the hold, and still taps the clock on a quick lift', () => {
+    const { events, send } = holdSetup();
+    send('down', 1, ...clock, 0);
+    send('up', 1, ...clock, 300);
+    expect(events).toEqual(['hold clock', 'end clock', 'tap clock']);
+  });
+
+  it('ends the hold without a tap after a long press', () => {
+    const { events, send } = holdSetup();
+    send('down', 1, ...clock, 0);
+    send('up', 1, ...clock, 3500);
+    expect(events).toEqual(['hold clock', 'end clock']);
+  });
+
+  it('ends the hold as soon as the finger slides off the clock', () => {
+    const { events, send } = holdSetup();
+    send('down', 1, ...clock, 0);
+    send('move', 1, 900, 52, 100);
+    expect(events).toEqual(['hold clock', 'end clock']);
+    send('up', 1, 900, 52, 200);
+    expect(events).toEqual(['hold clock', 'end clock']);
+  });
+
+  it('ends the hold when the screen changes under the finger', () => {
+    const { tracer, events, send } = holdSetup();
+    send('down', 1, ...clock, 0);
+    tracer.setEnabled(false);
+    expect(events).toEqual(['hold clock', 'end clock']);
+  });
+
+  it('only reports holds on hold buttons', () => {
+    const { events, send } = holdSetup();
+    send('down', 1, 390, 745, 0);
+    send('up', 1, 390, 745, 3500);
+    expect(events).toEqual([]);
+  });
+});

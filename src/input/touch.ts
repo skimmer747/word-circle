@@ -31,6 +31,8 @@ export interface TracerGeometry {
   scrollAreas?: ButtonGeometry[];
   /** Letters she can tap, or pick up and drag (Word Grid). */
   draggables?: ButtonGeometry[];
+  /** Buttons that also report being held down (the clock, which opens settings when held). */
+  holdButtons?: readonly string[];
 }
 
 export interface TracerCallbacks {
@@ -43,6 +45,10 @@ export interface TracerCallbacks {
   buttonPressed?(id: string): void;
   /** That finger lifted or was cancelled, or the screen changed under it. */
   buttonReleased?(id: string): void;
+  /** A finger came down on a hold button... */
+  holdStarted?(id: string): void;
+  /** ...and lifted, slid off it, or was cancelled, or the screen changed under it. */
+  holdEnded?(id: string): void;
   /** A scrolling finger moved; `dy` is positive when it moved up, to show what is further down. */
   scrolled?(id: string, dy: number): void;
   /** A finger on a draggable moved far enough to pick it up... */
@@ -68,6 +74,8 @@ export const DRAG_START_DISTANCE = 12;
 interface Press {
   button: string;
   time?: number;
+  /** True while the finger is still down on a hold button. */
+  holding: boolean;
 }
 
 interface Drag {
@@ -134,6 +142,7 @@ export class LetterTracer {
         if (input.id === this.activeId) this.onMove(input);
         else if (input.id === this.dragging?.id) this.onDrag(input);
         else if (input.id === this.scrolling?.id) this.onScroll(input);
+        else if (this.presses.get(input.id)?.holding) this.onHoldMove(input);
         return;
       case 'up':
         this.onEnd(input, true);
@@ -149,8 +158,10 @@ export class LetterTracer {
     if (!this.enabled || this.activeId !== null || this.dragging !== null || this.isInSafeZone(x)) return;
     const button = this.buttonAt(x, y);
     if (button !== null) {
-      this.presses.set(id, { button, time });
+      const holding = this.geometry.holdButtons?.includes(button) ?? false;
+      this.presses.set(id, { button, time, holding });
       this.callbacks.buttonPressed?.(button);
+      if (holding) this.callbacks.holdStarted?.(button);
       return;
     }
     const draggable = rectAt(this.geometry.draggables ?? [], x, y);
@@ -198,6 +209,14 @@ export class LetterTracer {
     this.callbacks.dragMoved?.(drag.target, x, y);
   }
 
+  /** A finger holding a hold button slid off it: the hold is over. */
+  private onHoldMove({ id, x, y }: PointerInput): void {
+    const press = this.presses.get(id)!;
+    if (this.buttonAt(x, y) === press.button) return;
+    press.holding = false;
+    this.callbacks.holdEnded?.(press.button);
+  }
+
   private visit(x: number, y: number): void {
     const tile = this.tileAt(x, y, 1);
     if (tile === null) return;
@@ -230,6 +249,7 @@ export class LetterTracer {
     if (press) {
       this.presses.delete(id);
       this.callbacks.buttonReleased?.(press.button);
+      if (press.holding) this.callbacks.holdEnded?.(press.button);
       const quick = press.time === undefined || time === undefined || time - press.time <= MAX_TAP_MS;
       if (submit && quick && this.buttonAt(x, y) === press.button) this.callbacks.buttonTapped(press.button);
       return;
@@ -248,7 +268,10 @@ export class LetterTracer {
   private reset(): void {
     this.activeId = null;
     this.selected = [];
-    for (const press of this.presses.values()) this.callbacks.buttonReleased?.(press.button);
+    for (const press of this.presses.values()) {
+      this.callbacks.buttonReleased?.(press.button);
+      if (press.holding) this.callbacks.holdEnded?.(press.button);
+    }
     this.presses.clear();
     this.scrolling = null;
     const drag = this.dragging;
