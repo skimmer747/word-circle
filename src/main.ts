@@ -5,7 +5,11 @@ import { loadSavedGame } from './circle/storage';
 import type { PuzzleSet } from './circle/types';
 import guessWords from './data/guess-words.json';
 import puzzleData from './data/puzzles.json';
+import gridPuzzles from './data/grid-puzzles.json';
+import gridWords from './data/grid-words.json';
 import { Frame } from './frame/frame';
+import { GridScreen } from './grid/screen';
+import type { GridPuzzleSet, GridWords } from './grid/types';
 import { GuessScreen } from './guess/screen';
 import type { GuessWords } from './guess/words';
 import { setupUpdates } from './pwa';
@@ -38,6 +42,7 @@ const updates = setupUpdates(() => frame?.interacted ?? false);
 const games = [
   new CircleScreen(puzzleData as PuzzleSet, store),
   new GuessScreen(guessWords as GuessWords, store, { fetchDaily, share }),
+  new GridScreen(gridPuzzles as GridPuzzleSet, gridWords as GridWords, store),
 ];
 frame = new Frame(root, store, updates, games, loadSavedGame(store).stats);
 frame.start();
