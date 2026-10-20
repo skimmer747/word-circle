@@ -278,7 +278,7 @@ export class GridScreen implements GameScreen {
     this.resetIdle();
     this.refresh();
     // If the hint star is still flying, it finishes the puzzle when it lands.
-    if (this.game.solved && !this.hintFlying) void this.finish();
+    if (this.game.solved && !this.hintFlying && !this.busy) void this.finish();
   }
 
   private select(square: number): void {
@@ -334,6 +334,8 @@ export class GridScreen implements GameScreen {
   }
 
   private async finish(): Promise<void> {
+    // A tile she's still holding (picked up while a hint star flew) is let go: the puzzle is done.
+    if (this.held) this.dragCancelled();
     this.busy = true;
     window.clearTimeout(this.idleTimer);
     this.view?.setHintPulse(false);
