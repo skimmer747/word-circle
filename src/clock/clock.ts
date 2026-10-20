@@ -1,3 +1,4 @@
+import { greeting } from '../settings/name';
 import type { ScheduledEvent } from './schedule';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -12,6 +13,8 @@ const WEEK_AHEAD_DAYS = 7;
 const MINUTES_PER_DAY = 24 * 60;
 
 export interface ClockFace {
+  /** "Good morning, Ruth", or '' when no name is set. */
+  greeting: string;
   /** "10:30 AM" */
   time: string;
   /** "in the morning", "in the afternoon", "in the evening" or "at night" */
@@ -20,7 +23,8 @@ export interface ClockFace {
   date: string;
 }
 
-function formatTime(minutes: number): string {
+/** Minutes after midnight as "6:00 PM". */
+export function formatTime(minutes: number): string {
   const hour = Math.floor(minutes / 60);
   const minute = minutes % 60;
   return `${hour % 12 === 0 ? 12 : hour % 12}:${String(minute).padStart(2, '0')} ${hour < 12 ? 'AM' : 'PM'}`;
@@ -33,8 +37,9 @@ function partOfDay(hour: number): string {
   return 'at night';
 }
 
-export function clockFace(now: Date): ClockFace {
+export function clockFace(now: Date, name = ''): ClockFace {
   return {
+    greeting: greeting(name, now.getHours()),
     time: formatTime(now.getHours() * 60 + now.getMinutes()),
     part: partOfDay(now.getHours()),
     date: `${DAY_NAMES[now.getDay()]}, ${MONTH_NAMES[now.getMonth()]} ${now.getDate()}`,

@@ -7,11 +7,16 @@ const at = (h: number, m = 0, day = 19) => new Date(2026, 9, day, h, m);
 
 describe('clockFace', () => {
   it('says the time, part of day and date in plain words', () => {
-    expect(clockFace(at(10, 30))).toEqual({ time: '10:30 AM', part: 'in the morning', date: 'Monday, October 19' });
+    expect(clockFace(at(10, 30))).toEqual({ greeting: '', time: '10:30 AM', part: 'in the morning', date: 'Monday, October 19' });
     expect(clockFace(at(14, 5)).part).toBe('in the afternoon');
     expect(clockFace(at(18, 40)).part).toBe('in the evening');
     expect(clockFace(at(22, 0)).part).toBe('at night');
     expect(clockFace(at(3, 0)).part).toBe('at night');
+  });
+
+  it('greets her by name when it has one', () => {
+    expect(clockFace(at(10, 30), 'Ruth').greeting).toBe('Good morning, Ruth');
+    expect(clockFace(at(18, 40), 'Ruth').greeting).toBe('Good evening, Ruth');
   });
 
   it('handles noon and midnight', () => {
