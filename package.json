@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "puzzles": "tsx scripts/build-puzzles.ts",
+    "grid-puzzles": "tsx scripts/build-grid-puzzles.ts",
     "icons": "pwa-assets-generator --preset minimal-2023 public/icon.svg",
     "daily-word": "tsx scripts/daily-word.ts"
   },
