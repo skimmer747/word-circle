@@ -1959,3 +1959,79 @@ body {
 .next.stats svg {
   color: var(--level);
 }
+
+/* How she's doing: the family's honest charts, at ordinary page size. */
+.family-table {
+  width: 100%;
+  margin: 8px 0 16px;
+  border-collapse: collapse;
+  font-size: 18px;
+}
+
+.family-table th {
+  padding: 6px 0;
+  color: var(--label);
+  font-weight: 700;
+  text-align: right;
+}
+
+.family-table td {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--absent-fill);
+}
+
+.family-table td + td,
+.family-table th + th {
+  padding-left: 12px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.family-chart {
+  margin-top: 20px;
+}
+
+.family-chart h3 {
+  margin: 0;
+}
+
+.family-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.family-grid {
+  stroke: var(--absent-fill);
+  stroke-width: 1;
+}
+
+.family-axis {
+  font-size: 13px;
+  fill: var(--label);
+}
+
+.family-label {
+  font-size: 15px;
+  font-weight: 700;
+  fill: var(--ink);
+}
+
+.family-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.family-value {
+  min-height: 1.4em;
+  margin: 4px 0 0;
+  color: var(--navy);
+}
+
+.settings-family summary {
+  min-height: 48px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 48px;
+  cursor: pointer;
+}

@@ -2,6 +2,8 @@ import { GAME_IDS, GAME_TITLES } from '../frame/games';
 import { THUMBS, type Thumb } from '../frame/layout';
 import { parseAvoidWords } from '../shared/avoid';
 import { dayKey } from '../shared/days';
+import type { FamilyStats } from '../stats/family-stats';
+import { renderFamily } from '../stats/family-view';
 import { el } from '../ui/dom';
 import { MAX_NAME_LENGTH, cleanName } from './name';
 import { WEEKDAY_NAMES, currentLines, eventLine, eventRow, type EventEntry, type RepeatChoice } from './schedule-form';
@@ -17,6 +19,8 @@ export interface SettingsPageOptions {
   done(settings: Settings): void;
   /** Cancel, or left untouched for 5 minutes. Not offered the first time. */
   cancel(): void;
+  /** The family's charts; null on first-time setup. */
+  family: FamilyStats | null;
 }
 
 const THUMB_LABELS: Record<Thumb, string> = { left: 'Left', right: 'Right', none: 'Neither' };
@@ -278,6 +282,12 @@ export function openSettingsPage(root: HTMLElement, settings: Settings, options:
   const keep = el('details', 'settings-section settings-keep', sheet);
   el('summary', '', keep).textContent = 'Keep them in the game (optional)';
   keep.insertAdjacentHTML('beforeend', KEEP_IN_GAME);
+
+  if (options.family) {
+    const doing = el('details', 'settings-section settings-family', sheet);
+    el('summary', '', doing).textContent = draft.name ? `How ${draft.name} is doing` : "How they're doing";
+    renderFamily(doing, options.family);
+  }
 
   el('p', 'settings-privacy', sheet).textContent = 'Everything on this page stays on this iPad.';
   const actions = el('div', 'settings-actions', sheet);

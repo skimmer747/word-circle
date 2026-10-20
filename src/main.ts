@@ -19,6 +19,9 @@ import { openSettingsPage } from './settings/page';
 import { loadSettings, saveSettings, type Settings } from './settings/settings';
 import { openWelcomePage } from './settings/welcome';
 import { avoidChecker } from './shared/avoid';
+import { dayKey } from './shared/days';
+import { familyStats, type FamilyStats } from './stats/family-stats';
+import { loadLifetime, loadLog } from './stats/log';
 
 const root = document.getElementById('app');
 if (!root) throw new Error('Missing #app element');
@@ -48,10 +51,11 @@ let settingsShowing = false;
 // Updates wait while she's playing, or while a caregiver is filling in the settings page.
 const updates = setupUpdates(() => settingsShowing || (frame?.interacted ?? false));
 
-function showSettings(settings: Settings, firstTime: boolean, done: (next: Settings) => void, cancel: () => void): void {
+function showSettings(settings: Settings, firstTime: boolean, family: FamilyStats | null, done: (next: Settings) => void, cancel: () => void): void {
   settingsShowing = true;
   openSettingsPage(root!, settings, {
     firstTime,
+    family,
     done: (next) => {
       settingsShowing = false;
       done(next);
@@ -79,6 +83,7 @@ function startApp(settings: Settings): void {
       showSettings(
         settings,
         false,
+        familyStats(loadLog(store), dayKey(new Date()), loadLifetime(store).since),
         (next) => {
           saveSettings(store, next);
           // Everything is saved after every move, so she loses nothing; the app comes back built from the new settings.
@@ -96,6 +101,7 @@ const firstSetup = () =>
   showSettings(
     settings,
     true,
+    null,
     (next) => {
       saveSettings(store, next);
       startApp(next);
