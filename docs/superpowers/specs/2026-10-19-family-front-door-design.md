@@ -1,7 +1,7 @@
 # Front Door for Other Families — Design
 
 **Date:** 2026-10-19
-**Status:** Design approved in brainstorming; not built yet.
+**Status:** Built 2026-10-19 (plan: `docs/superpowers/plans/2026-10-19-family-front-door.md`). Checked in the browser at iPad sizes and in iPad Safari on the Simulator (the welcome shows). Opening the Home Screen copy wasn't checked: the Simulator stopped responding to Safari's Share button, so that relies on `navigator.standalone` and its unit tests until it's tried on a real iPad.
 **Builds on:** `2026-10-19-caregiver-settings-design.md` (the settings page, first-time setup, Mom's-iPad rule)
 
 ## Purpose
