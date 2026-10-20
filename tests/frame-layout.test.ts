@@ -55,6 +55,18 @@ describe.each(SCREENS_AND_THUMBS)('frame layout on a %i×%i screen, thumb %s', (
     expect(nextButton.y + nextButton.h).toBeLessThanOrEqual(card.y + card.h);
   });
 
+  it('puts Back to puzzle and Your stats side by side above Next, clear of the safe zones', () => {
+    const { backButton, cardStatsButton, nextButton, shareButton, nextWordButton } = frame;
+    for (const button of [backButton, cardStatsButton]) {
+      expect(inPlayArea(button, frame), JSON.stringify(button)).toBe(true);
+      expect(button.h).toBeGreaterThanOrEqual(80);
+      expect(button.y + button.h).toBeLessThanOrEqual(Math.min(nextButton.y, shareButton.y, nextWordButton.y) - 12);
+    }
+    expect(backButton.y).toBe(cardStatsButton.y);
+    expect(backButton.x + backButton.w).toBeLessThan(cardStatsButton.x);
+    expect(backButton.w).toBeGreaterThanOrEqual(320);
+  });
+
   it('puts the Games button just left of the clock, the same size and in the same row', () => {
     const { gamesButton, clockButton, corner } = frame;
     expect(inPlayArea(gamesButton, frame)).toBe(true);

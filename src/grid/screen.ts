@@ -255,7 +255,7 @@ export class GridScreen implements GameScreen {
     trayTiles(layout, tray.length).forEach((rect, i) => {
       if (!tray[i].used) draggables.push({ id: `tray:${i}`, ...rect });
     });
-    return { tiles: [], buttons, draggables };
+    return { tiles: [], buttons, draggables, reviewButton: layout.reviewButton };
   }
 
   /** Redraws the squares and tray and tells the touch tracker what can be touched now. */

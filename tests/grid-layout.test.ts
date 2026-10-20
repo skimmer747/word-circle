@@ -19,6 +19,14 @@ describe.each(SCREENS_AND_THUMBS)('Word Grid layout on a %i×%i screen, thumb %s
       h: size * layout.squareSize,
     };
 
+    it('puts Next over the empty tray when she looks back, clear of the grid and big enough to tap', () => {
+      const next = layout.reviewButton;
+      expect(inPlayArea(next, frame)).toBe(true);
+      expect(next.w).toBeGreaterThanOrEqual(300);
+      expect(next.h).toBeGreaterThanOrEqual(96);
+      for (const rect of [box, frame.corner, layout.hintButton]) expect(overlaps(next, rect)).toBe(false);
+    });
+
     it('keeps everything out of the safe zones and on screen', () => {
       for (const rect of [...left, layout.tray, ...tiles, ...layout.squares]) {
         expect(inPlayArea(rect, frame), JSON.stringify(rect)).toBe(true);

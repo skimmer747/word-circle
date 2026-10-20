@@ -29,6 +29,8 @@ const HOLD_OPEN_MS = 3000;
 const HOLD_RING_MS = 500;
 /** Her stats close by themselves after this long untouched. */
 const STATS_OPEN_MS = 120_000;
+/** Looking back at a finished puzzle moves on to the next one by itself after this long. */
+const REVIEW_MS = 60_000;
 
 /** What this iPad's settings tell the frame. */
 export interface FrameOptions {
@@ -51,6 +53,8 @@ interface Celebrating {
   card: CelebrationCard;
   done: () => void;
   timeout: number;
+  /** She tapped Back to puzzle: the card is gone and only its Next button is left over the finished puzzle. */
+  reviewing: boolean;
 }
 
 /**
@@ -152,7 +156,7 @@ export class Frame implements FrameHost {
         if (this.updates.applyIfPending()) return;
         resolve();
       };
-      this.celebration = { card, done, timeout: window.setTimeout(done, card.timeoutMs) };
+      this.celebration = { card, done, timeout: window.setTimeout(done, card.timeoutMs), reviewing: false };
       if (this.layout) this.view.showCelebration(card, this.layout, wellDoneTitle(this.options.name));
       this.updateTouchTargets();
     });
@@ -188,6 +192,8 @@ export class Frame implements FrameHost {
   private buttonTapped(id: string): void {
     if (id === 'next') this.celebration?.done();
     else if (id === 'share') this.shareCelebration();
+    else if (id === 'back') this.reviewPuzzle();
+    else if (id === 'card-stats') this.openStatsFromCard();
     else if (id === 'clock') this.openClock();
     else if (id === 'close') this.closeClock();
     else if (id === 'games') this.openGames();
@@ -226,6 +232,21 @@ export class Frame implements FrameHost {
       this.sharing = false;
       if (this.celebration === celebrating) celebrating.timeout = window.setTimeout(celebrating.done, celebrating.card.timeoutMs);
     });
+  }
+
+  /** Back to puzzle: the card goes so she can look at what she finished, with Next left over it. */
+  private reviewPuzzle(): void {
+    const celebrating = this.celebration;
+    if (!celebrating || celebrating.reviewing || this.sharing) return;
+    celebrating.reviewing = true;
+    window.clearTimeout(celebrating.timeout);
+    celebrating.timeout = window.setTimeout(celebrating.done, REVIEW_MS);
+    this.view.showReview(this.reviewButton());
+    this.updateTouchTargets();
+  }
+
+  private reviewButton() {
+    return this.targets.reviewButton ?? this.layout!.nextButton;
   }
 
   private openGames(): void {
@@ -267,9 +288,22 @@ export class Frame implements FrameHost {
   /** Her stats: the game pauses (looking isn't play time), and the pop-up opens on its first card. */
   private openStats(): void {
     if (this.blocked() || !this.layout) return;
+    this.game.pause();
+    this.showStats();
+  }
+
+  /** Her stats from the "Well done!" card, with the puzzle she just finished counted. The card waits underneath. */
+  private openStatsFromCard(): void {
+    const celebrating = this.celebration;
+    if (!celebrating || celebrating.reviewing || this.sharing || this.statsOpen || !this.layout) return;
+    // The game is already stopped while it celebrates.
+    window.clearTimeout(celebrating.timeout);
+    this.showStats();
+  }
+
+  private showStats(): void {
     this.statsOpen = true;
     track('stats_opened');
-    this.game.pause();
     this.statsInput = {
       games: this.games.map((game) => ({ id: game.id, title: game.title, ...game.summary() })),
       streak: this.saved,
@@ -306,7 +340,10 @@ export class Frame implements FrameHost {
     this.stats = null;
     this.statsInput = null;
     this.statsView.hide();
-    this.game.resume();
+    // Opened from the card: back to the card, which starts its time again.
+    const celebrating = this.celebration;
+    if (celebrating) celebrating.timeout = window.setTimeout(celebrating.done, celebrating.card.timeoutMs);
+    else this.game.resume();
     this.updateTouchTargets();
   }
 
@@ -443,6 +480,8 @@ export class Frame implements FrameHost {
       this.tracer.setEnabled(false);
       return;
     }
+    // The finished puzzle would be redrawn as the next one: looking back ends, as if she'd tapped Next.
+    if (this.celebration?.reviewing) this.celebration.done();
     const layout = computeFrameLayout(width, height, this.games.length, this.options.thumb);
     this.layout = layout;
     this.view.renderCorner(layout, this.games.length > 1 ? 'games' : 'stats');
@@ -451,8 +490,8 @@ export class Frame implements FrameHost {
   }
 
   /**
-   * What the touch tracker listens for: only the card's buttons while celebrating, only a pop-up's buttons while
-   * one is open, otherwise the game and the top-right buttons.
+   * What the touch tracker listens for: only a pop-up's buttons while one is open (her stats can open over the card),
+   * only the card's buttons while celebrating, otherwise the game and the top-right buttons.
    */
   private updateTouchTargets(): void {
     const layout = this.layout;
@@ -460,20 +499,23 @@ export class Frame implements FrameHost {
     let tiles: TileGeometry[] = [];
     let draggables: ButtonGeometry[] = [];
     let buttons: ButtonGeometry[];
-    if (this.celebration) {
+    if (this.statsOpen) {
+      buttons = [
+        { id: 'stats-close', ...layout.shareButton },
+        { id: 'stats-next', ...layout.nextWordButton },
+      ];
+    } else if (this.celebration?.reviewing) {
+      buttons = [{ id: 'next', ...this.reviewButton() }];
+    } else if (this.celebration) {
       buttons = this.celebration.card.share
         ? [
             { id: 'share', ...layout.shareButton },
             { id: 'next', ...layout.nextWordButton },
           ]
         : [{ id: 'next', ...layout.nextButton }];
+      buttons.push({ id: 'back', ...layout.backButton }, { id: 'card-stats', ...layout.cardStatsButton });
     } else if (this.clockOpen) {
       buttons = [{ id: 'close', ...layout.closeButton }];
-    } else if (this.statsOpen) {
-      buttons = [
-        { id: 'stats-close', ...layout.shareButton },
-        { id: 'stats-next', ...layout.nextWordButton },
-      ];
     } else if (this.gamesOpen) {
       buttons = [
         ...this.games.map((game, i) => ({ id: `game:${game.id}`, ...layout.gameCards[i] })),
@@ -498,7 +540,7 @@ export class Frame implements FrameHost {
       // A finger dragged anywhere on the clock card scrolls its countdowns.
       scrollAreas: this.clockOpen ? [{ id: 'clock', ...layout.card }] : [],
     });
-    if (this.celebration) this.view.placeCelebration(layout);
+    if (this.celebration && !this.celebration.reviewing) this.view.placeCelebration(layout);
     if (this.clockOpen) this.view.placeClock(layout);
     if (this.gamesOpen) this.view.placeGames(layout);
     if (this.statsOpen) this.statsView.place(layout);

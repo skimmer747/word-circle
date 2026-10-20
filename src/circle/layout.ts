@@ -1,4 +1,4 @@
-import { MARGIN, type FrameLayout, type Rect } from '../frame/layout';
+import { MARGIN, reviewButtonIn, type FrameLayout, type Rect } from '../frame/layout';
 
 export type { Rect };
 
@@ -53,6 +53,8 @@ export interface Layout {
   rows: Rect[];
   shuffleButton: Rect;
   hintButton: Rect;
+  /** Next, over the letter circle, while she looks back at a finished puzzle. */
+  reviewButton: Rect;
 }
 
 export function computeLayout(frame: FrameLayout, { letterCount, wordLengths }: CircleShape): Layout {
@@ -114,5 +116,6 @@ export function computeLayout(frame: FrameLayout, { letterCount, wordLengths }: 
     rows,
     shuffleButton,
     hintButton,
+    reviewButton: reviewButtonIn({ x: backing.x - backing.r, y: backing.y - backing.r, w: 2 * backing.r, h: 2 * backing.r }),
   };
 }

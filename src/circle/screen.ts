@@ -100,6 +100,7 @@ export class CircleScreen implements GameScreen {
         { id: 'hint', ...layout.hintButton },
         ...LEVELS.map((level, i) => ({ id: `level:${level}`, ...layout.levels[i] })),
       ],
+      reviewButton: layout.reviewButton,
     };
   }
 

@@ -22,6 +22,11 @@ const CLOSE_HEIGHT = 100;
 const SHARE_WIDTH = 290;
 const NEXT_WORD_WIDTH = 400;
 const PAIR_GAP = 24;
+/** The card's Back to puzzle and Your stats buttons sit in a smaller row above Next. */
+const BACK_WIDTH = 340;
+const CARD_STATS_WIDTH = 260;
+const SMALL_HEIGHT = 84;
+const ROW_GAP = 16;
 const GAME_CARD_MAX_WIDTH = 360;
 const GAME_CARD_GAP = 24;
 /** Every game's Hint button sits in the top-left corner of the play area, at this size... */
@@ -68,6 +73,9 @@ export interface FrameLayout {
   /** A card's Share and Next word buttons, side by side. */
   shareButton: Rect;
   nextWordButton: Rect;
+  /** The card's Back to puzzle and Your stats buttons, side by side above Next. */
+  backButton: Rect;
+  cardStatsButton: Rect;
   /** The pop-ups' Close button. */
   closeButton: Rect;
   /** One big card per game in the Games pop-up. */
@@ -105,6 +113,10 @@ export function computeFrameLayout(width: number, height: number, gameCount = 2,
   const pairLeft = playCenter - (SHARE_WIDTH + PAIR_GAP + NEXT_WORD_WIDTH) / 2;
   const shareButton: Rect = { x: pairLeft, y: nextButton.y, w: SHARE_WIDTH, h: NEXT_HEIGHT };
   const nextWordButton: Rect = { x: pairLeft + SHARE_WIDTH + PAIR_GAP, y: nextButton.y, w: NEXT_WORD_WIDTH, h: NEXT_HEIGHT };
+  const smallLeft = playCenter - (BACK_WIDTH + PAIR_GAP + CARD_STATS_WIDTH) / 2;
+  const smallY = nextButton.y - ROW_GAP - SMALL_HEIGHT;
+  const backButton: Rect = { x: smallLeft, y: smallY, w: BACK_WIDTH, h: SMALL_HEIGHT };
+  const cardStatsButton: Rect = { x: smallLeft + BACK_WIDTH + PAIR_GAP, y: smallY, w: CARD_STATS_WIDTH, h: SMALL_HEIGHT };
   const closeButton: Rect = {
     x: width / 2 - CLOSE_WIDTH / 2,
     y: card.y + card.h - CARD_PADDING - CLOSE_HEIGHT,
@@ -134,7 +146,19 @@ export function computeFrameLayout(width: number, height: number, gameCount = 2,
     nextButton,
     shareButton,
     nextWordButton,
+    backButton,
+    cardStatsButton,
     closeButton,
     gameCards,
   };
+}
+
+/**
+ * Where Next goes while she looks back at a finished puzzle: as big as the card's Next button, centered over `area`
+ * (the part of the game she no longer needs, like the letters she played with), and no bigger than it.
+ */
+export function reviewButtonIn(area: Rect): Rect {
+  const w = Math.min(NEXT_WIDTH, area.w);
+  const h = Math.min(NEXT_HEIGHT, area.h);
+  return { x: area.x + (area.w - w) / 2, y: area.y + (area.h - h) / 2, w, h };
 }

@@ -193,7 +193,7 @@ export class GuessScreen implements GameScreen {
       { id: 'all-letters', ...layout.allLettersButton },
     ];
     if (this.dailyMode() === 'share') buttons.push({ id: 'share-today', ...layout.dailyButton });
-    return { tiles: [], buttons };
+    return { tiles: [], buttons, reviewButton: layout.reviewButton };
   }
 
   /** The six rows on the board: the last checked guesses, the row she's typing, then empty rows. */

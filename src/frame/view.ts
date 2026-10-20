@@ -3,7 +3,7 @@ import { el, place } from '../ui/dom';
 import { fitFontScale } from '../ui/fit';
 import { ARROW_ICON, CHECK_ICON, CLOCK_ICON, CLOSE_ICON, EVENT_ICON, GAMES_ICON, SHARE_ICON, STAR_ICON } from '../ui/icons';
 import type { GameId } from './games';
-import type { FrameLayout } from './layout';
+import type { FrameLayout, Rect } from './layout';
 
 /** One line of good news on the "Well done!" card. */
 export interface CelebrationLine {
@@ -38,6 +38,8 @@ export interface GameEntry {
 
 /** Text doesn't shrink exactly in proportion to its size, so a line that has to shrink gets 2% to spare. */
 const FIT_SPARE = 0.98;
+/** The least space between the "Well done!" card's last line and its buttons. */
+const CARD_BUTTON_GAP = 16;
 const ICON_ATTRS =
   'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
 /** Solid triangles: easier for her to spot than thin chevrons. */
@@ -161,6 +163,12 @@ export class FrameView {
     next.type = 'button';
     next.innerHTML = `<span></span>${ARROW_ICON}`;
     next.querySelector('span')!.textContent = card.nextLabel;
+    const back = el('button', 'next small back', this.celebrate);
+    back.type = 'button';
+    back.innerHTML = `${ARROW_ICON}<span>Back to puzzle</span>`;
+    const stats = el('button', 'next small stats', this.celebrate);
+    stats.type = 'button';
+    stats.innerHTML = `${STAR_ICON}<span>Your stats</span>`;
     // Visible first, so the rows can be measured when they're fitted.
     this.celebrate.classList.add('visible');
     this.placeCelebration(layout);
@@ -177,8 +185,23 @@ export class FrameView {
     }
     if (share) place(share, layout.shareButton);
     if (next) place(next, share ? layout.nextWordButton : layout.nextButton);
+    const back = this.celebrate.querySelector<HTMLElement>('.back');
+    if (back) place(back, layout.backButton);
+    const stats = this.celebrate.querySelector<HTMLElement>('.stats');
+    if (stats) place(stats, layout.cardStatsButton);
+    this.fitCelebrationHeight(layout);
     this.fitCelebrationRows();
     this.fitCelebrationTitle();
+  }
+
+  /** Back to puzzle: the card goes so she can see the finished puzzle, leaving its Next button at `next`. */
+  showReview(next: Rect): void {
+    for (const node of this.celebrate.querySelectorAll('.celebrate-dim, .card, .share, .back, .stats')) node.remove();
+    const button = this.celebrate.querySelector<HTMLElement>('.forward');
+    if (button) {
+      button.classList.add('review');
+      place(button, next);
+    }
   }
 
   hideCelebration(): void {
@@ -304,6 +327,26 @@ export class FrameView {
   hideClock(): void {
     this.clockPopup.classList.remove('visible');
     this.clockPopup.replaceChildren();
+  }
+
+  /** Shrinks everything on the card together if it would run into its buttons (a long Word Guess card). */
+  private fitCelebrationHeight(layout: FrameLayout): void {
+    const box = this.celebrate.querySelector<HTMLElement>('.card');
+    const last = box?.lastElementChild as HTMLElement | null | undefined;
+    if (!box || !last) return;
+    // Measured at full size: the row and title fits that follow shrink only across.
+    for (const node of box.querySelectorAll<HTMLElement>('.card-rows, .card-title')) node.style.fontSize = '';
+    let u = layout.card.h / 100;
+    // Text doesn't shrink exactly in proportion, so it gets a few tries. Offsets, not screen positions: the card
+    // is still scaling in.
+    for (let i = 0; i < 3; i++) {
+      const top = parseFloat(getComputedStyle(box).paddingTop);
+      const room = layout.backButton.y - CARD_BUTTON_GAP - layout.card.y - box.clientTop - top;
+      const used = last.offsetTop + last.scrollHeight - top;
+      if (used <= room) break;
+      u *= (room / used) * FIT_SPARE;
+      box.style.setProperty('--u', `${u}px`);
+    }
   }
 
   /** Shrinks the stat rows together if the widest is too wide for one line, so their icons stay lined up. */

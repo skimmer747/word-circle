@@ -14,6 +14,13 @@ describe.each(SCREENS_AND_THUMBS)('Word Guess layout on a %i×%i screen, thumb %
     for (const rect of [...rows, ...keyRects, ...left]) expect(inPlayArea(rect, frame), JSON.stringify(rect)).toBe(true);
   });
 
+  it('puts Next over the keyboard when she looks back, clear of the board', () => {
+    const next = layout.reviewButton;
+    expect(inPlayArea(next, frame)).toBe(true);
+    expect(next).toMatchObject({ w: 420, h: 100 });
+    for (const row of rows) expect(overlaps(next, row)).toBe(false);
+  });
+
   it("has the 26 letters plus Enter and Back, in Wordle's three rows", () => {
     expect(keys.map((k) => k.id.slice('key:'.length)).join(' ')).toBe(
       'q w e r t y u i o p a s d f g h j k l enter z x c v b n m back',

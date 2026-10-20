@@ -1,4 +1,4 @@
-import type { FrameLayout, Rect } from '../frame/layout';
+import { reviewButtonIn, type FrameLayout, type Rect } from '../frame/layout';
 
 /** Space between Hint, the tray, the grid, the level buttons and the top-right buttons. */
 const GAP = 16;
@@ -28,6 +28,8 @@ export interface GridLayout {
   squareSize: number;
   squareFont: number;
   cornerFont: number;
+  /** Next, over the (empty) tray, while she looks back at a finished puzzle. */
+  reviewButton: Rect;
 }
 
 export function computeGridLayout(frame: FrameLayout, size: number): GridLayout {
@@ -64,6 +66,7 @@ export function computeGridLayout(frame: FrameLayout, size: number): GridLayout 
     squareSize,
     squareFont: Math.round(squareSize * LETTER_SCALE),
     cornerFont: Math.max(CORNER_MIN, Math.round(squareSize * CORNER_SCALE)),
+    reviewButton: reviewButtonIn(tray),
   };
 }
 

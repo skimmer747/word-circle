@@ -1,4 +1,4 @@
-import type { FrameLayout, Rect } from '../frame/layout';
+import { reviewButtonIn, type FrameLayout, type Rect } from '../frame/layout';
 
 /** Wordle's keyboard rows. Enter and Back go either side of the bottom row. */
 const KEY_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
@@ -40,6 +40,8 @@ export interface GuessLayout {
   allLettersButton: Rect;
   /** Today's Wordle label, or Share today's Wordle. */
   dailyButton: Rect;
+  /** Next, over the keyboard, while she looks back at a finished word. */
+  reviewButton: Rect;
 }
 
 export function computeGuessLayout(frame: FrameLayout): GuessLayout {
@@ -93,5 +95,6 @@ export function computeGuessLayout(frame: FrameLayout): GuessLayout {
     hintButton,
     allLettersButton,
     dailyButton,
+    reviewButton: reviewButtonIn({ x: play.x, y: keyboardTop, w: play.w, h: bottomY + keyH - keyboardTop }),
   };
 }

@@ -1,5 +1,5 @@
 import type { ButtonGeometry, TileGeometry } from '../input/touch';
-import type { FrameLayout } from './layout';
+import type { FrameLayout, Rect } from './layout';
 import type { PlayRecord } from '../stats/log';
 import type { CelebrationCard } from './view';
 
@@ -15,6 +15,8 @@ export interface GameTargets {
   buttons: ButtonGeometry[];
   /** Letters she can tap, or pick up and drag (Word Grid). */
   draggables?: ButtonGeometry[];
+  /** Where Next goes while she looks back at the finished puzzle: over something she no longer needs. */
+  reviewButton?: Rect;
 }
 
 /** A game's figures for her stats. */
@@ -31,7 +33,10 @@ export interface FrameHost {
   readonly isTracing: boolean;
   /** The tiles traced so far. */
   readonly selection: readonly number[];
-  /** Shows the "Well done!" card until she taps its Next button or it moves on by itself. */
+  /**
+   * Shows the "Well done!" card until she taps its Next button or it moves on by itself. She can look back at the
+   * finished puzzle first, so the game leaves it on screen (not redrawn) until this resolves.
+   */
   celebrate(card: CelebrationCard): Promise<void>;
   /** Redraws the game (and tells the touch tracker about its new targets). */
   redraw(animateIn: boolean): void;
@@ -44,8 +49,8 @@ export interface FrameHost {
 }
 
 /**
- * A game the frame can show. Button ids "next", "share", "clock", "close", "games", "games-close" and
- * "game:…" belong to the frame.
+ * A game the frame can show. Button ids "next", "share", "back", "card-stats", "clock", "close", "games",
+ * "games-close", "games-stats", "stats", "stats-next", "stats-close" and "game:…" belong to the frame.
  */
 export interface GameScreen {
   readonly id: GameId;
