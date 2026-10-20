@@ -32,10 +32,10 @@ One object, saved under `word-games:settings:v1` next to the games' progress.
 
 | Setting | What it does | New iPad | Mom's iPad |
 |---|---|---|---|
-| `name` | "Well done, Ruth!" as the card's title and "Good morning, Ruth" (afternoon, evening by the hour) at the top of the clock pop-up. Blank: today's wording. | blank | blank |
+| `name` | "Well done, Ruth!" as the card's title and "Good morning, Ruth" (afternoon, evening by the hour) at the top of the clock pop-up. At most 16 letters; the card title shrinks to fit. Blank: today's wording. | blank | blank |
 | `thumb` | `left`, `right` or `none`: which side gets the wider safe zone (§4) | `left` | `left` |
 | `games` | Which games appear, in the usual order; at least one | all three | all three |
-| `startLevel` | `easy`, `medium` or `hard`: where Word Circle and Word Grid open the first time. After that her own last level is kept. | `medium` | `medium` |
+| `startLevel` | `easy`, `medium` or `hard`: where Word Circle and Word Grid open the first time. After that her own last level is kept. | `medium` | `easy` (Word Grid already starts there for her; Word Circle has her level saved) |
 | `share` | Whether Word Guess offers Share after today's Wordle | on | on |
 | `schedule` | `{ source: 'web' }` (fetch `schedule.txt`, as today) or `{ source: 'device', lines: string[] }` | device, no lines | web |
 | `avoid` | Extra words kept out of every game (lowercase, letters only), on top of the built-in blocklist | none | none |
@@ -69,7 +69,7 @@ From top to bottom:
 6. **Words to avoid:** a text box, words separated by commas, spaces or new lines, with a count under it ("3 words"). Anything that isn't letters is dropped; words are saved lowercase and without repeats.
 7. **Buttons:** **Done** (first time: **Start playing**) and **Cancel** (not shown the first time).
 
-**Done** saves and reloads the app (§5). **Cancel** closes the page and throws away the changes. If the page is left untouched for 5 minutes it closes as if Cancel was tapped, so a page opened by accident doesn't sit on her screen. That timer doesn't apply to first-time setup.
+**Done** saves and reloads the app (§5). **Start playing** saves and goes straight into the first game without a reload, so an iPad that can't save still gets to play instead of seeing setup again. **Cancel** closes the page and throws away the changes. If the page is left untouched for 5 minutes it closes as if Cancel was tapped, so a page opened by accident doesn't sit on her screen. That timer doesn't apply to first-time setup.
 
 ## 3. The schedule section
 
@@ -98,7 +98,7 @@ On Mom's iPad (`web`): "Events come from schedule.txt on GitHub" and a **Type th
 - **Share:** `share` is passed to Word Guess only when on (Word Guess already hides Share when it's missing).
 - **Schedule:** the frame fetches `schedule.txt` only for `source: 'web'`. For `device` it parses `lines` and skips the fetch, the 10-minute refresh and the schedule cache.
 - **Name:** passed to the frame for the card title and the clock greeting.
-- **Words to avoid** (`src/settings/avoid.ts`, one `isAvoided(word)` check):
+- **Words to avoid** (`src/shared/avoid.ts`, one `avoided(word)` check):
   - Puzzle lists are **not** filtered, so saved positions keep pointing at the same puzzles. Instead each game skips an avoided puzzle when it would come up: on start, after a solve, and when switching level. If every puzzle in a level is avoided (only possible with absurd lists), the level plays as if nothing were avoided rather than breaking.
   - **Word Circle:** a puzzle is avoided if any of its slot `words` is. Avoided `bonus` words are not accepted as extra words.
   - **Word Guess:** avoided answers are skipped; avoided words aren't accepted as guesses (as with the blocklist). If today's Wordle word is avoided, she gets a word from the app's own list that day, as the blocklist already does.
@@ -115,8 +115,10 @@ New folder `src/settings/`:
 
 - `settings.ts`: the `Settings` type, defaults, `loadSettings(store)` (including the Mom's-iPad rule and damaged saves), `saveSettings`.
 - `schedule-form.ts`: form entry → `schedule.txt` line, line → list row, dropping past one-time events. No DOM.
-- `avoid.ts`: parsing the avoid box, `isAvoided`, and the per-game "is this puzzle avoided" checks.
-- `page.ts` and `view.ts`: the settings page (state and DOM).
+- `name.ts`: tidying the name, the clock greeting and the card title.
+- `page.ts`: the settings page (DOM). Everything it decides is in the files above, so it can be tested without a browser.
+
+Also new: `src/shared/avoid.ts` (parsing the avoid box, the `avoided(word)` check, and skipping to the next allowed puzzle), used by all three games. Each game's own "is this puzzle avoided" check lives in its storage file.
 
 Changed: `main.ts` (build from settings), `frame/frame.ts` (clock hold, opening the page, greeting, one-game mode, schedule source), `frame/layout.ts` (thumb), `input/touch.ts` (clock hold), and the three games' screens (start level, skipping avoided puzzles).
 
