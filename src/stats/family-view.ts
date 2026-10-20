@@ -13,6 +13,8 @@ const L = 48;
 const R = 520;
 const T = 12;
 const B = 168;
+/** End-of-line labels sit at least this far apart, so lines ending close together stay readable. */
+const LABEL_GAP = 16;
 
 interface Chart {
   plot: SVGSVGElement;
@@ -28,11 +30,13 @@ function svg<K extends keyof SVGElementTagNameMap>(parent: Element, tag: K, attr
   return node;
 }
 
-function chart(parent: HTMLElement, heading: string, note: string): Chart {
+/** A chart's box. Charts whose marks can be tapped get a line under them for the tapped value. */
+function chart(parent: HTMLElement, heading: string, note: string, tappable = true): Chart {
   const box = el('div', 'family-chart', parent);
   el('h3', '', box).textContent = heading;
   el('p', 'settings-note', box).textContent = note;
   const plot = svg(box, 'svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': heading });
+  if (!tappable) return { plot, show: () => {} };
   const value = el('p', 'family-value', box);
   value.textContent = 'Tap a point or bar for its number.';
   return { plot, show: (text) => (value.textContent = text) };
@@ -63,6 +67,7 @@ function lineChart(
   axes(c.plot, max, axisLabel);
   const x = (i: number) => L + ((R - L) * i) / (weekStarts.length - 1);
   const y = (v: number) => B - ((B - T) * v) / max;
+  const labels: { x: number; y: number; text: string }[] = [];
   for (const s of series) {
     let d = '';
     let drawing = false;
@@ -83,8 +88,14 @@ function lineChart(
       const hit = svg(c.plot, 'circle', { cx: x(i), cy: y(p), r: 14, class: 'family-hit' });
       hit.addEventListener('click', () => c.show(tapText(s, p, weekStarts[i])));
     });
-    if (last >= 0) svg(c.plot, 'text', { x: x(last) + 8, y: y(s.points[last]!) + 5, class: 'family-label' }, s.label);
+    if (last >= 0) labels.push({ x: x(last) + 8, y: y(s.points[last]!) + 5, text: s.label });
   }
+  labels.sort((a, b) => a.y - b.y);
+  labels.forEach((label, i) => {
+    const above = labels[i - 1];
+    if (above && label.y - above.y < LABEL_GAP) label.y = above.y + LABEL_GAP;
+    svg(c.plot, 'text', { x: label.x, y: label.y, class: 'family-label' }, label.text);
+  });
   xLabels(c.plot, '12 weeks ago', 'This week');
 }
 
@@ -171,6 +182,6 @@ export function renderFamily(parent: HTMLElement, stats: FamilyStats): void {
       `${week(start)}: ${v.toFixed(1)} tries per word`);
   }
   dayBars(chart(parent, 'Puzzles per day', 'The last 4 weeks'), stats.perDay, stats.days);
-  partBars(chart(parent, 'Time of day', 'When puzzles were finished, the last 4 weeks'), stats.timeOfDay);
+  partBars(chart(parent, 'Time of day', 'When puzzles were finished, the last 4 weeks', false), stats.timeOfDay);
   if (stats.games.length > 0) gameBars(chart(parent, 'Games', 'Puzzles per week, by game'), stats.games, stats.weekStarts);
 }

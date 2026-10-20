@@ -19,7 +19,7 @@ const CONFETTI_COLORS = ['#f6e09c', '#f4c0d1', '#cdeccf', '#b5d4f4', '#ffe9d6', 
 const CONFETTI_PIECES = 40;
 const COUNT_UP_MS = 1500;
 /** Her longest word's tiles are at most this many card-height percent wide (smaller for a long word). */
-const TILE_UNITS = 9;
+const TILE_UNITS = 12;
 
 /** True when the iPad is set to Reduce Motion: then nothing moves. */
 function reducedMotion(): boolean {
@@ -173,6 +173,7 @@ function confetti(card: HTMLElement): void {
 export class HerStatsView {
   private readonly root: HTMLElement;
   private countUp = 0;
+  private countDone = 0;
 
   constructor(parent: HTMLElement) {
     this.root = el('div', 'stats-popup', parent);
@@ -180,7 +181,7 @@ export class HerStatsView {
 
   /** Shows card `index` (0–4), animating it in; confetti if it has something new. */
   show(stats: HerStats, index: number, layout: FrameLayout): void {
-    cancelAnimationFrame(this.countUp);
+    this.stopCountUp();
     this.root.replaceChildren();
     el('div', 'celebrate-dim', this.root);
     const card = el('div', 'stats-card', this.root);
@@ -213,7 +214,7 @@ export class HerStatsView {
   }
 
   hide(): void {
-    cancelAnimationFrame(this.countUp);
+    this.stopCountUp();
     this.root.classList.remove('visible');
     this.root.replaceChildren();
   }
@@ -222,6 +223,7 @@ export class HerStatsView {
   private countUpTo(card: HTMLElement, total: number): void {
     const node = card.querySelector<HTMLElement>('.stats-big');
     if (!node) return;
+    const final = total.toLocaleString('en-US');
     const start = performance.now();
     const step = (now: number) => {
       const p = Math.min(1, (now - start) / COUNT_UP_MS);
@@ -230,5 +232,12 @@ export class HerStatsView {
     };
     node.textContent = '0';
     this.countUp = requestAnimationFrame(step);
+    // Animation frames can stall (a backgrounded page); the true total always arrives.
+    this.countDone = window.setTimeout(() => (node.textContent = final), COUNT_UP_MS + 100);
+  }
+
+  private stopCountUp(): void {
+    cancelAnimationFrame(this.countUp);
+    window.clearTimeout(this.countDone);
   }
 }
