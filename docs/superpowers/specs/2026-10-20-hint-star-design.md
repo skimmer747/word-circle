@@ -1,7 +1,7 @@
 # Hint Star — Design
 
 **Date:** 2026-10-20
-**Status:** Approved, not built yet.
+**Status:** Built 2026-10-20.
 
 ## Purpose
 
@@ -27,8 +27,9 @@ The whole thing takes about 1.1 seconds. The star and sparkles float above every
 - **The target square looks empty until the star lands**, then shows the letter. In Word Guess and Word Grid, the hinted square is locked from the tap, so typing or dropping a tile can't land there during the flight.
 - **One star at a time.** Taps on Hint while a star is flying are ignored, so an accidental double tap doesn't use two hints.
 - **She can keep playing during the flight:** typing in Word Guess, placing tiles in Word Grid, tracing in Word Circle.
-- **Finishing waits for the star.** If the hint completes the word or puzzle, "Well done!" (and the found-word pulse in Word Circle) starts after the star has landed.
+- **Finishing waits for the star.** If the hint completes the word or puzzle, "Well done!" (and Word Circle's "Good!") starts after the star has landed. If she has left the game by then, "Well done!" waits until she's back; it never shows over another game, and it runs exactly once however the puzzle was finished.
 - **Reduce Motion:** if the iPad's Reduce Motion is on, there is no flight or sparkles; the letter appears at once with the existing small pop.
+- **Landing only redraws.** It never resets the touch targets, so a tile she's holding in Word Grid or a word she's tracing in Word Circle isn't dropped.
 - **If the target square can't be found on screen** (should never happen), the letter simply appears with the pop.
 
 ## Code
