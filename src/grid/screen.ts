@@ -176,7 +176,9 @@ export class GridScreen implements GameScreen {
   resume(): void {
     this.shown = true;
     this.timer.resume(performance.now());
-    if (!this.busy) this.resetIdle();
+    // A puzzle she finished with a tile while a hint star flew, just before switching away, is celebrated when she's back.
+    if (this.game.solved && !this.busy && !this.hintFlying) void this.finish();
+    else if (!this.busy) this.resetIdle();
   }
 
   activity(): void {
@@ -227,9 +229,11 @@ export class GridScreen implements GameScreen {
       letters: shape.open.map((_, square) => (square === this.hiddenSquare ? '' : this.game.letterAt(square))),
       hinted: new Set(this.game.hinted.filter((square) => square !== this.hiddenSquare)),
       selected: this.selected,
+      // While the star flies, the tray already shows the hinted letter as used: it's on the grid, just not drawn yet.
       tray: this.trayLetters(),
       corners: shape.sections.map((_, section) => this.game.tray(section)),
-      badRuns: this.game.badRuns().map((i) => shape.runs[i]),
+      // A run through the square the hint star is flying to is checked when it lands.
+      badRuns: this.game.badRuns().map((i) => shape.runs[i]).filter((run) => this.hiddenSquare === null || !run.includes(this.hiddenSquare)),
     };
   }
 
@@ -307,16 +311,15 @@ export class GridScreen implements GameScreen {
     this.refresh();
     await this.view?.flyStar(square);
     this.hintFlying = false;
-    // She switched level while the star flew: that puzzle is gone from the screen.
-    if (this.hiddenSquare !== square) return;
-    this.hiddenSquare = null;
-    if (!this.shown && !this.game.solved) {
-      // She left Word Grid while the star flew: draw the letter, but leave the touch targets to what's on screen.
+    // If she switched level while the star flew, that puzzle is gone from the screen.
+    if (this.hiddenSquare === square) {
+      this.hiddenSquare = null;
+      // Only the drawing changes: the touch targets were set at the tap, and setting them again would drop a tile she's holding.
       this.view?.update(this.viewState());
-      return;
+      if (this.shown) this.view?.landSquare(square);
     }
-    this.changed();
-    this.view?.landSquare(square);
+    // A puzzle finished during the flight (by this hint or by a tile) gets its "Well done!" now, if she's still here.
+    if (this.game.solved && (this.busy || this.shown)) void this.finish();
   }
 
   /** Each level keeps its own puzzle and letters, so switching never loses anything. */
