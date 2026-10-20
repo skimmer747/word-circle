@@ -51,12 +51,13 @@ describe.each(SCREENS)('Word Circle layout on a %i×%i screen', (width, height) 
       expect(layout.slotSize).toBeLessThanOrEqual(72);
     });
 
-    it('stacks word rows above the buttons without overlapping', () => {
+    it('stacks word rows between Hint and Shuffle at the top and the level buttons at the bottom', () => {
       layout.rows.forEach((row, i) => {
         if (i > 0) expect(row.y).toBeGreaterThanOrEqual(layout.rows[i - 1].y + layout.rows[i - 1].h);
       });
       const last = layout.rows[layout.rows.length - 1];
-      expect(last.y + last.h).toBeLessThanOrEqual(layout.shuffleButton.y);
+      expect(layout.rows[0].y).toBeGreaterThanOrEqual(layout.hintButton.y + layout.hintButton.h + 16);
+      expect(last.y + last.h).toBeLessThanOrEqual(layout.levels[0].y - 16);
     });
 
     it('puts Extra words at the top right, above the word bar and letter circle', () => {
@@ -76,15 +77,16 @@ describe.each(SCREENS)('Word Circle layout on a %i×%i screen', (width, height) 
       expect(layout.extras.w).toBeGreaterThanOrEqual(200);
     });
 
-    it('puts three small level buttons in a row at the top left, above the word slots', () => {
-      const { levels, rows } = layout;
-      expect(levels).toHaveLength(3);
-      levels.forEach((button, i) => {
-        expect(button.h).toBeGreaterThanOrEqual(44);
-        expect(button.w).toBeLessThanOrEqual(120);
-        expect(button.y + button.h).toBeLessThanOrEqual(rows[0].y);
-        if (i > 0) expect(button.x).toBeGreaterThanOrEqual(levels[i - 1].x + levels[i - 1].w);
-      });
+    it('puts the level buttons in the same row at the bottom left as every game', () => {
+      expect(layout.levels).toEqual(frame.levelButtons);
+    });
+
+    it('puts Hint in the same top-left place as every game, with Shuffle the same size beside it', () => {
+      const { hintButton, shuffleButton } = layout;
+      expect(hintButton).toEqual(frame.hintButton);
+      expect(shuffleButton.y).toBe(hintButton.y);
+      expect(shuffleButton.x).toBeGreaterThanOrEqual(hintButton.x + hintButton.w + 16);
+      expect([shuffleButton.w, shuffleButton.h]).toEqual([hintButton.w, hintButton.h]);
     });
 
     it('keeps the left column clear of the right column', () => {

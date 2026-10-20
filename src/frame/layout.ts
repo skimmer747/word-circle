@@ -22,6 +22,15 @@ const NEXT_WORD_WIDTH = 400;
 const PAIR_GAP = 24;
 const GAME_CARD_MAX_WIDTH = 360;
 const GAME_CARD_GAP = 24;
+/** Every game's Hint button sits in the top-left corner of the play area, at this size... */
+const HINT_WIDTH = 130;
+const HINT_HEIGHT = 96;
+/** ...and every game with levels has Easy, Medium and Hard in a row at the bottom left. Three fit beside Word
+ * Circle's letter circle on the narrowest iPad. */
+const LEVEL_WIDTH = 100;
+const LEVEL_HEIGHT = 64;
+const LEVEL_GAP = 8;
+const LEVEL_COUNT = 3;
 /** The Games pop-up's cards start below its title... */
 const GAME_CARDS_TOP = 0.2;
 /** ...and take this share of the card's height. */
@@ -46,6 +55,10 @@ export interface FrameLayout {
   clockButton: Rect;
   /** Everything in the top-right corner; games keep clear of it. */
   corner: Rect;
+  /** Hint, in the same place in every game. */
+  hintButton: Rect;
+  /** Easy, Medium and Hard, in the same place in every game that has levels. */
+  levelButtons: Rect[];
   /** The "Well done!" card and the pop-ups fill almost the whole screen so their text can be as big as possible. */
   card: Rect;
   /** A card's single button (Next puzzle). */
@@ -73,6 +86,13 @@ export function computeFrameLayout(width: number, height: number, gameCount = 2)
   const clockButton: Rect = { x: play.x + play.w - CORNER_SIZE, y: MARGIN, w: CORNER_SIZE, h: CORNER_SIZE };
   const gamesButton: Rect = { x: clockButton.x - CORNER_GAP - CORNER_SIZE, y: MARGIN, w: CORNER_SIZE, h: CORNER_SIZE };
   const corner: Rect = { x: gamesButton.x, y: MARGIN, w: clockButton.x + clockButton.w - gamesButton.x, h: CORNER_SIZE };
+  const hintButton: Rect = { x: play.x, y: play.y, w: HINT_WIDTH, h: HINT_HEIGHT };
+  const levelButtons: Rect[] = Array.from({ length: LEVEL_COUNT }, (_, i) => ({
+    x: play.x + i * (LEVEL_WIDTH + LEVEL_GAP),
+    y: play.y + play.h - LEVEL_HEIGHT,
+    w: LEVEL_WIDTH,
+    h: LEVEL_HEIGHT,
+  }));
   const card: Rect = { x: MARGIN, y: MARGIN, w: width - 2 * MARGIN, h: height - 2 * MARGIN };
   const playCenter = play.x + play.w / 2;
   const nextButton: Rect = {
@@ -107,6 +127,8 @@ export function computeFrameLayout(width: number, height: number, gameCount = 2)
     gamesButton,
     clockButton,
     corner,
+    hintButton,
+    levelButtons,
     card,
     nextButton,
     shareButton,

@@ -18,14 +18,8 @@ const SLOT_GAP = 6;
 const ROW_GAP = 12;
 const MIN_SLOT = 48;
 const MAX_SLOT = 72;
-const BUTTON_HEIGHT = 96;
+/** Space between Hint and Shuffle, and between the word slots and the buttons above and below them. */
 const BUTTON_GAP = 16;
-const BUTTONS_TOP_GAP = 32;
-const LEVEL_HEIGHT = 48;
-const LEVEL_MAX_WIDTH = 120;
-const LEVEL_GAP = 8;
-const LEVELS_BOTTOM_GAP = 16;
-const LEVEL_COUNT = 3;
 
 export interface Circle {
   x: number;
@@ -42,7 +36,7 @@ export interface CircleShape {
 export interface Layout {
   /** The frame's geometry: safe zones, play area, top-right buttons and pop-up cards. */
   frame: FrameLayout;
-  /** Easy, Medium and Hard buttons at the top left. */
+  /** Easy, Medium and Hard: the frame's row at the bottom left, as in every game. */
   levels: Rect[];
   /** "Extra words" list at the top right. */
   extras: Rect;
@@ -87,25 +81,16 @@ export function computeLayout(frame: FrameLayout, { letterCount, wordLengths }: 
     return { x: backing.x + ringR * Math.cos(angle), y: backing.y + ringR * Math.sin(angle), r: tileR };
   });
 
-  const buttonsY = height - MARGIN - BUTTON_HEIGHT;
-  const buttonWidth = (leftWidth - BUTTON_GAP) / 2;
-  const shuffleButton: Rect = { x: playLeft, y: buttonsY, w: buttonWidth, h: BUTTON_HEIGHT };
-  const hintButton: Rect = { x: playLeft + buttonWidth + BUTTON_GAP, y: buttonsY, w: buttonWidth, h: BUTTON_HEIGHT };
+  // Hint in the top-left corner, as in every game, with Shuffle beside it; the levels in the frame's bottom row.
+  const hintButton: Rect = frame.hintButton;
+  const shuffleButton: Rect = { ...hintButton, x: hintButton.x + hintButton.w + BUTTON_GAP };
+  const levels: Rect[] = frame.levelButtons;
 
   const leftCenter = playLeft + leftWidth / 2;
-  const levelWidth = Math.min(LEVEL_MAX_WIDTH, (leftWidth - (LEVEL_COUNT - 1) * LEVEL_GAP) / LEVEL_COUNT);
-  const levelsLeft = leftCenter - (LEVEL_COUNT * levelWidth + (LEVEL_COUNT - 1) * LEVEL_GAP) / 2;
-  const levels: Rect[] = Array.from({ length: LEVEL_COUNT }, (_, i) => ({
-    x: levelsLeft + i * (levelWidth + LEVEL_GAP),
-    y: MARGIN,
-    w: levelWidth,
-    h: LEVEL_HEIGHT,
-  }));
-
   const rowCount = wordLengths.length;
   const longest = Math.max(...wordLengths);
-  const slotsTop = MARGIN + LEVEL_HEIGHT + LEVELS_BOTTOM_GAP;
-  const slotsSpace = buttonsY - BUTTONS_TOP_GAP - slotsTop;
+  const slotsTop = hintButton.y + hintButton.h + BUTTON_GAP;
+  const slotsSpace = levels[0].y - BUTTON_GAP - slotsTop;
   const byWidth = (leftWidth - (longest - 1) * SLOT_GAP) / longest;
   const byHeight = (slotsSpace - (rowCount - 1) * ROW_GAP) / rowCount;
   const slotSize = Math.min(MAX_SLOT, Math.max(MIN_SLOT, Math.floor(Math.min(byWidth, byHeight))));

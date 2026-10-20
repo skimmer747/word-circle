@@ -14,13 +14,10 @@ const SQUARE_GAP = 8;
 const SQUARE_MAX = 110;
 const SQUARE_LETTER_SCALE = 0.62;
 const KEY_LETTER_SCALE = 0.55;
-/** The left column (Hint, All letters, Today's Wordle) is never narrower than this. */
-const LEFT_MIN_WIDTH = 110;
-/** Space between the left column and the board. */
+/** Space between the left column (Hint, All letters, Today's Wordle) and the board. */
 const COLUMN_GAP = 24;
 /** Space between the board and the top-right buttons. */
 const CORNER_CLEARANCE = 16;
-const BUTTON_HEIGHT = 96;
 const BUTTON_GAP = 16;
 const DAILY_MAX_HEIGHT = 180;
 
@@ -62,7 +59,9 @@ export function computeGuessLayout(frame: FrameLayout): GuessLayout {
   keys.push({ id: 'key:back', rect: { x: play.x + play.w - wideW, y: bottomY, w: wideW, h: keyH } });
 
   const boardBottom = keyboardTop - BOARD_GAP;
-  const regionLeft = play.x + LEFT_MIN_WIDTH + COLUMN_GAP;
+  // The left column is as wide as Hint, which sits in the same top-left place in every game.
+  const { hintButton } = frame;
+  const regionLeft = hintButton.x + hintButton.w + COLUMN_GAP;
   const regionRight = frame.corner.x - CORNER_CLEARANCE;
   const byHeight = (boardBottom - play.y - 5 * SQUARE_GAP) / 6;
   const byWidth = (regionRight - regionLeft - 4 * SQUARE_GAP) / 5;
@@ -79,11 +78,9 @@ export function computeGuessLayout(frame: FrameLayout): GuessLayout {
     h: squareSize,
   }));
 
-  const leftW = boardX - COLUMN_GAP - play.x;
-  const hintButton: Rect = { x: play.x, y: play.y, w: leftW, h: BUTTON_HEIGHT };
-  const allLettersButton: Rect = { x: play.x, y: hintButton.y + BUTTON_HEIGHT + BUTTON_GAP, w: leftW, h: BUTTON_HEIGHT };
-  const dailyY = allLettersButton.y + BUTTON_HEIGHT + BUTTON_GAP;
-  const dailyButton: Rect = { x: play.x, y: dailyY, w: leftW, h: Math.min(DAILY_MAX_HEIGHT, boardBottom - dailyY) };
+  const allLettersButton: Rect = { ...hintButton, y: hintButton.y + hintButton.h + BUTTON_GAP };
+  const dailyY = allLettersButton.y + allLettersButton.h + BUTTON_GAP;
+  const dailyButton: Rect = { x: hintButton.x, y: dailyY, w: hintButton.w, h: Math.min(DAILY_MAX_HEIGHT, boardBottom - dailyY) };
 
   return {
     frame,

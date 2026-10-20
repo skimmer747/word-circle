@@ -1,12 +1,6 @@
 import type { FrameLayout, Rect } from '../frame/layout';
 
-/** The left column: Easy, Medium, Hard, then Hint. */
-const LEFT_WIDTH = 130;
-const LEVEL_HEIGHT = 64;
-const LEVEL_GAP = 12;
-const HINT_GAP = 28;
-const HINT_HEIGHT = 96;
-/** Space between the left column, the tray, the grid and the top-right buttons. */
+/** Space between Hint, the tray, the grid, the level buttons and the top-right buttons. */
 const GAP = 16;
 /** The tray is this share of the screen height, within the limits below. */
 const TRAY_SHARE = 0.12;
@@ -22,7 +16,7 @@ const CORNER_MIN = 18;
 
 export interface GridLayout {
   frame: FrameLayout;
-  /** Easy, Medium, Hard. */
+  /** Easy, Medium, Hard: the frame's row at the bottom left, as in every game. */
   levels: Rect[];
   hintButton: Rect;
   /** The yellow backing for the selected section's letters. */
@@ -37,18 +31,18 @@ export interface GridLayout {
 }
 
 export function computeGridLayout(frame: FrameLayout, size: number): GridLayout {
-  const { play } = frame;
-  const levels = [0, 1, 2].map((i) => ({ x: play.x, y: play.y + i * (LEVEL_HEIGHT + LEVEL_GAP), w: LEFT_WIDTH, h: LEVEL_HEIGHT }));
-  const hintButton = { x: play.x, y: levels[2].y + LEVEL_HEIGHT + HINT_GAP, w: LEFT_WIDTH, h: HINT_HEIGHT };
-
-  const left = play.x + LEFT_WIDTH + GAP;
+  // Hint in the top-left corner and the levels in the bottom row, as in every game; the tray between Hint and
+  // the top-right buttons; the grid in the whole width between the tray and the levels.
+  const { play, hintButton, levelButtons: levels } = frame;
+  const trayLeft = hintButton.x + hintButton.w + GAP;
   const trayH = Math.round(Math.min(TRAY_MAX, Math.max(TRAY_MIN, frame.height * TRAY_SHARE)));
-  const tray = { x: left, y: play.y, w: frame.corner.x - GAP - left, h: trayH };
+  const tray = { x: trayLeft, y: play.y, w: frame.corner.x - GAP - trayLeft, h: trayH };
   const tileSize = trayH - 2 * TRAY_PADDING;
 
-  const top = tray.y + trayH + GAP;
+  const left = play.x;
+  const top = Math.max(tray.y + trayH, hintButton.y + hintButton.h) + GAP;
   const right = play.x + play.w;
-  const bottom = play.y + play.h;
+  const bottom = levels[0].y - GAP;
   const squareSize = Math.floor(Math.min(SQUARE_MAX, (right - left) / size, (bottom - top) / size));
   const x0 = left + (right - left - size * squareSize) / 2;
   const y0 = top + (bottom - top - size * squareSize) / 2;

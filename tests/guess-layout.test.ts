@@ -62,4 +62,10 @@ describe.each(SCREENS)('Word Guess layout on a %i×%i screen', (width, height) =
     expect(layout.allLettersButton.y).toBeGreaterThanOrEqual(layout.hintButton.y + layout.hintButton.h);
     expect(layout.dailyButton.y).toBeGreaterThanOrEqual(layout.allLettersButton.y + layout.allLettersButton.h);
   });
+
+  it('puts Hint in the same top-left place as every game, with the other buttons the same width below it', () => {
+    expect(layout.hintButton).toEqual(frame.hintButton);
+    for (const button of [layout.allLettersButton, layout.dailyButton]) expect(button.w).toBe(frame.hintButton.w);
+    expect(layout.allLettersButton.h).toBe(frame.hintButton.h);
+  });
 });

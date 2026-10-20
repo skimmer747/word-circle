@@ -25,14 +25,9 @@ describe.each(SCREENS)('Word Grid layout on a %i×%i screen', (width, height) =>
       }
     });
 
-    it('stacks Easy, Medium, Hard and Hint in a left column at least 110 px wide', () => {
-      left.forEach((rect, i) => {
-        expect(rect.x).toBe(frame.play.x);
-        expect(rect.w).toBeGreaterThanOrEqual(110);
-        if (i > 0) expect(rect.y).toBeGreaterThanOrEqual(left[i - 1].y + left[i - 1].h);
-      });
-      for (const level of layout.levels) expect(level.h).toBeGreaterThanOrEqual(60);
-      expect(layout.hintButton.h).toBeGreaterThanOrEqual(90);
+    it('puts Hint and Easy, Medium, Hard in the same places as every game', () => {
+      expect(layout.hintButton).toEqual(frame.hintButton);
+      expect(layout.levels).toEqual(frame.levelButtons);
     });
 
     it('fits four big tray tiles in the tray, clear of the left column and the top-right buttons', () => {
@@ -46,11 +41,12 @@ describe.each(SCREENS)('Word Grid layout on a %i×%i screen', (width, height) =>
       for (const rect of [...left, frame.corner]) expect(overlaps(layout.tray, rect), JSON.stringify(rect)).toBe(false);
     });
 
-    it('makes squares at least 90 px (at most 150) in a grid below the tray, clear of everything else', () => {
-      expect(layout.squareSize).toBeGreaterThanOrEqual(90);
+    it('makes squares at least 85 px (at most 150) between the tray and the level buttons, clear of everything else', () => {
+      expect(layout.squareSize).toBeGreaterThanOrEqual(85);
       expect(layout.squareSize).toBeLessThanOrEqual(150);
       expect(layout.squares).toHaveLength(size * size);
       expect(box.y).toBeGreaterThanOrEqual(layout.tray.y + layout.tray.h + 16);
+      expect(box.y + box.h).toBeLessThanOrEqual(layout.levels[0].y - 16);
       for (const rect of [...left, layout.tray, frame.corner]) expect(overlaps(box, rect), JSON.stringify(rect)).toBe(false);
     });
 

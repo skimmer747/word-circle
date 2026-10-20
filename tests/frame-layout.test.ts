@@ -84,6 +84,22 @@ describe.each(SCREENS)('frame layout on a %i×%i screen', (width, height) => {
     });
   });
 
+  it("puts every game's Hint button in the top-left corner of the play area", () => {
+    expect(frame.hintButton).toEqual({ x: frame.play.x, y: frame.play.y, w: 130, h: 96 });
+  });
+
+  it("puts every game's level buttons in a row at the bottom left, big enough to tap", () => {
+    const { levelButtons, play } = frame;
+    expect(levelButtons).toHaveLength(3);
+    levelButtons.forEach((button, i) => {
+      expect(inPlayArea(button, frame)).toBe(true);
+      expect(button.h).toBeGreaterThanOrEqual(60);
+      expect(button.w).toBeGreaterThanOrEqual(100);
+      expect(button.y + button.h).toBe(play.y + play.h);
+      expect(button.x).toBe(i === 0 ? play.x : levelButtons[i - 1].x + levelButtons[i - 1].w + 8);
+    });
+  });
+
   it('gives the clock pop-up a big Close button clear of the safe zones', () => {
     const { card, closeButton } = frame;
     expect(inPlayArea(closeButton, frame)).toBe(true);
