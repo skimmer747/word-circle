@@ -423,3 +423,140 @@ describe('scrolling', () => {
     expect(tracer.isTracing).toBe(false);
   });
 });
+
+describe('dragging letters', () => {
+  const DRAG_GEOMETRY: TracerGeometry = {
+    screenWidth: 1180,
+    safeZoneLeft: 200,
+    safeZoneRight: 130,
+    tiles: [],
+    buttons: [{ id: 'hint', x: 220, y: 300, w: 120, h: 96 }],
+    draggables: [
+      { id: 'tray:0', x: 400, y: 20, w: 90, h: 90 },
+      { id: 'square:5', x: 500, y: 300, w: 100, h: 100 },
+    ],
+  };
+
+  function dragSetup() {
+    const events: string[] = [];
+    const tracer = new LetterTracer({
+      letterAdded: () => events.push('add'),
+      letterRemoved: () => events.push('remove'),
+      wordSubmitted: () => events.push('submit'),
+      selectionCleared: () => events.push('clear'),
+      buttonTapped: (id) => events.push(`tap ${id}`),
+      dragStarted: (id) => events.push(`start ${id}`),
+      dragMoved: (id, x, y) => events.push(`move ${id} ${x},${y}`),
+      dragEnded: (id, x, y) => events.push(`drop ${id} ${x},${y}`),
+      dragCancelled: (id) => events.push(`cancel ${id}`),
+    });
+    tracer.setGeometry(DRAG_GEOMETRY);
+    const send = (type: PointerInput['type'], id: number, x: number, y: number, time?: number) =>
+      tracer.handle({ type, id, x, y, time });
+    return { tracer, events, send };
+  }
+
+  it('taps a letter when the finger barely moves', () => {
+    const { events, send } = dragSetup();
+    send('down', 1, 445, 65);
+    send('move', 1, 450, 70);
+    send('up', 1, 450, 70);
+    expect(events).toEqual(['tap tray:0']);
+  });
+
+  it('picks a letter up once the finger moves more than 12 px, and drops it where the finger lifts', () => {
+    const { events, send } = dragSetup();
+    send('down', 1, 445, 65);
+    send('move', 1, 445, 75);
+    expect(events).toEqual([]);
+    send('move', 1, 445, 90);
+    send('move', 1, 550, 350);
+    send('up', 1, 550, 350);
+    expect(events).toEqual(['start tray:0', 'move tray:0 445,90', 'move tray:0 550,350', 'drop tray:0 550,350']);
+  });
+
+  it('picks up a letter from a square', () => {
+    const { events, send } = dragSetup();
+    send('down', 1, 550, 350);
+    send('move', 1, 650, 350);
+    send('up', 1, 650, 350);
+    expect(events).toEqual(['start square:5', 'move square:5 650,350', 'drop square:5 650,350']);
+  });
+
+  it('says it is dragging while a finger holds a letter', () => {
+    const { tracer, send } = dragSetup();
+    send('down', 1, 445, 65);
+    expect(tracer.isDragging).toBe(true);
+    send('up', 1, 445, 65);
+    expect(tracer.isDragging).toBe(false);
+  });
+
+  it('does not tap a letter that a resting finger lifts off long after landing', () => {
+    const { events, send } = dragSetup();
+    send('down', 1, 445, 65, 1000);
+    send('up', 1, 445, 65, 4000);
+    expect(events).toEqual([]);
+  });
+
+  it('lets a letter be dropped in a safe zone (the game decides what happens)', () => {
+    const { events, send } = dragSetup();
+    send('down', 1, 445, 65);
+    send('move', 1, 1100, 300);
+    send('up', 1, 1100, 300);
+    expect(events).toEqual(['start tray:0', 'move tray:0 1100,300', 'drop tray:0 1100,300']);
+  });
+
+  it('ignores a letter touched from inside a safe zone', () => {
+    const { events, send, tracer } = dragSetup();
+    tracer.setGeometry({ ...DRAG_GEOMETRY, draggables: [{ id: 'tray:0', x: 100, y: 20, w: 90, h: 90 }] });
+    send('down', 1, 145, 65);
+    send('move', 1, 400, 300);
+    send('up', 1, 400, 300);
+    expect(events).toEqual([]);
+  });
+
+  it('ignores other fingers while a letter is held', () => {
+    const { events, send } = dragSetup();
+    send('down', 1, 445, 65);
+    send('move', 1, 445, 120);
+    send('down', 2, 280, 350);
+    send('up', 2, 280, 350);
+    send('up', 1, 445, 120);
+    expect(events).toEqual(['start tray:0', 'move tray:0 445,120', 'drop tray:0 445,120']);
+  });
+
+  it('drags while her thumb rests in the safe zone', () => {
+    const { events, send } = dragSetup();
+    send('down', 9, 60, 600);
+    send('down', 1, 445, 65);
+    send('move', 1, 445, 120);
+    send('up', 1, 445, 120);
+    expect(events).toEqual(['start tray:0', 'move tray:0 445,120', 'drop tray:0 445,120']);
+  });
+
+  it('cancels a drag when the iPad cancels the touch or the screen changes under it', () => {
+    const { events, send, tracer } = dragSetup();
+    send('down', 1, 445, 65);
+    send('move', 1, 445, 120);
+    send('cancel', 1, 445, 120);
+    send('down', 2, 445, 65);
+    send('move', 2, 445, 120);
+    tracer.setGeometry(DRAG_GEOMETRY);
+    send('up', 2, 445, 120);
+    expect(events).toEqual([
+      'start tray:0',
+      'move tray:0 445,120',
+      'cancel tray:0',
+      'start tray:0',
+      'move tray:0 445,120',
+      'cancel tray:0',
+    ]);
+  });
+
+  it('still taps ordinary buttons', () => {
+    const { events, send } = dragSetup();
+    send('down', 1, 280, 350);
+    send('up', 1, 280, 350);
+    expect(events).toEqual(['tap hint']);
+  });
+});

@@ -29,6 +29,8 @@ export interface TracerGeometry {
   buttons: ButtonGeometry[];
   /** Areas a finger can drag up and down to scroll (buttons inside still tap). */
   scrollAreas?: ButtonGeometry[];
+  /** Letters she can tap, or pick up and drag (Word Grid). */
+  draggables?: ButtonGeometry[];
 }
 
 export interface TracerCallbacks {
@@ -43,6 +45,14 @@ export interface TracerCallbacks {
   buttonReleased?(id: string): void;
   /** A scrolling finger moved; `dy` is positive when it moved up, to show what is further down. */
   scrolled?(id: string, dy: number): void;
+  /** A finger on a draggable moved far enough to pick it up... */
+  dragStarted?(id: string): void;
+  /** ...moved (screen px)... */
+  dragMoved?(id: string, x: number, y: number): void;
+  /** ...and lifted there. */
+  dragEnded?(id: string, x: number, y: number): void;
+  /** The iPad cancelled the touch, or the screen changed under it. */
+  dragCancelled?(id: string): void;
 }
 
 /** A word may start slightly outside a tile's drawn edge. */
@@ -52,14 +62,26 @@ const MIN_TRACE_LENGTH = 3;
 const SAMPLE_SPACING = 10;
 /** A press longer than this is a resting thumb, not a tap. */
 const MAX_TAP_MS = 2000;
+/** A finger has to move more than this (px) before a press on a letter becomes a drag. */
+export const DRAG_START_DISTANCE = 12;
 
 interface Press {
   button: string;
   time?: number;
 }
 
+interface Drag {
+  id: number;
+  target: string;
+  x: number;
+  y: number;
+  time?: number;
+  /** True once the finger has moved far enough to pick the letter up. */
+  started: boolean;
+}
+
 /**
- * Turns finger movement into letter selections, button taps and scrolling, ignoring the safe zones.
+ * Turns finger movement into letter selections, drags, button taps and scrolling, ignoring the safe zones.
  * Every finger is tracked separately, so a resting thumb never blocks another finger
  * (iPadOS drops ordinary click events while another finger is on the screen).
  */
@@ -70,6 +92,7 @@ export class LetterTracer {
   private last = { x: 0, y: 0 };
   private readonly presses = new Map<number, Press>();
   private scrolling: { id: number; area: string; y: number } | null = null;
+  private dragging: Drag | null = null;
   private enabled = true;
 
   constructor(private readonly callbacks: TracerCallbacks) {}
@@ -80,6 +103,11 @@ export class LetterTracer {
 
   get isTracing(): boolean {
     return this.activeId !== null;
+  }
+
+  /** True while a finger holds a letter (picked up or not yet). */
+  get isDragging(): boolean {
+    return this.dragging !== null;
   }
 
   setGeometry(geometry: TracerGeometry): void {
@@ -104,6 +132,7 @@ export class LetterTracer {
         return;
       case 'move':
         if (input.id === this.activeId) this.onMove(input);
+        else if (input.id === this.dragging?.id) this.onDrag(input);
         else if (input.id === this.scrolling?.id) this.onScroll(input);
         return;
       case 'up':
@@ -116,11 +145,18 @@ export class LetterTracer {
   }
 
   private onDown({ id, x, y, time }: PointerInput): void {
-    if (!this.enabled || this.activeId !== null || this.isInSafeZone(x)) return;
+    // While a letter is held, other fingers are ignored, as while tracing.
+    if (!this.enabled || this.activeId !== null || this.dragging !== null || this.isInSafeZone(x)) return;
     const button = this.buttonAt(x, y);
     if (button !== null) {
       this.presses.set(id, { button, time });
       this.callbacks.buttonPressed?.(button);
+      return;
+    }
+    const draggable = rectAt(this.geometry.draggables ?? [], x, y);
+    if (draggable !== null) {
+      this.dragging = { id, target: draggable, x, y, time, started: false };
+      this.callbacks.buttonPressed?.(draggable);
       return;
     }
     const tile = this.tileAt(x, y, START_HIT_FACTOR);
@@ -152,6 +188,16 @@ export class LetterTracer {
     if (dy !== 0) this.callbacks.scrolled?.(scrolling.area, dy);
   }
 
+  private onDrag({ x, y }: PointerInput): void {
+    const drag = this.dragging!;
+    if (!drag.started) {
+      if (Math.hypot(x - drag.x, y - drag.y) <= DRAG_START_DISTANCE) return;
+      drag.started = true;
+      this.callbacks.dragStarted?.(drag.target);
+    }
+    this.callbacks.dragMoved?.(drag.target, x, y);
+  }
+
   private visit(x: number, y: number): void {
     const tile = this.tileAt(x, y, 1);
     if (tile === null) return;
@@ -167,6 +213,19 @@ export class LetterTracer {
   }
 
   private onEnd({ id, x, y, time }: PointerInput, submit: boolean): void {
+    const drag = this.dragging;
+    if (drag && id === drag.id) {
+      this.dragging = null;
+      this.callbacks.buttonReleased?.(drag.target);
+      if (drag.started) {
+        if (submit) this.callbacks.dragEnded?.(drag.target, x, y);
+        else this.callbacks.dragCancelled?.(drag.target);
+      } else {
+        const quick = drag.time === undefined || time === undefined || time - drag.time <= MAX_TAP_MS;
+        if (submit && quick) this.callbacks.buttonTapped(drag.target);
+      }
+      return;
+    }
     const press = this.presses.get(id);
     if (press) {
       this.presses.delete(id);
@@ -192,16 +251,20 @@ export class LetterTracer {
     for (const press of this.presses.values()) this.callbacks.buttonReleased?.(press.button);
     this.presses.clear();
     this.scrolling = null;
+    const drag = this.dragging;
+    this.dragging = null;
+    if (drag) {
+      this.callbacks.buttonReleased?.(drag.target);
+      if (drag.started) this.callbacks.dragCancelled?.(drag.target);
+    }
   }
 
   private buttonAt(x: number, y: number): string | null {
-    const button = this.geometry.buttons.find((b) => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h);
-    return button ? button.id : null;
+    return rectAt(this.geometry.buttons, x, y);
   }
 
   private scrollAreaAt(x: number, y: number): string | null {
-    const area = this.geometry.scrollAreas?.find((a) => x >= a.x && x <= a.x + a.w && y >= a.y && y <= a.y + a.h);
-    return area ? area.id : null;
+    return rectAt(this.geometry.scrollAreas ?? [], x, y);
   }
 
   private tileAt(x: number, y: number, factor: number): number | null {
@@ -211,4 +274,9 @@ export class LetterTracer {
     }
     return null;
   }
+}
+
+function rectAt(rects: readonly ButtonGeometry[], x: number, y: number): string | null {
+  const rect = rects.find((r) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h);
+  return rect ? rect.id : null;
 }
