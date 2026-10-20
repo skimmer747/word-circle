@@ -251,3 +251,153 @@ export function encodePuzzle(size: number, answer: readonly string[], sectionOf:
     .join('');
   return { size, cells: answer.map((letter) => letter || '.').join(''), sections };
 }
+
+export interface LevelRules {
+  /** Squares across (and down) in the box. */
+  size: number;
+  /** The most letters in one section. */
+  maxSection: number;
+}
+
+export interface GridIndexes {
+  answers: PatternIndex;
+  words: PatternIndex;
+}
+
+/** One puzzle for the level, or null if this attempt didn't work out (the caller tries again). */
+export function makePuzzle(rules: LevelRules, indexes: GridIndexes, random: () => number): GridPuzzle | null {
+  const open = randomShape(rules.size, random);
+  const answer = fillShape(open, rules.size, indexes.answers, random);
+  if (!answer) return null;
+  const sectionOf = carveSections(open, rules.size, answer, indexes.words, rules.maxSection, random);
+  const puzzle = encodePuzzle(rules.size, answer, sectionOf);
+  // A one-letter section is a free letter; one is fine, more makes it too easy.
+  const singles = readPuzzle(puzzle).sections.filter((squares) => squares.length === 1).length;
+  return singles <= 1 ? puzzle : null;
+}
+
+/** Up to `count` different puzzles for a level. */
+export function buildLevel(rules: LevelRules, indexes: GridIndexes, count: number, random: () => number): GridPuzzle[] {
+  const puzzles: GridPuzzle[] = [];
+  const seen = new Set<string>();
+  for (let attempt = 0; attempt < count * 20 && puzzles.length < count; attempt++) {
+    const puzzle = makePuzzle(rules, indexes, random);
+    if (puzzle && !seen.has(puzzle.cells)) {
+      seen.add(puzzle.cells);
+      puzzles.push(puzzle);
+    }
+  }
+  return puzzles;
+}
+
+export function wordsByLength(words: Iterable<string>): Map<number, string[]> {
+  const byLength = new Map<number, string[]>();
+  for (const word of words) {
+    const list = byLength.get(word.length) ?? [];
+    list.push(word);
+    byLength.set(word.length, list);
+  }
+  return byLength;
+}
+
+/**
+ * Every answer to a puzzle (stopping at `limit`), as cells strings, found a different way from countSolutions:
+ * word by word, longest runs first, using up each section's letters. Used to check the puzzles we ship.
+ */
+export function solveByWords(puzzle: GridPuzzle, byLength: ReadonlyMap<number, readonly string[]>, limit = 2): string[] {
+  const shape = readPuzzle(puzzle);
+  const runs = [...shape.runs].sort((a, b) => b.length - a.length);
+  const pools = shape.letters.map((letters) => {
+    const pool = new Map<string, number>();
+    for (const letter of letters) pool.set(letter, (pool.get(letter) ?? 0) + 1);
+    return pool;
+  });
+  const letters = shape.open.map(() => '');
+  const found: string[] = [];
+  const place = (k: number): boolean => {
+    if (k === runs.length) {
+      found.push(letters.map((letter) => letter || '.').join(''));
+      return found.length >= limit;
+    }
+    const run = runs[k];
+    for (const word of byLength.get(run.length) ?? []) {
+      const placed: number[] = [];
+      let fits = true;
+      for (let i = 0; i < run.length && fits; i++) {
+        const square = run[i];
+        if (letters[square]) {
+          fits = letters[square] === word[i];
+          continue;
+        }
+        const pool = pools[shape.sectionOf[square]];
+        const left = pool.get(word[i]) ?? 0;
+        if (left === 0) {
+          fits = false;
+          continue;
+        }
+        pool.set(word[i], left - 1);
+        letters[square] = word[i];
+        placed.push(square);
+      }
+      const stop = fits && place(k + 1);
+      for (const square of placed) {
+        const pool = pools[shape.sectionOf[square]];
+        pool.set(letters[square], pool.get(letters[square])! + 1);
+        letters[square] = '';
+      }
+      if (stop) return true;
+    }
+    return false;
+  };
+  place(0);
+  return found;
+}
+
+const sectionName = (i: number) => String.fromCharCode(97 + i);
+
+/** Everything wrong with one puzzle; empty when it's fine. */
+export function puzzleProblems(
+  puzzle: GridPuzzle,
+  rules: LevelRules,
+  answers: ReadonlySet<string>,
+  byLength: ReadonlyMap<number, readonly string[]>,
+): string[] {
+  const problems: string[] = [];
+  const say = (problem: string) => problems.push(`${puzzle.cells}: ${problem}`);
+  const { size } = rules;
+  if (puzzle.size !== size || puzzle.cells.length !== size * size || puzzle.sections.length !== size * size) {
+    say('is the wrong size');
+    return problems;
+  }
+  if (![...puzzle.cells].every((ch, i) => (ch === '.') === (puzzle.sections[i] === '.'))) {
+    say("has blocked squares that don't match its sections");
+    return problems;
+  }
+  const shape = readPuzzle(puzzle);
+  for (const problem of shapeProblems(shape.open, size)) say(problem);
+  const spelled = shape.runs.map((run) => run.map((square) => shape.answer[square]).join(''));
+  for (const word of spelled) if (!answers.has(word)) say(`"${word}" is not an answer word`);
+  if (new Set(spelled).size !== spelled.length) say('repeats a word');
+  shape.sections.forEach((squares, i) => {
+    if (squares.length === 0) say(`section ${sectionName(i)} is empty`);
+    else if (connected(squares[0], new Set(squares), size).size !== squares.length) say(`section ${sectionName(i)} is in pieces`);
+    if (squares.length > rules.maxSection) say(`section ${sectionName(i)} is too big`);
+  });
+  if (shape.sections.filter((squares) => squares.length === 1).length > 1) say('has more than one one-letter section');
+  const solutions = solveByWords(puzzle, byLength);
+  if (solutions.length !== 1) say(`has ${solutions.length} answers`);
+  else if (solutions[0] !== puzzle.cells) say("its one answer isn't the stored one");
+  return problems;
+}
+
+/** Problems with a whole level: repeated puzzles, or too few. */
+export function levelProblems(level: string, puzzles: readonly GridPuzzle[], minimum: number): string[] {
+  const problems: string[] = [];
+  const seen = new Set<string>();
+  for (const { cells } of puzzles) {
+    if (seen.has(cells)) problems.push(`${level}: ${cells} appears twice`);
+    seen.add(cells);
+  }
+  if (puzzles.length < minimum) problems.push(`${level}: only ${puzzles.length} puzzles could be made (need at least ${minimum})`);
+  return problems;
+}
