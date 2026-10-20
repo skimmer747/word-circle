@@ -5,9 +5,19 @@ import { circleLines } from './celebration';
 import { computeLayout, type Layout } from './layout';
 import { identityOrder, shuffleRing } from './ring';
 import { Game } from './state';
+import { NOTHING_AVOIDED, type AvoidCheck } from '../shared/avoid';
 import { dayKey } from '../shared/days';
 import { emptyStats, recordSolve } from './stats';
-import { loadSavedGame, nextIndex, resolveStart, saveSavedGame, type SavedGame, type StartPoint } from './storage';
+import {
+  loadSavedGame,
+  nextIndex,
+  resolveStart,
+  saveSavedGame,
+  skipAvoided,
+  withoutAvoidedBonus,
+  type SavedGame,
+  type StartPoint,
+} from './storage';
 import { PlayTimer } from './timer';
 import { LEVELS, type Level, type PuzzleSet } from './types';
 import { View, type RowState } from './view';
@@ -16,6 +26,13 @@ const IDLE_HINT_MS = 120_000;
 const GOOD_MS = 1200;
 /** The celebration moves on by itself after this long if she doesn't tap Next puzzle. */
 const CELEBRATION_MS = 15_000;
+
+export interface CircleOptions {
+  /** Her level the very first time (default Medium). */
+  startLevel?: Level;
+  /** Words she should never see: puzzles with one are skipped, and they never count as extra words. */
+  avoided?: AvoidCheck;
+}
 
 /** Word Circle: slide across a circle of letters to fill the word slots. */
 export class CircleScreen implements GameScreen {
@@ -35,14 +52,21 @@ export class CircleScreen implements GameScreen {
   /** Created on the first render; taps and words can only arrive after that. */
   private view!: View;
 
+  private readonly startLevel: Level;
+  private readonly avoided: AvoidCheck;
+
   constructor(
     private readonly puzzles: PuzzleSet,
     private readonly store: KeyValueStore,
-  ) {}
+    options: CircleOptions = {},
+  ) {
+    this.startLevel = options.startLevel ?? 'medium';
+    this.avoided = options.avoided ?? NOTHING_AVOIDED;
+  }
 
   start(host: FrameHost): void {
     this.host = host;
-    this.saved = loadSavedGame(this.store);
+    this.saved = loadSavedGame(this.store, this.startLevel);
     this.openLevel(this.saved.level);
   }
 
@@ -112,12 +136,18 @@ export class CircleScreen implements GameScreen {
   /** Switches to a level's saved place (or its first puzzle). */
   private openLevel(level: Level): void {
     this.level = level;
-    this.loadPuzzle(resolveStart(this.puzzles[level], this.saved.levels[level]));
+    const list = this.puzzles[level];
+    this.loadPuzzle(skipAvoided(list, resolveStart(list, this.saved.levels[level]), this.avoided));
   }
 
   private loadPuzzle(start: StartPoint): void {
     this.index = start.index;
-    this.game = new Game(this.puzzles[this.level][start.index], start.found, start.revealed, start.bonusFound);
+    this.game = new Game(
+      withoutAvoidedBonus(this.puzzles[this.level][start.index], this.avoided),
+      start.found,
+      start.revealed,
+      start.bonusFound,
+    );
     this.ringOrder = identityOrder(this.game.puzzle.letters.length);
     this.timer = new PlayTimer(start.elapsedMs);
     if (document.hidden) this.timer.pause();
@@ -197,13 +227,13 @@ export class CircleScreen implements GameScreen {
     const { stats, celebration } = recordSolve(this.saved.stats, this.level, this.timer.elapsedMs, dayKey(new Date()));
     this.saved.stats = stats;
     // Save the next puzzle as her place now, so closing the app mid-celebration loses nothing.
-    this.loadPuzzle({
-      index: nextIndex(this.index, this.puzzles[this.level].length),
-      found: [],
-      revealed: {},
-      bonusFound: [],
-      elapsedMs: 0,
-    });
+    this.loadPuzzle(
+      skipAvoided(
+        this.puzzles[this.level],
+        { index: nextIndex(this.index, this.puzzles[this.level].length), found: [], revealed: {}, bonusFound: [], elapsedMs: 0 },
+        this.avoided,
+      ),
+    );
     this.timer.pause();
     // Days in a row count puzzles and words in either game.
     const streakDays = this.host.recordPlayDay();

@@ -1,3 +1,4 @@
+import { firstAllowed, type AvoidCheck } from '../shared/avoid';
 import type { KeyValueStore } from '../shared/store';
 import { emptyStats, type Stats } from './stats';
 import { LEVELS, type Level, type Progress, type Puzzle } from './types';
@@ -23,7 +24,7 @@ export interface StartPoint {
   elapsedMs: number;
 }
 
-const fresh = (): SavedGame => ({ level: 'medium', levels: {}, stats: emptyStats() });
+const fresh = (level: Level = 'medium'): SavedGame => ({ level, levels: {}, stats: emptyStats() });
 
 const isWordList = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((w) => typeof w === 'string');
@@ -81,10 +82,11 @@ function readSavedGame(value: unknown): SavedGame | null {
   return result;
 }
 
-export function loadSavedGame(store: KeyValueStore): SavedGame {
+/** Her save, or a fresh start on `startLevel` (set on the settings page). */
+export function loadSavedGame(store: KeyValueStore, startLevel: Level = 'medium'): SavedGame {
   try {
     const raw = store.getItem(STORAGE_KEY);
-    if (raw !== null) return readSavedGame(JSON.parse(raw)) ?? fresh();
+    if (raw !== null) return readSavedGame(JSON.parse(raw)) ?? fresh(startLevel);
     const old = store.getItem(OLD_STORAGE_KEY);
     if (old !== null) {
       const progress: unknown = JSON.parse(old);
@@ -93,7 +95,7 @@ export function loadSavedGame(store: KeyValueStore): SavedGame {
   } catch {
     // Unreadable save: start fresh.
   }
-  return fresh();
+  return fresh(startLevel);
 }
 
 export function saveSavedGame(store: KeyValueStore, game: SavedGame): void {
@@ -114,4 +116,15 @@ export function resolveStart(puzzles: readonly Puzzle[], saved: Progress | undef
 
 export function nextIndex(index: number, count: number): number {
   return (index + 1) % count;
+}
+
+/** Where to start instead if a puzzle's words include one she should never see: the next puzzle without one, fresh. */
+export function skipAvoided(puzzles: readonly Puzzle[], start: StartPoint, avoided: AvoidCheck): StartPoint {
+  const index = firstAllowed(puzzles, start.index, (puzzle) => puzzle.words.some(avoided));
+  return index === start.index ? start : { index, found: [], revealed: {}, bonusFound: [], elapsedMs: 0 };
+}
+
+/** The puzzle without extra words she should never see (they then don't count as words at all). */
+export function withoutAvoidedBonus(puzzle: Puzzle, avoided: AvoidCheck): Puzzle {
+  return puzzle.bonus.some(avoided) ? { ...puzzle, bonus: puzzle.bonus.filter((word) => !avoided(word)) } : puzzle;
 }

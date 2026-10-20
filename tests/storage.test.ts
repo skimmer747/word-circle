@@ -6,9 +6,12 @@ import {
   nextIndex,
   resolveStart,
   saveSavedGame,
+  skipAvoided,
+  withoutAvoidedBonus,
   type KeyValueStore,
   type SavedGame,
 } from '../src/circle/storage';
+import { NOTHING_AVOIDED, avoidChecker } from '../src/shared/avoid';
 import { emptyStats } from '../src/circle/stats';
 import type { Progress, Puzzle } from '../src/circle/types';
 
@@ -146,5 +149,37 @@ describe('nextIndex', () => {
   it('moves forward and wraps around', () => {
     expect(nextIndex(0, 3)).toBe(1);
     expect(nextIndex(2, 3)).toBe(0);
+  });
+});
+
+describe('the starting level', () => {
+  it('starts a new player on the chosen level', () => {
+    expect(loadSavedGame(new MemoryStore(), 'easy')).toEqual({ ...FRESH, level: 'easy' });
+  });
+
+  it('keeps her own level once she has one', () => {
+    const store = new MemoryStore();
+    saveSavedGame(store, { ...FRESH, level: 'hard' });
+    expect(loadSavedGame(store, 'easy').level).toBe('hard');
+  });
+});
+
+describe('words she should never see', () => {
+  const withWords = (id: string, words: string[]): Puzzle => ({ id, letters: [...id], words, bonus: [] });
+  const LIST = [withWords('abcde', ['bead']), withWords('fghij', ['grave']), withWords('klmno', ['lemon'])];
+  const START = { index: 1, found: ['grave'], revealed: {}, bonusFound: [], elapsedMs: 5000 };
+
+  it('keeps her puzzle when nothing in it is avoided', () => {
+    expect(skipAvoided(LIST, START, NOTHING_AVOIDED)).toBe(START);
+  });
+
+  it('moves her to the next allowed puzzle, fresh', () => {
+    expect(skipAvoided(LIST, START, avoidChecker(['grave']))).toEqual({ index: 2, found: [], revealed: {}, bonusFound: [], elapsedMs: 0 });
+  });
+
+  it('drops avoided extra words and leaves the rest', () => {
+    const p: Puzzle = { id: 'aelst', letters: [...'least'], words: ['last'], bonus: ['slate', 'stale'] };
+    expect(withoutAvoidedBonus(p, avoidChecker(['stale'])).bonus).toEqual(['slate']);
+    expect(withoutAvoidedBonus(p, NOTHING_AVOIDED)).toBe(p);
   });
 });
