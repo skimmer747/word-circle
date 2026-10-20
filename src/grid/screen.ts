@@ -1,4 +1,4 @@
-import type { FrameHost, GameScreen, GameTargets } from '../frame/games';
+import { GAME_TITLES, type FrameHost, type GameScreen, type GameTargets } from '../frame/games';
 import type { FrameLayout, Rect } from '../frame/layout';
 import type { ButtonGeometry } from '../input/touch';
 import { NOTHING_AVOIDED, type AvoidCheck } from '../shared/avoid';
@@ -34,7 +34,7 @@ export interface GridOptions {
 /** Word Grid: Knotwords in big print, with a tray of letters on top to tap or drag into place. */
 export class GridScreen implements GameScreen {
   readonly id = 'grid';
-  readonly title = 'Word Grid';
+  readonly title = GAME_TITLES.grid;
   /** True while the words are turning green or she's celebrating. */
   busy = false;
   private host!: FrameHost;

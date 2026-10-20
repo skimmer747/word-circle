@@ -1228,3 +1228,204 @@ body {
 .row-nohints svg {
   color: var(--found);
 }
+
+/* The caregiver's settings page: ordinary controls at a comfortable size, scrolling over everything.
+   It's its own scroll container, so the body's touch-action: none doesn't stop it scrolling. */
+.settings-page {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: var(--bg);
+  font-size: 20px;
+  font-weight: 400;
+}
+
+/* Safari won't let her type in a field that inherits user-select: none. */
+.settings-page input,
+.settings-page textarea {
+  -webkit-user-select: text;
+  user-select: text;
+  font: inherit;
+}
+
+.settings-sheet {
+  box-sizing: border-box;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.settings-title {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.settings-tip {
+  margin: 6px 0 24px;
+  color: var(--label);
+}
+
+.settings-section {
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.settings-section h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.settings-section h3 {
+  margin: 18px 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.settings-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 2px solid var(--slot-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.settings-field {
+  display: block;
+  margin-top: 12px;
+}
+
+.settings-field > span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.settings-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.settings-choice,
+.settings-button,
+.settings-cancel,
+.settings-done {
+  min-height: 48px;
+  padding: 8px 18px;
+  border: 2px solid var(--navy);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--navy);
+  font: inherit;
+  font-weight: 700;
+}
+
+.settings-choice[aria-pressed='true'] {
+  background: var(--navy);
+  color: #fff;
+}
+
+.settings-button:disabled {
+  opacity: 0.4;
+}
+
+.settings-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+}
+
+.settings-check input {
+  width: 28px;
+  height: 28px;
+}
+
+.settings-events {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.settings-event {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--absent-fill);
+}
+
+.settings-empty,
+.settings-note {
+  color: var(--label);
+}
+
+.settings-warn {
+  min-height: 1.2em;
+  margin: 0;
+  color: var(--squiggle);
+}
+
+.settings-add {
+  margin-top: 16px;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.settings-done {
+  border-color: var(--found);
+  background: var(--found);
+  color: #fff;
+}
+
+/* A little screen on each thumb button, its safe zones shaded and the wide one where the thumb rests. */
+.thumb-pic {
+  position: relative;
+  display: block;
+  width: 72px;
+  height: 50px;
+  margin: 2px auto 6px;
+  border: 3px solid currentColor;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.thumb-pic::before,
+.thumb-pic::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: var(--absent-fill);
+}
+
+.thumb-pic::before {
+  left: 0;
+}
+
+.thumb-pic::after {
+  right: 0;
+}
+
+.thumb-pic.left::before,
+.thumb-pic.right::after {
+  width: 20px;
+  background: var(--present-fill);
+}

@@ -1,4 +1,4 @@
-import type { FrameHost, GameScreen, GameTargets } from '../frame/games';
+import { GAME_TITLES, type FrameHost, type GameScreen, type GameTargets } from '../frame/games';
 import type { FrameLayout } from '../frame/layout';
 import type { KeyValueStore } from '../shared/store';
 import { circleLines } from './celebration';
@@ -37,7 +37,7 @@ export interface CircleOptions {
 /** Word Circle: slide across a circle of letters to fill the word slots. */
 export class CircleScreen implements GameScreen {
   readonly id = 'circle';
-  readonly title = 'Word Circle';
+  readonly title = GAME_TITLES.circle;
   /** True from finishing a puzzle until the next one is on screen. */
   busy = false;
   private host!: FrameHost;

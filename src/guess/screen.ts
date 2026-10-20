@@ -1,4 +1,4 @@
-import type { FrameHost, GameScreen, GameTargets } from '../frame/games';
+import { GAME_TITLES, type FrameHost, type GameScreen, type GameTargets } from '../frame/games';
 import type { FrameLayout } from '../frame/layout';
 import type { CelebrationCard } from '../frame/view';
 import { NOTHING_AVOIDED, type AvoidCheck } from '../shared/avoid';
@@ -38,7 +38,7 @@ const emptyRow = (): SquareView[] => Array.from({ length: 5 }, () => ({ letter: 
 /** Word Guess: Wordle in big print, with no losing, and the real daily Wordle word once a day. */
 export class GuessScreen implements GameScreen {
   readonly id = 'guess';
-  readonly title = 'Word Guess';
+  readonly title = GAME_TITLES.guess;
   /** True while a guess is coloring in, the rows are sliding, or she's celebrating. */
   busy = false;
   private host!: FrameHost;
