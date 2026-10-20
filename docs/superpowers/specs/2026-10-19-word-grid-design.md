@@ -139,7 +139,7 @@ No sound, no flashing, no shaking.
 
 ### Shapes
 
-A random crossword shape in the level's box: about 70% of the box's squares open; every row and column of the box has at least one open square; the open squares are all one piece (connected side to side); every open square is in at least one run.
+A random crossword shape in the level's box: about 70% of the box's squares open (never under 60% or over 90%); every row and column of the box has at least one open square; the open squares are all one piece (connected side to side); every open square is in at least one run.
 
 ### Making a puzzle (one answer by construction)
 
