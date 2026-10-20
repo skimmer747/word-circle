@@ -31,3 +31,9 @@ export function recordPlayDay(days: PlayDays, day: string): PlayDays {
   const streakDays = days.lastPlayedDay === previousDay(day) ? days.streakDays + 1 : 1;
   return { streakDays, lastPlayedDay: day };
 }
+
+/** `day` moved by `n` days (negative for earlier), as "YYYY-MM-DD". */
+export function addDays(day: string, n: number): string {
+  const [y, m, d] = day.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+}
