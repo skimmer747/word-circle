@@ -104,6 +104,7 @@ All through the per-finger tracker: a finger that lands on a tray tile or a plac
 - Free and unlimited. Puts the right letter in the selected square, unless it's already right; then it fills the first square (reading order) that is empty or wrong instead.
 - The right letter comes from the tray if a copy is still there; otherwise from a square of the section where it's wrong (there always is one). Whatever was in the hinted square goes back to the tray.
 - The hinted letter turns dark blue and is locked. Hinted squares are saved.
+- The selection then moves to the next empty square in that section, as it does after placing a tile, so the next Hint fills that one.
 - After 2 minutes without a letter placed or moved, the Hint button gently pulses every 4 seconds until she does something. It never fills anything by itself.
 
 ### Finishing

@@ -285,7 +285,7 @@ export class GridScreen implements GameScreen {
   private hint(): void {
     const square = this.game.hint(this.selected);
     if (square === null) return;
-    this.selected = square;
+    this.selected = this.game.nextEmptyInSection(square) ?? square;
     this.changed();
     this.view?.popSquare(square);
   }
