@@ -89,6 +89,13 @@ describe.each(SCREENS_AND_THUMBS)('frame layout on a %i×%i screen, thumb %s', (
     });
   });
 
+  it('puts a pair of buttons where the single Close was, below the game cards', () => {
+    const { shareButton, nextWordButton, closeButton, gameCards } = frame;
+    expect(shareButton.y).toBe(closeButton.y);
+    expect(nextWordButton.y).toBe(closeButton.y);
+    for (const game of gameCards) expect(game.y + game.h).toBeLessThanOrEqual(shareButton.y - 16);
+  });
+
   it("puts every game's Hint button in the top-left corner of the play area", () => {
     expect(frame.hintButton).toEqual({ x: frame.play.x, y: frame.play.y, w: 130, h: 96 });
   });

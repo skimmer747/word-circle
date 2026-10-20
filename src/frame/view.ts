@@ -1,7 +1,7 @@
 import type { ClockFace, UpcomingEvent } from '../clock/clock';
 import { el, place } from '../ui/dom';
 import { fitFontScale } from '../ui/fit';
-import { ARROW_ICON, CHECK_ICON, CLOCK_ICON, CLOSE_ICON, EVENT_ICON, GAMES_ICON, SHARE_ICON } from '../ui/icons';
+import { ARROW_ICON, CHECK_ICON, CLOCK_ICON, CLOSE_ICON, EVENT_ICON, GAMES_ICON, SHARE_ICON, STAR_ICON } from '../ui/icons';
 import type { GameId } from './games';
 import type { FrameLayout } from './layout';
 
@@ -85,6 +85,8 @@ const GAME_PICTURES: Record<GameId, string> = {
 export class FrameView {
   /** The game on screen draws itself in here. */
   readonly gameLayer: HTMLElement;
+  /** Her stats pop-up draws itself in here. */
+  readonly statsLayer: HTMLElement;
   private readonly corner: HTMLElement;
   private readonly celebrate: HTMLElement;
   private readonly clockPopup: HTMLElement;
@@ -98,19 +100,18 @@ export class FrameView {
     this.celebrate = el('div', 'celebrate', root);
     this.clockPopup = el('div', 'clock-popup', root);
     this.gamesPopup = el('div', 'games-popup', root);
+    this.statsLayer = el('div', 'stats-layer', root);
     this.rotate = el('div', 'rotate', root);
     this.rotate.innerHTML = `${SIDEWAYS_IPAD}<div>Please turn the iPad sideways</div>`;
   }
 
-  /** The Games button (only with more than one game) and the Clock button in the top-right corner. */
-  renderCorner(layout: FrameLayout, showGames: boolean): void {
+  /** The Games button (or, with one game, a Stats button) and the Clock button in the top-right corner. */
+  renderCorner(layout: FrameLayout, corner: 'games' | 'stats'): void {
     this.corner.replaceChildren();
-    if (showGames) {
-      const games = el('button', 'games-button', this.corner);
-      games.type = 'button';
-      games.innerHTML = `${GAMES_ICON}<span>Games</span>`;
-      place(games, layout.gamesButton);
-    }
+    const left = el('button', 'games-button', this.corner);
+    left.type = 'button';
+    left.innerHTML = corner === 'games' ? `${GAMES_ICON}<span>Games</span>` : `${STAR_ICON}<span>Stats</span>`;
+    place(left, layout.gamesButton);
     const clock = el('button', 'clock-button', this.corner);
     clock.type = 'button';
     clock.setAttribute('aria-label', 'Clock');
@@ -202,6 +203,9 @@ export class FrameView {
     const close = el('button', 'next close', this.gamesPopup);
     close.type = 'button';
     close.innerHTML = `${CLOSE_ICON}<span>Close</span>`;
+    const stats = el('button', 'next stats', this.gamesPopup);
+    stats.type = 'button';
+    stats.innerHTML = `${STAR_ICON}<span>Your stats</span>`;
     this.gamesPopup.classList.add('visible');
     this.placeGames(layout);
   }
@@ -216,8 +220,10 @@ export class FrameView {
     const card = this.gamesPopup.querySelector<HTMLElement>('.games-card');
     if (card) place(card, layout.card);
     this.gamesPopup.querySelectorAll<HTMLElement>('.game-choice').forEach((choice, i) => place(choice, layout.gameCards[i]));
-    const close = this.gamesPopup.querySelector<HTMLElement>('.next');
-    if (close) place(close, layout.closeButton);
+    const close = this.gamesPopup.querySelector<HTMLElement>('.close');
+    if (close) place(close, layout.shareButton);
+    const stats = this.gamesPopup.querySelector<HTMLElement>('.stats');
+    if (stats) place(stats, layout.nextWordButton);
   }
 
   hideGames(): void {

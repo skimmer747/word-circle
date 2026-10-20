@@ -6,7 +6,9 @@ import { dayKey, recordPlayDay as countPlayDay, type PlayDays } from '../shared/
 import { wellDoneTitle } from '../settings/name';
 import type { ScheduleSetting } from '../settings/settings';
 import type { KeyValueStore } from '../shared/store';
-import { addPlay, type PlayRecord } from '../stats/log';
+import { CARD_COUNT, herStats, loadSeen, saveSeen, seenAfter, type HerStats, type HerStatsInput } from '../stats/her-stats';
+import { HerStatsView } from '../stats/her-view';
+import { addPlay, loadLifetime, loadLog, type PlayRecord } from '../stats/log';
 import type { FrameHost, GameId, GameScreen, GameTargets } from './games';
 import { computeFrameLayout, type FrameLayout, type Thumb } from './layout';
 import { loadSavedFrame, saveSavedFrame, type SavedFrame } from './storage';
@@ -24,6 +26,8 @@ const SCHEDULE_REFRESH_MS = 5 * 60_000;
 const HOLD_OPEN_MS = 3000;
 /** ...and a ring starts filling around it after this long, so a quick tap looks just as before. */
 const HOLD_RING_MS = 500;
+/** Her stats close by themselves after this long untouched. */
+const STATS_OPEN_MS = 120_000;
 
 /** What this iPad's settings tell the frame. */
 export interface FrameOptions {
@@ -70,6 +74,12 @@ export class Frame implements FrameHost {
   private settingsOpen = false;
   private holdRing = 0;
   private holdOpen = 0;
+  private statsOpen = false;
+  private statsCard = 0;
+  private statsAutoClose = 0;
+  private statsInput: HerStatsInput | null = null;
+  private stats: HerStats | null = null;
+  private readonly statsView: HerStatsView;
   private readonly view: FrameView;
   private readonly tracer: LetterTracer;
 
@@ -83,6 +93,7 @@ export class Frame implements FrameHost {
     private readonly options: FrameOptions,
   ) {
     this.view = new FrameView(root);
+    this.statsView = new HerStatsView(this.view.statsLayer);
     this.game = games[0];
     this.saved = { current: games[0].id, ...seed };
     this.tracer = new LetterTracer({
@@ -180,6 +191,10 @@ export class Frame implements FrameHost {
     else if (id === 'games') this.openGames();
     else if (id === 'games-close') this.closeGames();
     else if (id.startsWith('game:')) this.chooseGame(id.slice('game:'.length) as GameId);
+    else if (id === 'stats') this.openStats();
+    else if (id === 'games-stats') this.openStatsFromGames();
+    else if (id === 'stats-next') this.nextStatsCard();
+    else if (id === 'stats-close') this.closeStats();
     else this.game.buttonTapped(id);
   }
 
@@ -188,6 +203,7 @@ export class Frame implements FrameHost {
     return (
       this.celebration !== null ||
       this.settingsOpen ||
+      this.statsOpen ||
       this.clockOpen ||
       this.gamesOpen ||
       this.game.busy ||
@@ -238,6 +254,56 @@ export class Frame implements FrameHost {
     saveSavedFrame(this.store, this.saved);
     this.relayout(true);
     this.game.resume();
+  }
+
+  private openStatsFromGames(): void {
+    this.closeGames();
+    this.openStats();
+  }
+
+  /** Her stats: the game pauses (looking isn't play time), and the pop-up opens on its first card. */
+  private openStats(): void {
+    if (this.blocked() || !this.layout) return;
+    this.statsOpen = true;
+    this.game.pause();
+    this.statsInput = {
+      games: this.games.map((game) => ({ id: game.id, title: game.title, ...game.summary() })),
+      streak: this.saved,
+      log: loadLog(this.store),
+      lifetime: loadLifetime(this.store),
+      today: dayKey(new Date()),
+      seen: loadSeen(this.store),
+    };
+    this.stats = herStats(this.statsInput);
+    this.statsCard = 0;
+    this.showStatsCard();
+    this.updateTouchTargets();
+  }
+
+  private showStatsCard(): void {
+    if (!this.stats || !this.statsInput || !this.layout) return;
+    this.statsView.show(this.stats, this.statsCard, this.layout);
+    // Something new is celebrated once: remember what this card showed.
+    saveSeen(this.store, seenAfter(loadSeen(this.store), this.statsInput, this.statsCard));
+    window.clearTimeout(this.statsAutoClose);
+    this.statsAutoClose = window.setTimeout(() => this.closeStats(), STATS_OPEN_MS);
+  }
+
+  private nextStatsCard(): void {
+    if (!this.statsOpen) return;
+    this.statsCard = (this.statsCard + 1) % CARD_COUNT;
+    this.showStatsCard();
+  }
+
+  private closeStats(): void {
+    if (!this.statsOpen) return;
+    window.clearTimeout(this.statsAutoClose);
+    this.statsOpen = false;
+    this.stats = null;
+    this.statsInput = null;
+    this.statsView.hide();
+    this.game.resume();
+    this.updateTouchTargets();
   }
 
   /** Picks up changes to the online schedule; keeps the last copy when offline. */
@@ -351,7 +417,7 @@ export class Frame implements FrameHost {
       if (document.hidden) {
         this.game.pause();
       } else {
-        if (!this.settingsOpen) this.game.resume();
+        if (!this.settingsOpen && !this.statsOpen) this.game.resume();
         void this.refreshSchedule();
       }
     });
@@ -374,7 +440,7 @@ export class Frame implements FrameHost {
     }
     const layout = computeFrameLayout(width, height, this.games.length, this.options.thumb);
     this.layout = layout;
-    this.view.renderCorner(layout, this.games.length > 1);
+    this.view.renderCorner(layout, this.games.length > 1 ? 'games' : 'stats');
     this.targets = this.game.render(this.view.gameLayer, layout, animateIn);
     this.updateTouchTargets();
   }
@@ -398,17 +464,23 @@ export class Frame implements FrameHost {
         : [{ id: 'next', ...layout.nextButton }];
     } else if (this.clockOpen) {
       buttons = [{ id: 'close', ...layout.closeButton }];
+    } else if (this.statsOpen) {
+      buttons = [
+        { id: 'stats-close', ...layout.shareButton },
+        { id: 'stats-next', ...layout.nextWordButton },
+      ];
     } else if (this.gamesOpen) {
       buttons = [
         ...this.games.map((game, i) => ({ id: `game:${game.id}`, ...layout.gameCards[i] })),
-        { id: 'games-close', ...layout.closeButton },
+        { id: 'games-close', ...layout.shareButton },
+        { id: 'games-stats', ...layout.nextWordButton },
       ];
     } else {
       tiles = this.targets.tiles;
       draggables = this.targets.draggables ?? [];
       buttons = [...this.targets.buttons, { id: 'clock', ...layout.clockButton }];
-      // With one game there's no Games button.
-      if (this.games.length > 1) buttons.push({ id: 'games', ...layout.gamesButton });
+      // With one game, the Games button's place holds Stats.
+      buttons.push({ id: this.games.length > 1 ? 'games' : 'stats', ...layout.gamesButton });
     }
     this.tracer.setGeometry({
       screenWidth: layout.width,
@@ -424,6 +496,7 @@ export class Frame implements FrameHost {
     if (this.celebration) this.view.placeCelebration(layout);
     if (this.clockOpen) this.view.placeClock(layout);
     if (this.gamesOpen) this.view.placeGames(layout);
+    if (this.statsOpen) this.statsView.place(layout);
     this.tracer.setEnabled(!this.settingsOpen);
   }
 }
