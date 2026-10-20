@@ -144,7 +144,7 @@ Every letter is `#141414` on white.
 
 ### Hint
 
-- Free and unlimited. Puts the right letter into the leftmost square of her current row whose letter isn't yet known to be right, replacing any letter she typed there. That letter is locked and carries down like any right-spot letter.
+- Free and unlimited. Puts the right letter into the highlighted square (the next one she would type in), keeping the letters she typed before it. When her row is full, it goes in the leftmost square whose letter isn't yet known to be right, replacing the letter she typed there. That letter is locked and carries down like any right-spot letter.
 - If the hint makes all five letters known, the word is complete: "Well done!".
 - After 2 minutes without a guess, the Hint button gently pulses every 4 seconds until she guesses or taps Hint. It never reveals anything by itself.
 
@@ -252,7 +252,7 @@ All in `localStorage`; damaged or missing data never costs her progress elsewher
 ## 9. Testing
 
 - **Unit tests (Vitest), written before the code:**
-  - `guess/rules`: colors for a guess, including repeated letters in the guess and the answer; carry-down and locking; Back skipping locked squares; hint placement, replacing a typed letter, and completing a word; key states and hidden letters; the six-row window after six guesses.
+  - `guess/rules`: colors for a guess, including repeated letters in the guess and the answer; carry-down and locking; Back skipping locked squares; hint placement (the highlighted square, or the leftmost unknown one in a full row, replacing a typed letter), and completing a word; key states and hidden letters; the six-row window after six guesses.
   - `guess/share`: six or fewer tries, more than six, finished by hint, number with comma.
   - `guess/daily`: reading the file (only today's line, bad lines skipped); when the daily word comes up; swapping only an untouched list word; never interrupting; after midnight.
   - `scripts/daily-word`: parsing a pretend NYT reply, skipping blocked or malformed words, the date range, strict mode on scheduled runs.

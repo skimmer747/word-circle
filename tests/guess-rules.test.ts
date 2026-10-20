@@ -132,7 +132,7 @@ describe('what she knows', () => {
 });
 
 describe('hints', () => {
-  it('fills the leftmost square she does not know yet, and locks it', () => {
+  it('fills the highlighted square, and locks it', () => {
     const g = game('slate', ['stare']);
     expect(g.hint()).toEqual({ position: 1, solved: false });
     expect(letters(g)).toBe('sla_e');
@@ -140,7 +140,22 @@ describe('hints', () => {
     expect(g.hinted).toEqual([1]);
   });
 
-  it('replaces a letter she typed in that square and keeps her others', () => {
+  it('fills the highlighted square after letters she typed, keeping them', () => {
+    const g = game('slate');
+    typeWord(g, 'xy');
+    expect(g.hint()).toEqual({ position: 2, solved: false });
+    expect(letters(g)).toBe('xya__');
+    expect(g.hinted).toEqual([2]);
+  });
+
+  it('skips past locked squares to the highlighted one', () => {
+    const g = game('slate', ['stare']);
+    typeWord(g, 'x');
+    expect(g.hint()).toEqual({ position: 3, solved: false });
+    expect(letters(g)).toBe('sxate');
+  });
+
+  it('when the row is full, replaces her letter in the leftmost square she does not know and keeps her others', () => {
     const g = game('slate', ['stare']);
     typeWord(g, 'xy');
     expect(letters(g)).toBe('sxaye');

@@ -145,10 +145,13 @@ export class GuessGame {
     return word === this.answer ? 'solved' : 'guessed';
   }
 
-  /** Puts the right letter in the leftmost square she doesn't know yet. Null if she knows every letter. */
+  /**
+   * Puts the right letter in the highlighted square, or, when the row is full, in the leftmost square she doesn't
+   * know yet. Null if she knows every letter.
+   */
   hint(): { position: number; solved: boolean } | null {
     const known = new Set(this.known());
-    let position = -1;
+    let position = this.nextSquare();
     for (let i = 0; i < WORD_LENGTH && position < 0; i++) if (!known.has(i)) position = i;
     if (position < 0) return null;
     this.hints = [...this.hints, position].sort((a, b) => a - b);
