@@ -148,3 +148,106 @@ export function fillShape(
   };
   return fill(0) ? letters : null;
 }
+
+/**
+ * How many ways (stopping at `limit`) the open squares can be filled with their sections' letters so that every
+ * run is a real word. Fills squares in reading order and checks every run through a square as it goes.
+ */
+export function countSolutions(
+  open: readonly boolean[],
+  size: number,
+  sectionOf: readonly number[],
+  answer: readonly string[],
+  words: PatternIndex,
+  limit = 2,
+): number {
+  const runs = findRuns(open, size);
+  const squares = openSquares(open);
+  const runsThrough = new Map(squares.map((square) => [square, runs.filter((run) => run.includes(square))]));
+  const pools = new Map<number, Map<string, number>>();
+  for (const square of squares) {
+    const pool = pools.get(sectionOf[square]) ?? new Map<string, number>();
+    pool.set(answer[square], (pool.get(answer[square]) ?? 0) + 1);
+    pools.set(sectionOf[square], pool);
+  }
+  const letters = open.map(() => '');
+  const pattern = (run: readonly number[]) => run.map((square) => letters[square] || '.').join('');
+  let count = 0;
+  const fill = (i: number): boolean => {
+    if (i === squares.length) return ++count >= limit;
+    const square = squares[i];
+    const pool = pools.get(sectionOf[square])!;
+    for (const [letter, left] of pool) {
+      if (left === 0) continue;
+      pool.set(letter, left - 1);
+      letters[square] = letter;
+      const stop = runsThrough.get(square)!.every((run) => words.has(pattern(run))) && fill(i + 1);
+      pool.set(letter, left);
+      letters[square] = '';
+      if (stop) return true;
+    }
+    return false;
+  };
+  fill(0);
+  return count;
+}
+
+function touching(a: readonly number[], b: readonly number[], size: number): boolean {
+  const inB = new Set(b);
+  return a.some((square) => neighbours(square, size).some((next) => inB.has(next)));
+}
+
+/**
+ * Splits a filled shape into sections that leave exactly one answer. Every square starts as its own section (one
+ * answer); then neighbouring sections are merged, smallest pairs first, and a merge is kept only if there is still
+ * one answer. Merging only ever adds answers, so a merge that failed once is never tried again.
+ * Returns each square's section, or -1 for a blocked square.
+ */
+export function carveSections(
+  open: readonly boolean[],
+  size: number,
+  answer: readonly string[],
+  words: PatternIndex,
+  maxSection: number,
+  random: () => number,
+): number[] {
+  let groups = openSquares(open).map((square) => [square]);
+  const failed = new Set<string>();
+  const key = (a: readonly number[], b: readonly number[]) => [...a, ...b].sort((x, y) => x - y).join(',');
+  const sectionsOf = (list: readonly number[][]) => {
+    const of = open.map(() => -1);
+    list.forEach((group, i) => group.forEach((square) => (of[square] = i)));
+    return of;
+  };
+  for (;;) {
+    const pairs: Array<[number, number]> = [];
+    for (let i = 0; i < groups.length; i++) {
+      for (let j = i + 1; j < groups.length; j++) {
+        if (groups[i].length + groups[j].length > maxSection || failed.has(key(groups[i], groups[j]))) continue;
+        if (touching(groups[i], groups[j], size)) pairs.push([i, j]);
+      }
+    }
+    if (pairs.length === 0) return sectionsOf(groups);
+    const sizeOf = ([i, j]: [number, number]) => groups[i].length + groups[j].length;
+    const smallest = Math.min(...pairs.map(sizeOf));
+    const choices = pairs.filter((pair) => sizeOf(pair) === smallest);
+    const [i, j] = choices[Math.floor(random() * choices.length)];
+    const merged = [...groups[i], ...groups[j]].sort((x, y) => x - y);
+    const next = [...groups.filter((_, k) => k !== i && k !== j), merged];
+    if (countSolutions(open, size, sectionsOf(next), answer, words) === 1) groups = next;
+    else failed.add(key(groups[i], groups[j]));
+  }
+}
+
+/** A puzzle as stored: sections lettered a, b, c… in order of first appearance. */
+export function encodePuzzle(size: number, answer: readonly string[], sectionOf: readonly number[]): GridPuzzle {
+  const names = new Map<number, string>();
+  const sections = sectionOf
+    .map((section) => {
+      if (section < 0) return '.';
+      if (!names.has(section)) names.set(section, String.fromCharCode(97 + names.size));
+      return names.get(section)!;
+    })
+    .join('');
+  return { size, cells: answer.map((letter) => letter || '.').join(''), sections };
+}

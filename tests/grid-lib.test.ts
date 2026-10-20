@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildGridWordLists,
+  carveSections,
+  countSolutions,
+  encodePuzzle,
   fillShape,
   PatternIndex,
   randomShape,
   shapeProblems,
   TWO_LETTER_ANSWERS,
 } from '../scripts/grid-lib';
-import { findRuns } from '../src/grid/puzzle';
+import { findRuns, readPuzzle } from '../src/grid/puzzle';
 import { seededRandom } from '../src/shared/random';
 
 /** "#" is an open square, "." a blocked one. */
@@ -94,5 +97,57 @@ describe('filling a shape', () => {
     expect(letters).not.toBeNull();
     const spelled = findRuns(open, 4).map((run) => run.map((s) => letters![s]).join(''));
     expect(spelled.sort()).toEqual([...words].sort());
+  });
+});
+
+/**
+ * A 2×2 box, "ab / cd": ab, cd across and ac, bd down. With one section per column (a and c, b and d), flipping
+ * both columns gives "cd / ab", which also works when ca and db are words.
+ */
+const ALL_OPEN = [true, true, true, true];
+const ABCD = ['a', 'b', 'c', 'd'];
+const COLUMNS = [0, 1, 0, 1];
+const ONE_WAY = new PatternIndex(['ab', 'cd', 'ac', 'bd']);
+const TWO_WAYS = new PatternIndex(['ab', 'cd', 'ac', 'bd', 'ca', 'db']);
+
+describe('counting answers', () => {
+  it('finds one answer when only one arrangement spells words', () => {
+    expect(countSolutions(ALL_OPEN, 2, COLUMNS, ABCD, ONE_WAY)).toBe(1);
+  });
+
+  it('finds two answers when the letters can be swapped around', () => {
+    expect(countSolutions(ALL_OPEN, 2, COLUMNS, ABCD, TWO_WAYS)).toBe(2);
+  });
+
+  it('finds one answer when every square is its own section', () => {
+    expect(countSolutions(ALL_OPEN, 2, [0, 1, 2, 3], ABCD, TWO_WAYS)).toBe(1);
+  });
+
+  it('stops counting at the limit', () => {
+    expect(countSolutions(ALL_OPEN, 2, COLUMNS, ABCD, TWO_WAYS, 1)).toBe(1);
+  });
+});
+
+describe('carving sections', () => {
+  it('merges sections as far as it can while there is still one answer', () => {
+    const sectionOf = carveSections(ALL_OPEN, 2, ABCD, TWO_WAYS, 4, seededRandom(1));
+    expect(countSolutions(ALL_OPEN, 2, sectionOf, ABCD, TWO_WAYS)).toBe(1);
+    expect(new Set(sectionOf).size).toBe(2);
+  });
+
+  it('never makes a section bigger than the limit', () => {
+    const open = shapeOf(['####', '##.#', '####', '##.#']);
+    const answer = [...'gnatno.aantswe.k'].map((ch) => (ch === '.' ? '' : ch));
+    const words = new PatternIndex(['gnat', 'no', 'ants', 'we', 'gnaw', 'none', 'task']);
+    const sectionOf = carveSections(open, 4, answer, words, 3, seededRandom(2));
+    const shape = readPuzzle(encodePuzzle(4, answer, sectionOf));
+    expect(Math.max(...shape.sections.map((s) => s.length))).toBeLessThanOrEqual(3);
+    expect(countSolutions(open, 4, sectionOf, answer, words)).toBe(1);
+  });
+});
+
+describe('storing a puzzle', () => {
+  it('letters its sections a, b, c… in order of first appearance', () => {
+    expect(encodePuzzle(2, ['a', 'b', '', 'd'], [5, 2, -1, 2])).toEqual({ size: 2, cells: 'ab.d', sections: 'ab.b' });
   });
 });
