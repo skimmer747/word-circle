@@ -57,7 +57,7 @@ Add a third game to the Word Circle site: **Word Grid**, our own big-print versi
 | Tray tile already placed | dashed border, tile and letter at 35% |
 | Tile being dragged | follows the finger at 110% size, orange border plus orange ring (like a selected Word Circle tile) |
 | Not-a-word squiggle | soft pink `#D9577F`, 6 px wavy line at 80% through the run's squares |
-| Finished word | 5 px green `#2E9E4F` border on its squares |
+| Finished word | 5 px green `#2E9E4F` border and the light green fill Word Guess uses, on its squares |
 | Level buttons / Hint | white; level buttons 3 px gray border, current one 6 px purple `#6A4FB3` plus check; Hint 5 px gold `#B8860B` border and icon |
 
 ## 2. How Word Grid plays
@@ -157,7 +157,7 @@ The **solver** fills squares in reading order with letters from each square's se
   - `src/data/grid-words.json`: `{ "words": [...] }`, every real word, sorted.
   - Both are committed, like Word Circle's puzzles. It takes a few minutes; `npm run puzzles` is unchanged.
 - **Build checks** (the script fails on any): a second solver, written independently (section by section, trying each arrangement of a section's letters), finds exactly one answer for every puzzle, and it's the stored one; every run of every puzzle is an answer word and none repeats; every section is connected, 1 to the level's biggest size, with at most one one-letter section; shapes follow the rules above; no puzzle appears twice in a level; at least 400 puzzles per level.
-- **Review page:** `docs/puzzle-sample.html` gains a Word Grid section, written by the same script, drawing the first 20 puzzles of each level (solved, with sections outlined) and listing every answer word used, so the owner can skim and blocklist any. After blocklisting, run `npm run grid-puzzles` again.
+- **Review page:** `docs/grid-sample.html` (its own page, so the two puzzle scripts never overwrite each other's), written by the same script, drawing the first 20 puzzles of each level (solved, with sections outlined) and listing every answer word used, so the owner can skim and blocklist any. After blocklisting, run `npm run grid-puzzles` again.
 - **Order:** each level plays its list in order and wraps to the start after the last puzzle.
 
 ## 4. Structure
