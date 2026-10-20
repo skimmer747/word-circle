@@ -1,6 +1,7 @@
 import type { Rect } from '../frame/layout';
 import { el, place, restartAnimation, wait } from '../ui/dom';
 import { BACK_ICON, CHECK_ICON, ENTER_ICON, HINT_ICON, KEYBOARD_ICON, NEWS_ICON, SHARE_ICON } from '../ui/icons';
+import { flyHintStar, landHintLetter } from '../ui/hint-star';
 import type { GuessLayout } from './layout';
 import type { KeyState, Mark } from './rules';
 
@@ -111,6 +112,18 @@ export class GuessView {
   popSquare(row: number, col: number): void {
     const square = this.squares[row]?.[col];
     if (square) restartAnimation(square, 'pop');
+  }
+
+  /** The hint star flies from Hint to the square. Resolves when it lands. */
+  async flyStar(row: number, col: number): Promise<void> {
+    const square = this.squares[row]?.[col];
+    if (this.hintButton && square) await flyHintStar(this.hintButton, square);
+  }
+
+  /** The hinted letter lands in its square with a bounce. */
+  landSquare(row: number, col: number): void {
+    const square = this.squares[row]?.[col];
+    if (square) landHintLetter(square);
   }
 
   /** One gentle wiggle: the row isn't full, or isn't a word she can use. */

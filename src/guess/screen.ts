@@ -50,6 +50,8 @@ export class GuessScreen implements GameScreen {
   private layout: GuessLayout | null = null;
   private dailyWords: DailyWord[] = [];
   private allLetters = false;
+  /** While the hint star flies: the square it's flying to (hidden until it lands), and how many guesses she had. */
+  private hiddenHint: { guesses: number; position: number } | null = null;
   private shown = false;
   private idleTimer = 0;
   private timer = new PlayTimer();
@@ -99,7 +101,7 @@ export class GuessScreen implements GameScreen {
   buttonTapped(id: string): void {
     if (this.busy) return;
     if (id.startsWith('key:')) this.key(id.slice('key:'.length));
-    else if (id === 'hint') this.hint();
+    else if (id === 'hint') void this.hint();
     else if (id === 'all-letters') this.toggleAllLetters();
     else if (id === 'share-today') this.shareToday();
   }
@@ -210,10 +212,12 @@ export class GuessScreen implements GameScreen {
 
   private currentRow(): SquareView[] {
     const next = this.game.nextSquare();
-    return this.game.row.map((square, i) => ({
-      letter: square.letter,
-      look: square.locked ? 'right' : square.letter ? 'typed' : i === next ? 'cursor' : 'empty',
-    }));
+    const hidden = this.hiddenHint?.guesses === this.game.guesses.length ? this.hiddenHint.position : -1;
+    return this.game.row.map((square, i) =>
+      i === hidden
+        ? { letter: '', look: 'empty' }
+        : { letter: square.letter, look: square.locked ? 'right' : square.letter ? 'typed' : i === next ? 'cursor' : 'empty' },
+    );
   }
 
   /** Where the row she's typing sits on the board. */
@@ -260,13 +264,26 @@ export class GuessScreen implements GameScreen {
     this.busy = false;
   }
 
-  private hint(): void {
+  private async hint(): Promise<void> {
+    // One star at a time, so a double tap doesn't use two hints.
+    if (this.hiddenHint) return;
     const result = this.game.hint();
     if (!result) return;
     this.save();
     this.resetIdle();
-    this.view?.setRow(this.currentRowIndex(), this.currentRow());
+    // A hint that finishes the word: nothing more to do until "Well done!".
+    if (result.solved) this.busy = true;
+    const guesses = this.game.guesses.length;
+    const row = this.currentRowIndex();
+    this.hiddenHint = { guesses, position: result.position };
+    this.view?.setRow(row, this.currentRow());
+    await this.view?.flyStar(row, result.position);
+    this.hiddenHint = null;
     this.refreshKeys();
+    // She checked a guess while the star flew: that row already shows the letter.
+    if (this.game.guesses.length !== guesses) return;
+    this.view?.setRow(row, this.currentRow());
+    this.view?.landSquare(row, result.position);
     if (result.solved) void this.finish();
   }
 
