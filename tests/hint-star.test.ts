@@ -15,6 +15,10 @@ describe('the hint star path', () => {
     expect(starPath(box(0, 200, 130, 96), box(400, 300, 100, 100)).control).toEqual({ x: 257.5, y: 168 });
   });
 
+  it('bends above the higher end when the square is above Hint', () => {
+    expect(starPath(box(0, 700, 130, 96), box(400, 100, 100, 100)).control).toEqual({ x: 257.5, y: 70 });
+  });
+
   it('never bends above the top of the screen', () => {
     expect(starPath(HINT, box(400, 300, 100, 100)).control.y).toBe(0);
   });
@@ -31,6 +35,17 @@ describe('the sparkle burst', () => {
     expect(offsets[0].x).toBeCloseTo(60);
     expect(offsets[0].y).toBeCloseTo(0);
     for (const { x, y } of offsets) expect(Math.hypot(x, y)).toBeCloseTo(60);
+  });
+
+  it('spaces them 36 degrees apart', () => {
+    const TAU = 2 * Math.PI;
+    sparkOffsets().forEach(({ x, y }, i) => {
+      const angle = (Math.atan2(y, x) + TAU) % TAU;
+      const expected = (i * TAU) / 10;
+      // Compare around the circle so 0 and 2π count as the same angle.
+      const diff = Math.abs(angle - expected);
+      expect(Math.min(diff, TAU - diff)).toBeCloseTo(0);
+    });
   });
 });
 

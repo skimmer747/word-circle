@@ -1,4 +1,4 @@
-import { restartAnimation } from './dom';
+import { reduceMotion, wait } from './dom';
 import { STAR_ICON } from './icons';
 
 export interface Point {
@@ -26,6 +26,8 @@ const ARC_RISE = 80;
 const FLY_MS = 700;
 /** The sparkles' burst when it lands. */
 const BURST_MS = 400;
+/** The hinted letter's bounce when it lands. */
+const LAND_MS = 400;
 const SPARKS = 10;
 const SPARK_REACH = 60;
 
@@ -52,18 +54,15 @@ export function sparkOffsets(count = SPARKS, reach = SPARK_REACH): Point[] {
   });
 }
 
-/** The iPad's Reduce Motion setting. */
-export function reduceMotion(): boolean {
-  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
 /**
  * A gold star flies from the Hint button to the square, spinning, then bursts into sparkles.
  * Resolves when the star lands (the sparkles finish by themselves). With Reduce Motion, resolves at once.
  */
 export async function flyHintStar(from: HTMLElement, to: HTMLElement): Promise<void> {
   if (reduceMotion()) return;
-  restartAnimation(from, 'tapped');
+  // Older iPads (iPadOS 15) can't fly an element along a path: skip the star there.
+  if (typeof CSS === 'undefined' || !CSS.supports('offset-path', 'path("M 0 0")')) return;
+  from.animate([{ transform: 'scale(1)' }, { transform: 'scale(0.9)' }, { transform: 'scale(1)' }], { duration: 200, easing: 'ease-out' });
   const path = starPath(from.getBoundingClientRect(), to.getBoundingClientRect());
   const layer = document.createElement('div');
   layer.className = 'hint-star-layer';
@@ -74,18 +73,16 @@ export async function flyHintStar(from: HTMLElement, to: HTMLElement): Promise<v
   star.innerHTML = STAR_ICON;
   star.style.setProperty('offset-path', `path("${starPathD(path)}")`);
   layer.appendChild(star);
-  try {
-    await star.animate(
-      [
-        { offsetDistance: '0%', transform: 'scale(0.6) rotate(0turn)' },
-        { offsetDistance: '50%', transform: 'scale(1.3) rotate(0.5turn)' },
-        { offsetDistance: '100%', transform: 'scale(1) rotate(1turn)' },
-      ],
-      { duration: FLY_MS, easing: 'ease-in-out' },
-    ).finished;
-  } catch {
-    // Cancelled (the page was hidden or torn down): land anyway.
-  }
+  const flight = star.animate(
+    [
+      { offsetDistance: '0%', transform: 'scale(0.6) rotate(0turn)' },
+      { offsetDistance: '50%', transform: 'scale(1.3) rotate(0.5turn)' },
+      { offsetDistance: '100%', transform: 'scale(1) rotate(1turn)' },
+    ],
+    { duration: FLY_MS, easing: 'ease-in-out', fill: 'forwards' },
+  );
+  // A cancelled flight rejects, and a page in the background may never finish it: land anyway.
+  await Promise.race([flight.finished.catch(() => undefined), wait(FLY_MS + 250)]);
   star.remove();
 
   const { end } = path;
@@ -102,4 +99,10 @@ export async function flyHintStar(from: HTMLElement, to: HTMLElement): Promise<v
     );
   }
   window.setTimeout(() => layer.remove(), BURST_MS);
+}
+
+/** The hinted letter lands with a bounce (a small pop with Reduce Motion). Pass the element that shows the letter. */
+export function landHintLetter(letter: HTMLElement): void {
+  if (reduceMotion()) letter.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 150, easing: 'ease-out' });
+  else letter.animate([{ transform: 'scale(0.4)' }, { transform: 'scale(1.25)', offset: 0.6 }, { transform: 'scale(1)' }], { duration: LAND_MS, easing: 'ease-out' });
 }

@@ -21,4 +21,9 @@ export function restartAnimation(node: HTMLElement, className: string): void {
   node.classList.add(className);
 }
 
+/** True when the iPad is set to Reduce Motion. */
+export function reduceMotion(): boolean {
+  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 export const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));

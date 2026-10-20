@@ -1,5 +1,5 @@
 import type { FrameLayout } from '../frame/layout';
-import { el, place } from '../ui/dom';
+import { el, place, reduceMotion } from '../ui/dom';
 import {
   ARROW_ICON,
   CALENDAR_ICON,
@@ -20,11 +20,6 @@ const CONFETTI_PIECES = 40;
 const COUNT_UP_MS = 1500;
 /** Her longest word's tiles are at most this many card-height percent wide (smaller for a long word). */
 const TILE_UNITS = 12;
-
-/** True when the iPad is set to Reduce Motion: then nothing moves. */
-function reducedMotion(): boolean {
-  return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
 
 function title(card: HTMLElement, text: string): void {
   el('div', 'stats-title', card).textContent = text;
@@ -194,7 +189,7 @@ export class HerStatsView {
     next.innerHTML = `<span>Next</span>${ARROW_ICON}`;
     this.root.classList.add('visible');
     this.place(layout);
-    if (reducedMotion()) return;
+    if (reduceMotion()) return;
     if (index === 0) this.countUpTo(card, stats.total.value);
     const isNew = [stats.total.isNew, false, stats.bests.isNew, false, stats.facts.wordIsNew][index];
     if (isNew) confetti(card);
