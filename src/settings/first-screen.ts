@@ -1,6 +1,7 @@
 /** The parts of `window` this reads, so tests can pass a stand-in. */
 export interface InstallWindow {
-  navigator: { standalone?: boolean };
+  /** iPad Safari adds `standalone` to it (true in a Home Screen app); other browsers don't have it. */
+  navigator: object;
   matchMedia(query: string): { matches: boolean };
 }
 
@@ -8,7 +9,8 @@ export interface InstallWindow {
 export function isInstalled(win: InstallWindow): boolean {
   try {
     // iPad Safari's Home Screen apps say so on navigator; other browsers through the display mode.
-    return win.navigator.standalone === true || win.matchMedia('(display-mode: standalone)').matches;
+    const { standalone } = win.navigator as { standalone?: unknown };
+    return standalone === true || win.matchMedia('(display-mode: standalone)').matches;
   } catch {
     return false;
   }

@@ -17,6 +17,7 @@ The buttons are in the same places in every game: **Hint** at the top left (with
 
 Hold the clock button for 3 seconds to open the settings page: her name, which thumb rests on the screen, which games show, the starting level, Word Guess's Share button, her schedule and words to avoid. **Done** saves and restarts the app; nothing she's played is lost.
 A new iPad shows this page the first time. Mom's iPad skipped it and still reads its schedule from `public/schedule.txt` (below); every other iPad keeps its schedule on the iPad itself.
+For another family, just send them the link https://skimmer747.github.io/word-circle/. Opened in Safari on their iPad, it tells them to add it to the Home Screen first, then asks its setup questions when they open it from there.
 
 ## Commands
 

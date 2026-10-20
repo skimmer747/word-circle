@@ -14,8 +14,10 @@ import type { GridPuzzleSet, GridWords } from './grid/types';
 import { GuessScreen } from './guess/screen';
 import type { GuessWords } from './guess/words';
 import { setupUpdates } from './pwa';
+import { firstScreen, isInstalled } from './settings/first-screen';
 import { openSettingsPage } from './settings/page';
 import { loadSettings, saveSettings, type Settings } from './settings/settings';
+import { openWelcomePage } from './settings/welcome';
 import { avoidChecker } from './shared/avoid';
 
 const root = document.getElementById('app');
@@ -89,8 +91,8 @@ function startApp(settings: Settings): void {
 }
 
 const { settings, firstTime } = loadSettings(store);
-if (firstTime) {
-  // Start playing goes straight in (no reload), so an iPad that can't save still gets to play.
+// Start playing goes straight in (no reload), so an iPad that can't save still gets to play.
+const firstSetup = () =>
   showSettings(
     settings,
     true,
@@ -100,6 +102,7 @@ if (firstTime) {
     },
     () => {},
   );
-} else {
-  startApp(settings);
-}
+const screen = firstScreen({ firstTime, installed: isInstalled(window) });
+if (screen === 'welcome') openWelcomePage(root, { setUpHere: firstSetup });
+else if (screen === 'setup') firstSetup();
+else startApp(settings);
