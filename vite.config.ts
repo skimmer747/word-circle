@@ -22,7 +22,8 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,woff2,png,ico,svg}'],
+        // Jigsaw's starter pictures and their list are kept on the iPad, so they work without Wi-Fi.
+        globPatterns: ['**/*.{js,css,html,woff2,png,ico,svg}', 'jigsaw/*.{jpg,json}'],
       },
     }),
   ],

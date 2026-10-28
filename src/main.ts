@@ -12,6 +12,8 @@ import type { GameId, GameScreen } from './frame/games';
 import { GridScreen } from './grid/screen';
 import type { GridPuzzleSet, GridWords } from './grid/types';
 import { GuessScreen } from './guess/screen';
+import { loadStarters } from './jigsaw/pictures';
+import { JigsawScreen } from './jigsaw/screen';
 import type { GuessWords } from './guess/words';
 import { startAnalytics } from './analytics';
 import { setupUpdates } from './pwa';
@@ -75,6 +77,7 @@ function startApp(settings: Settings): void {
     circle: () => new CircleScreen(puzzleData as PuzzleSet, store, { startLevel: settings.startLevel, avoided }),
     guess: () => new GuessScreen(guessWords as GuessWords, store, { fetchDaily, share: settings.share ? share : null, avoided }),
     grid: () => new GridScreen(gridPuzzles as GridPuzzleSet, gridWords as GridWords, store, { startLevel: settings.startLevel, avoided }),
+    jigsaw: () => new JigsawScreen(store, { loadPictures: () => loadStarters(import.meta.env.BASE_URL) }),
   };
   frame = new Frame(root!, store, updates, settings.games.map((id) => makers[id]()), loadSavedGame(store).stats, {
     name: settings.name,
