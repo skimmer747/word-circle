@@ -114,7 +114,7 @@ export class Frame implements FrameHost {
       buttonPressed: (id) => this.game.buttonPressed?.(id),
       buttonReleased: (id) => this.game.buttonReleased?.(id),
       scrolled: (id, dy) => this.scrolled(id, dy),
-      dragStarted: (id) => this.game.dragStarted?.(id),
+      dragStarted: (id, x, y) => this.game.dragStarted?.(id, x, y),
       dragMoved: (id, x, y) => this.game.dragMoved?.(id, x, y),
       dragEnded: (id, x, y) => this.game.dragEnded?.(id, x, y),
       dragCancelled: (id) => this.game.dragCancelled?.(id),

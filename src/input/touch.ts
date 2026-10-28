@@ -51,8 +51,8 @@ export interface TracerCallbacks {
   holdEnded?(id: string): void;
   /** A scrolling finger moved; `dy` is positive when it moved up, to show what is further down. */
   scrolled?(id: string, dy: number): void;
-  /** A finger on a draggable moved far enough to pick it up... */
-  dragStarted?(id: string): void;
+  /** A finger on a draggable moved far enough to pick it up (x, y: where it first came down, screen px)... */
+  dragStarted?(id: string, x: number, y: number): void;
   /** ...moved (screen px)... */
   dragMoved?(id: string, x: number, y: number): void;
   /** ...and lifted there. */
@@ -204,7 +204,7 @@ export class LetterTracer {
     if (!drag.started) {
       if (Math.hypot(x - drag.x, y - drag.y) <= DRAG_START_DISTANCE) return;
       drag.started = true;
-      this.callbacks.dragStarted?.(drag.target);
+      this.callbacks.dragStarted?.(drag.target, drag.x, drag.y);
     }
     this.callbacks.dragMoved?.(drag.target, x, y);
   }

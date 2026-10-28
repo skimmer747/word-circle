@@ -445,7 +445,7 @@ describe('dragging letters', () => {
       wordSubmitted: () => events.push('submit'),
       selectionCleared: () => events.push('clear'),
       buttonTapped: (id) => events.push(`tap ${id}`),
-      dragStarted: (id) => events.push(`start ${id}`),
+      dragStarted: (id, x, y) => events.push(`start ${id} ${x},${y}`),
       dragMoved: (id, x, y) => events.push(`move ${id} ${x},${y}`),
       dragEnded: (id, x, y) => events.push(`drop ${id} ${x},${y}`),
       dragCancelled: (id) => events.push(`cancel ${id}`),
@@ -472,7 +472,7 @@ describe('dragging letters', () => {
     send('move', 1, 445, 90);
     send('move', 1, 550, 350);
     send('up', 1, 550, 350);
-    expect(events).toEqual(['start tray:0', 'move tray:0 445,90', 'move tray:0 550,350', 'drop tray:0 550,350']);
+    expect(events).toEqual(['start tray:0 445,65', 'move tray:0 445,90', 'move tray:0 550,350', 'drop tray:0 550,350']);
   });
 
   it('picks up a letter from a square', () => {
@@ -480,7 +480,7 @@ describe('dragging letters', () => {
     send('down', 1, 550, 350);
     send('move', 1, 650, 350);
     send('up', 1, 650, 350);
-    expect(events).toEqual(['start square:5', 'move square:5 650,350', 'drop square:5 650,350']);
+    expect(events).toEqual(['start square:5 550,350', 'move square:5 650,350', 'drop square:5 650,350']);
   });
 
   it('says it is dragging while a finger holds a letter', () => {
@@ -503,7 +503,7 @@ describe('dragging letters', () => {
     send('down', 1, 445, 65);
     send('move', 1, 1100, 300);
     send('up', 1, 1100, 300);
-    expect(events).toEqual(['start tray:0', 'move tray:0 1100,300', 'drop tray:0 1100,300']);
+    expect(events).toEqual(['start tray:0 445,65', 'move tray:0 1100,300', 'drop tray:0 1100,300']);
   });
 
   it('ignores a letter touched from inside a safe zone', () => {
@@ -522,7 +522,7 @@ describe('dragging letters', () => {
     send('down', 2, 280, 350);
     send('up', 2, 280, 350);
     send('up', 1, 445, 120);
-    expect(events).toEqual(['start tray:0', 'move tray:0 445,120', 'drop tray:0 445,120']);
+    expect(events).toEqual(['start tray:0 445,65', 'move tray:0 445,120', 'drop tray:0 445,120']);
   });
 
   it('drags while her thumb rests in the safe zone', () => {
@@ -531,7 +531,7 @@ describe('dragging letters', () => {
     send('down', 1, 445, 65);
     send('move', 1, 445, 120);
     send('up', 1, 445, 120);
-    expect(events).toEqual(['start tray:0', 'move tray:0 445,120', 'drop tray:0 445,120']);
+    expect(events).toEqual(['start tray:0 445,65', 'move tray:0 445,120', 'drop tray:0 445,120']);
   });
 
   it('cancels a drag when the iPad cancels the touch or the screen changes under it', () => {
@@ -544,10 +544,10 @@ describe('dragging letters', () => {
     tracer.setGeometry(DRAG_GEOMETRY);
     send('up', 2, 445, 120);
     expect(events).toEqual([
-      'start tray:0',
+      'start tray:0 445,65',
       'move tray:0 445,120',
       'cancel tray:0',
-      'start tray:0',
+      'start tray:0 445,65',
       'move tray:0 445,120',
       'cancel tray:0',
     ]);

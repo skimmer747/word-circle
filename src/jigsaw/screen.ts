@@ -37,7 +37,9 @@ interface Held {
   id: number;
   ids: number[];
   starts: Rect[];
-  /** Set on the first move. */
+  /** Where her finger first came down. */
+  down: Point;
+  /** Where her finger is on the first piece's body; set on the first move. */
   grab: Point | null;
   fromTray: boolean;
 }
@@ -129,7 +131,7 @@ export class JigsawScreen implements GameScreen {
   }
 
   /** She picked a piece up. Its targets wait until she lets go: new targets now would cancel the drag. */
-  dragStarted(id: string): void {
+  dragStarted(id: string, x: number, y: number): void {
     const game = this.game;
     if (this.busy || !game || !this.view || this.mode !== 'puzzle' || !id.startsWith('piece:')) return;
     const piece = Number(id.slice('piece:'.length));
@@ -139,7 +141,7 @@ export class JigsawScreen implements GameScreen {
     const starts = ids.map((p) => spots.find((s) => s.id === p)?.body);
     if (starts.some((s) => !s)) return;
     this.lifted = null;
-    this.held = { id: piece, ids, starts: starts as Rect[], grab: null, fromTray: game.tray.includes(piece) };
+    this.held = { id: piece, ids, starts: starts as Rect[], down: { x, y }, grab: null, fromTray: game.tray.includes(piece) };
     this.view.hold(ids);
   }
 
@@ -148,12 +150,13 @@ export class JigsawScreen implements GameScreen {
     if (!held || !this.view) return;
     if (!held.grab) {
       const first = held.starts[0];
-      // A piece from the tray grows to full size under her finger; anything else keeps its place under her finger.
+      // A piece from the tray grows to full size under her finger; anything else stays held where she touched it
+      // (the finger has already moved a little before a drag starts).
       if (held.fromTray) {
         held.starts[0] = { ...first, x: x - first.w / 2, y: y - first.h / 2 };
         held.grab = { x: first.w / 2, y: first.h / 2 };
       } else {
-        held.grab = { x: x - first.x, y: y - first.y };
+        held.grab = { x: held.down.x - first.x, y: held.down.y - first.y };
       }
     }
     this.view.moveHeld(this.heldBodies(held, x, y));

@@ -74,8 +74,8 @@ export interface GameScreen {
   letterRemoved?(): void;
   selectionCleared?(): void;
   wordSubmitted?(tiles: readonly number[]): void;
-  /** She picked up a draggable letter... */
-  dragStarted?(id: string): void;
+  /** She picked up a draggable letter (or piece), her finger having first come down at x, y... */
+  dragStarted?(id: string, x: number, y: number): void;
   /** ...moved it... */
   dragMoved?(id: string, x: number, y: number): void;
   /** ...and let go there. */
