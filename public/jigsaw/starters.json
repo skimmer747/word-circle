@@ -16,5 +16,11 @@
     "file": "lake-minnehaha.jpg",
     "thumb": "lake-minnehaha.thumb.jpg",
     "caption": "Lake Minnehaha"
+  },
+  {
+    "id": "sand-hill-cranes",
+    "file": "sand-hill-cranes.jpg",
+    "thumb": "sand-hill-cranes.thumb.jpg",
+    "caption": "Sand Hill Cranes"
   }
 ]
