@@ -43,7 +43,7 @@ export function slug(file: string): string {
   const name = file
     .replace(/\.[^.]+$/, '')
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/['’]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
