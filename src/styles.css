@@ -2163,3 +2163,142 @@ body {
   background: #ece6fb;
   border-color: var(--shuffle);
 }
+
+/* Jigsaw */
+.button.pictures {
+  border-color: var(--shuffle);
+}
+
+.button.pictures svg {
+  color: var(--shuffle);
+}
+
+.jigsaw-board {
+  position: absolute;
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--grid-line);
+}
+
+.jigsaw-faint {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+}
+
+.jigsaw-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.jigsaw-lines path {
+  fill: none;
+  stroke: #fff;
+  stroke-opacity: 0.8;
+  stroke-width: 1.5;
+}
+
+.jigsaw-lid {
+  position: absolute;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.piece {
+  position: absolute;
+  transform-origin: center;
+  transition:
+    left 250ms ease,
+    top 250ms ease,
+    transform 250ms ease;
+}
+
+.piece canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.piece.tray,
+.piece.loose,
+.piece.table {
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
+}
+
+.piece.held {
+  z-index: 1000 !important;
+  transition: transform 150ms ease;
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.4));
+}
+
+.piece.lifted {
+  filter: drop-shadow(0 0 4px var(--select)) drop-shadow(0 0 4px var(--select));
+}
+
+.piece.pop {
+  animation: piece-pop 300ms ease-out;
+}
+
+.piece.wiggle {
+  animation: piece-wiggle 400ms ease-in-out;
+}
+
+@keyframes piece-pop {
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes piece-wiggle {
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+.jigsaw-star-target {
+  position: absolute;
+  pointer-events: none;
+}
+
+.jigsaw-photo {
+  position: absolute;
+  z-index: 1001;
+  opacity: 0;
+  border-radius: 4px;
+  transition:
+    opacity 600ms ease,
+    left 500ms ease,
+    top 500ms ease,
+    width 500ms ease,
+    height 500ms ease;
+}
+
+.jigsaw-photo.shown {
+  opacity: 1;
+}
+
+.board.jigsaw.done .tray,
+.board.jigsaw.done .level,
+.board.jigsaw.done .jigsaw-board,
+.board.jigsaw.done .jigsaw-lid {
+  visibility: hidden;
+}
+
+.jigsaw-caption {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 34px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--ink);
+  animation: grid-fade-in 400ms ease-out;
+}
