@@ -28,5 +28,11 @@
     "file": "rake-the-beach.jpg",
     "thumb": "rake-the-beach.thumb.jpg",
     "caption": "Rake the beach"
+  },
+  {
+    "id": "storm-is-coming",
+    "file": "storm-is-coming.jpg",
+    "thumb": "storm-is-coming.thumb.jpg",
+    "caption": "Storm is coming"
   }
 ]
