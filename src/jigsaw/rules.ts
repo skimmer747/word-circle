@@ -199,12 +199,98 @@ export class JigsawGame {
     this.looseMap.delete(id);
   }
 
-  // Table style: Task 7.
-  private dropOnTable(_id: number, _at: Point): DropResult {
-    return 'moved';
+  private dropOnTable(id: number, at: Point): DropResult {
+    const group = this.groupOf(id);
+    const from = this.positions[id];
+    this.shift(group, at.x - from.x, at.y - from.y);
+    this.raise(group);
+    return this.joinAll(group) ? 'joined' : 'moved';
   }
 
+  /** Joins the biggest group (the lowest-numbered of the biggest) to a piece that belongs next to it. */
   private hintOnTable(): number | null {
+    const sizes = new Map<number, number>();
+    for (const group of this.groups) sizes.set(group, (sizes.get(group) ?? 0) + 1);
+    let biggest = this.groups[0];
+    for (const [group, size] of sizes) {
+      const best = sizes.get(biggest)!;
+      if (size > best || (size === best && group < biggest)) biggest = group;
+    }
+    const members = range(this.count).filter((p) => this.groups[p] === biggest);
+    for (const p of members) {
+      for (const q of this.neighbors(p)) {
+        if (this.groups[q] === biggest) continue;
+        const target = this.beside(p, q);
+        this.shift(this.groupOf(q), target.x - this.positions[q].x, target.y - this.positions[q].y);
+        this.raise(this.merge(members, this.groupOf(q)));
+        this.hints++;
+        return q;
+      }
+    }
     return null;
+  }
+
+  /** Where `q` belongs if `p` stays put. */
+  private beside(p: number, q: number): Point {
+    return {
+      x: this.positions[p].x + (q % this.cols) - (p % this.cols),
+      y: this.positions[p].y + Math.floor(q / this.cols) - Math.floor(p / this.cols),
+    };
+  }
+
+  /** The pieces above, right, below and left of `p` in the picture. */
+  private neighbors(p: number): number[] {
+    const col = p % this.cols;
+    const row = Math.floor(p / this.cols);
+    const out: number[] = [];
+    if (row > 0) out.push(p - this.cols);
+    if (col < this.cols - 1) out.push(p + 1);
+    if (row < this.rows - 1) out.push(p + this.cols);
+    if (col > 0) out.push(p - 1);
+    return out;
+  }
+
+  /** A piece of `members` and a neighbor outside the group that lies close to where it belongs. */
+  private closePair(members: readonly number[]): [number, number] | null {
+    for (const p of members) {
+      for (const q of this.neighbors(p)) {
+        if (this.groups[q] !== this.groups[p] && near(this.positions[q], this.beside(p, q), JOIN)) return [p, q];
+      }
+    }
+    return null;
+  }
+
+  /** The first join moves what she dropped onto the piece it fits; anything else that then fits is pulled in. */
+  private joinAll(dropped: number[]): boolean {
+    let members = dropped;
+    let joined = false;
+    for (let pair = this.closePair(members); pair; pair = this.closePair(members)) {
+      const [p, q] = pair;
+      const target = this.beside(p, q);
+      const other = this.groupOf(q);
+      if (joined) this.shift(other, target.x - this.positions[q].x, target.y - this.positions[q].y);
+      else this.shift(members, this.positions[q].x - target.x, this.positions[q].y - target.y);
+      members = this.merge(members, other);
+      joined = true;
+    }
+    if (joined) this.raise(members);
+    return joined;
+  }
+
+  /** One group from two; it takes the lower group number. */
+  private merge(a: readonly number[], b: readonly number[]): number[] {
+    const group = Math.min(this.groups[a[0]], this.groups[b[0]]);
+    for (const p of [...a, ...b]) this.groups[p] = group;
+    return this.groupOf(a[0]);
+  }
+
+  private shift(ids: readonly number[], dx: number, dy: number): void {
+    for (const p of ids) this.positions[p] = { x: this.positions[p].x + dx, y: this.positions[p].y + dy };
+  }
+
+  /** Brings pieces to the top, keeping their order among themselves. */
+  private raise(ids: readonly number[]): void {
+    const lifted = new Set(ids);
+    this.order = [...this.order.filter((p) => !lifted.has(p)), ...this.order.filter((p) => lifted.has(p))];
   }
 }
