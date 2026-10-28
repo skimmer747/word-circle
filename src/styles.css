@@ -2517,6 +2517,13 @@ body {
   background: #fff;
 }
 
+.new-photo-tip {
+  position: absolute;
+  font-size: 20px;
+  line-height: 1.4;
+  color: var(--label);
+}
+
 .new-photo-confirm,
 .new-photo-cancel {
   position: absolute;

@@ -190,4 +190,10 @@ describe.each(SCREENS)('the new photo page on a %ix%i iPad', (width, height) => 
     apart(right);
     expect(layout.confirm.h).toBeGreaterThanOrEqual(72);
   });
+
+  it('puts the tip under the buttons, on screen', () => {
+    expect(layout.tip.y).toBeGreaterThanOrEqual(layout.confirm.y + layout.confirm.h);
+    expect(layout.tip.y + layout.tip.h).toBeLessThanOrEqual(height);
+    apart([...right, layout.tip]);
+  });
 });

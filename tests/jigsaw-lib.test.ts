@@ -21,6 +21,16 @@ describe('framing a photo for a puzzle', () => {
     expect(cropRect(3024, 4032, { x: 0.5, y: 7 })).toMatchObject({ y: 1764 });
   });
 
+  it('zooms in by making the frame smaller, still 4:3 and inside the photo', () => {
+    expect(cropRect(2000, 1500, { x: 0.5, y: 0.25, zoom: 2 })).toEqual({ x: 500, y: 188, w: 1000, h: 750 });
+    expect(cropRect(2000, 1500, { x: 0, y: 1, zoom: 4 })).toEqual({ x: 0, y: 1125, w: 500, h: 375 });
+  });
+
+  it('never zooms out past the whole photo', () => {
+    expect(cropRect(1600, 1200, { x: 0.5, y: 0.5, zoom: 0.5 })).toEqual({ x: 0, y: 0, w: 1600, h: 1200 });
+    expect(cropRect(1600, 1200, { x: 0.5, y: 0.5, zoom: NaN })).toEqual({ x: 0, y: 0, w: 1600, h: 1200 });
+  });
+
   it('never leaves the photo sideways either', () => {
     expect(cropRect(4000, 1500, { x: -2, y: 0.5 }).x).toBe(0);
     expect(cropRect(4000, 1500, { x: 5, y: 0.5 }).x).toBe(2000);

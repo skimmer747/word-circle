@@ -221,6 +221,8 @@ const NEW_LABEL = 32;
 /** Two lines of 26 px text, with room for the box's padding and border. */
 const NEW_CAPTION = 96;
 const NEW_BUTTONS = 80;
+/** Two lines of the tip. */
+const NEW_TIP = 64;
 const NEW_GAP = 16;
 
 export interface NewPhotoLayout {
@@ -233,6 +235,8 @@ export interface NewPhotoLayout {
   caption: Rect;
   confirm: Rect;
   cancel: Rect;
+  /** How to move and zoom the photo, under the buttons (the keyboard may cover it while she types). */
+  tip: Rect;
 }
 
 /** "Your new puzzle": the photo on the left, the title, caption box and buttons on the right, top-aligned. */
@@ -255,5 +259,6 @@ export function computeNewPhotoLayout(width: number, height: number): NewPhotoLa
     caption,
     confirm: { x, y: buttonsY, w: confirmW, h: NEW_BUTTONS },
     cancel: { x: x + confirmW + NEW_GAP, y: buttonsY, w: column - confirmW - NEW_GAP, h: NEW_BUTTONS },
+    tip: { x, y: buttonsY + NEW_BUTTONS + NEW_GAP, w: column, h: NEW_TIP },
   };
 }
