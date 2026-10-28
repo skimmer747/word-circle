@@ -43,7 +43,7 @@ Add a fourth game to the site: **Jigsaw**, a big-piece jigsaw puzzle made from p
 - **Hint** in the frame's `hintButton` (top-left of the play area).
 - **Pictures** (the game's own purple button, 4 px purple border, same size as Hint) 16 px to the right of Hint, where Word Circle's Shuffle sits.
 - **Tray** (Tray style only): a soft-yellow backing from 16 px right of Pictures to 16 px left of the top-right corner, the same height as Hint, holding **3 square slots**. Slot size = `min(trayHeight − 12, (trayWidth − 4 × 12) / 3)`, 12 px apart, centered. A piece sits scaled down to fit its slot (tabs included) and grows to full size when picked up. On the smallest iPad (1024×768) the tray is 264 px wide and the slots 72 px, so a tray piece is about half its board size at 30 pieces but only about a quarter at 9; bigger iPads have a wider tray. Worth a close look at the first checkpoint.
-- **Move picture** (Tray and Board styles; added at the owner's checkpoint): a purple button the size of Hint in the bottom-right corner of the play area, with an arrow pointing to the corner (or back to the board). It moves the guide picture between faint-on-the-board and a **small picture** just left of it (4:3, as tall as the two button rows, about 181 × 136 on the smallest iPad), and back. Her choice is remembered. Table style has no faint picture, so it always shows the small picture there (the old box lid at the top) and has no button. Both hide while she looks back at a finished picture.
+- **Move picture** (Tray and Board styles; added at the owner's checkpoint): a purple button in the bottom-right corner of the play area (since Hide edges, above it and as tall as a level button), with an arrow pointing to the corner (or back to the board). It moves the guide picture between faint-on-the-board and a **small picture** just left of it (4:3, as tall as the two button rows, about 181 × 136 on the smallest iPad), and back. Her choice is remembered. Table style has no faint picture, so it always shows the small picture there (the old box lid at the top) and has no button. Both hide while she looks back at a finished picture.
 - **Two rows of buttons** at the bottom left, each 100 × 64 px, 8 px apart, in the shared level-button look (white, 3 px gray border; the chosen one has a 6 px purple border and a check above its label):
   - bottom row in the frame's `levelButtons` rects: **9**, **16**, **30**;
   - the row 8 px above it: **Tray**, **Board**, **Table**.
@@ -86,6 +86,15 @@ The Hint star (`src/ui/hint-star.ts`) flies from the Hint button to a piece, and
 - **Tray:** the first piece in the tray. **Board:** a piece lying around, corners first, then edges, then the middle.
 - **Table:** a piece (with its group) that belongs next to the biggest group glides over and joins it.
 Each counts as one hint. The game is busy (pop-ups wait) until the piece lands.
+
+### Hide edges (added 2026-10-28 at the owner's request)
+
+A harder way to play, for her or a visitor. Normally the corner and side pieces give themselves away with their straight sides (and the tray hands out corners first).
+- **Hide edges** is a toggle in the level buttons' look (a check when on), stacked under **Move picture** in the bottom-right corner; the two share the height of the two button rows, each as tall as a level button, as wide as the top-right corner buttons. In Table style, which has no Move picture, Hide edges is there alone. Her choice is remembered.
+- When on, every straight side of a corner or side piece is drawn as a tab or a hole instead (fixed for each picture and piece count, like the real cut), so they look like middle pieces. A fake tab shows the photo mirrored at its edge, so it looks like more of the picture.
+- A piece shows its real shape once it **clicks into place** (Tray, Board) or **joins another piece** (Table), and every piece does at the finish. Turning it off shows every real shape at once.
+- With it on, a **new** Tray puzzle deals its pieces in a mixed order instead of corners first. A puzzle already started keeps its order.
+- Hint is unchanged (in Board style it still picks corners first: it's a help).
 
 ### Changing style or piece count
 
