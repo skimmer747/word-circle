@@ -3,5 +3,5 @@ dist/
 .DS_Store
 public/daily-word.txt
 .worktrees/
-photos/
+/photos/
 public/.jigsaw-new/

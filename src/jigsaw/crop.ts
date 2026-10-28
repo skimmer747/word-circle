@@ -10,7 +10,7 @@ export interface CropAt {
 export const START_CROP: Readonly<CropAt> = { x: 0.5, y: 0.25 };
 
 /** Between 0 and 1: anything outside goes to the nearer end, and NaN to 0. */
-const clamp01 = (value: number) => (value > 0 ? Math.min(1, value) : 0);
+export const clamp01 = (value: number) => (value > 0 ? Math.min(1, value) : 0);
 
 /** The largest 4:3 rectangle inside a width × height photo, placed `at` within the spare room. */
 export function cropRect(width: number, height: number, at: Readonly<CropAt> = START_CROP): Rect {
