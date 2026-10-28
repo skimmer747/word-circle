@@ -137,7 +137,6 @@ export function withoutPlace(saved: SavedJigsaw, picture: string, style: JigsawS
   return { ...saved, places: saved.places.filter((p) => !isMix(p, picture, style, count)) };
 }
 
-/** Gives the picture its check on the picture page. */
 /** Forgets pictures that are gone (removed family photos): their places, their checks, and the puzzle if it was current. */
 export function withoutPictures(saved: SavedJigsaw, gone: (picture: string) => boolean): SavedJigsaw {
   return {
@@ -148,6 +147,7 @@ export function withoutPictures(saved: SavedJigsaw, gone: (picture: string) => b
   };
 }
 
+/** Gives the picture its check on the picture page. */
 export function withFinished(saved: SavedJigsaw, picture: string): SavedJigsaw {
   return saved.finished.includes(picture) ? saved : { ...saved, finished: [...saved.finished, picture] };
 }

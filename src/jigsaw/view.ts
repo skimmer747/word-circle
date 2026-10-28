@@ -204,9 +204,7 @@ export class JigsawView {
     for (const piece of this.pieces.values()) piece.remove();
     // The piece images aren't needed any more (several MB at 30 pieces).
     this.pieces.clear();
-    this.canvases = [];
-    this.disguised.clear();
-    this.cutKey = '';
+    this.dropPieceImages();
     board.classList.add('done');
     place(photo, this.layout.finished);
     if (picture.caption) {
@@ -275,29 +273,49 @@ export class JigsawView {
     back.appendChild(lines);
   }
 
-  /** Cuts the picture into piece images once per picture, piece count and size. */
+  /**
+   * Cuts the picture into piece images once per picture, piece count and size, and the edge pieces' disguises (Hide
+   * edges) only while they're wanted.
+   */
   private cut(state: JigsawViewState): void {
     const { image, picture, shapes, pieceSize } = state;
     this.tab = tabFor(pieceSize.w, pieceSize.h);
     if (!image || !picture || shapes.length === 0) {
-      this.canvases = [];
-      this.disguised.clear();
-      this.cutKey = '';
+      this.dropPieceImages();
       return;
     }
-    const hidden = state.disguises.length === shapes.length;
-    const key = `${picture.src}|${shapes.length}|${pieceSize.w.toFixed(2)}x${pieceSize.h.toFixed(2)}|${hidden}`;
-    if (key === this.cutKey) return;
     const cols = Math.max(...shapes.map((s) => s.col)) + 1;
     const rows = Math.max(...shapes.map((s) => s.row)) + 1;
-    this.canvases = drawPieces(image, shapes, cols, rows, pieceSize.w, pieceSize.h);
-    this.disguised.clear();
-    if (hidden) {
+    const key = `${picture.src}|${shapes.length}|${pieceSize.w.toFixed(2)}x${pieceSize.h.toFixed(2)}`;
+    if (key !== this.cutKey) {
+      this.dropPieceImages();
+      this.canvases = drawPieces(image, shapes, cols, rows, pieceSize.w, pieceSize.h);
+      this.cutKey = key;
+    }
+    if (state.disguises.length !== shapes.length) {
+      empty(this.disguised.values());
+      this.disguised.clear();
+    } else if (this.disguised.size === 0) {
       // Only the corner and side pieces look different disguised (a 30-piece cut is several MB of images).
       const edgeIds = shapes.flatMap((s, id) => (s.top === 0 || s.right === 0 || s.bottom === 0 || s.left === 0 ? [id] : []));
       const drawn = drawPieces(image, edgeIds.map((id) => state.disguises[id]), cols, rows, pieceSize.w, pieceSize.h);
       edgeIds.forEach((id, i) => this.disguised.set(id, drawn[i]));
     }
-    this.cutKey = key;
+  }
+
+  /** Lets every piece image go (only ever after the pieces showing them are gone from the page). */
+  private dropPieceImages(): void {
+    empty([...this.canvases, ...this.disguised.values()]);
+    this.canvases = [];
+    this.disguised.clear();
+    this.cutKey = '';
+  }
+}
+
+/** iPads limit the memory all canvases share, and give it back sooner for an emptied canvas than a forgotten one. */
+function empty(canvases: Iterable<HTMLCanvasElement>): void {
+  for (const canvas of canvases) {
+    canvas.width = 0;
+    canvas.height = 0;
   }
 }

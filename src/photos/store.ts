@@ -68,6 +68,7 @@ const committed = (transaction: IDBTransaction) =>
 export function openPhotoStore(factory: IDBFactory | undefined = globalThis.indexedDB): PhotoStore | null {
   if (!factory) return null;
   let opening: Promise<IDBDatabase> | null = null;
+  let persisted = false;
   const open = (): Promise<IDBDatabase> => {
     opening ??= new Promise<IDBDatabase>((resolve, reject) => {
       const request = factory.open(DB_NAME, 1);
@@ -93,8 +94,11 @@ export function openPhotoStore(factory: IDBFactory | undefined = globalThis.inde
     },
     async put(photo) {
       await write((store) => store.put(photo));
-      // Asks the iPad not to clear the photos when it's short of space. It may say no.
-      void navigator.storage?.persist?.().catch(() => false);
+      // Asks the iPad (once) not to clear the photos when it's short of space. It may say no.
+      if (!persisted) {
+        persisted = true;
+        void navigator.storage?.persist?.().catch(() => false);
+      }
     },
     async remove(id) {
       await write((store) => store.delete(id));

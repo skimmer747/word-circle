@@ -104,10 +104,7 @@ export function openSettingsPage(root: HTMLElement, settings: Settings, options:
   const keepOpen = () => {
     if (options.firstTime) return;
     window.clearTimeout(idle);
-    idle = window.setTimeout(() => {
-      close();
-      options.cancel();
-    }, IDLE_CLOSE_MS);
+    idle = window.setTimeout(() => finish(() => options.cancel()), IDLE_CLOSE_MS);
   };
   page.addEventListener('pointerdown', keepOpen);
   page.addEventListener('input', keepOpen);
@@ -261,7 +258,17 @@ export function openSettingsPage(root: HTMLElement, settings: Settings, options:
   showCount();
 
   // Change framing opens inside the page, so its taps keep the page from closing itself as untouched.
-  renderJigsawPictures(sheet, page, options.photos, draft);
+  const photos = renderJigsawPictures(sheet, page, options.photos, draft);
+  // A caption typed a moment ago, or photos still being added, are saved before the page goes (Done reloads the app).
+  let closing = false;
+  const finish = (then: () => void) => {
+    if (closing) return;
+    closing = true;
+    void photos.settle().then(() => {
+      close();
+      then();
+    });
+  };
 
   const keep = el('details', 'settings-section settings-keep', sheet);
   el('summary', '', keep).textContent = 'Keep them in the game (optional)';
@@ -276,23 +283,14 @@ export function openSettingsPage(root: HTMLElement, settings: Settings, options:
   el('p', 'settings-privacy', sheet).textContent = 'Everything on this page stays on this iPad. Visits and finished puzzles are counted with Google Analytics; never names, words or schedules.';
   const actions = el('div', 'settings-actions', sheet);
   if (!options.firstTime) {
-    button(
-      actions,
-      'Cancel',
-      () => {
-        close();
-        options.cancel();
-      },
-      'settings-cancel',
-    );
+    button(actions, 'Cancel', () => finish(() => options.cancel()), 'settings-cancel');
   }
   button(
     actions,
     options.firstTime ? 'Start playing' : 'Done',
     () => {
       draft.name = cleanName(name.value);
-      close();
-      options.done(draft);
+      finish(() => options.done(draft));
     },
     'settings-done',
   );

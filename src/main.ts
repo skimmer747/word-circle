@@ -92,8 +92,9 @@ function startApp(settings: Settings): void {
     grid: () => new GridScreen(gridPuzzles as GridPuzzleSet, gridWords as GridWords, store, { startLevel: settings.startLevel, avoided }),
     jigsaw: () =>
       new JigsawScreen(store, {
+        // Where photos can't be kept, the starters are always shown: hidden, Jigsaw would have nothing.
         loadPictures: () =>
-          loadPictureList(photoStore, settings.jigsawStarters ? () => loadStarters(import.meta.env.BASE_URL) : async () => []),
+          loadPictureList(photoStore, settings.jigsawStarters || !photoStore ? () => loadStarters(import.meta.env.BASE_URL) : async () => []),
         photos: photoStore && photoAdder(root!, photoStore),
       }),
   };

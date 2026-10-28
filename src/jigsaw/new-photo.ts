@@ -1,4 +1,4 @@
-import { MAX_CAPTION, cleanCaption, dragFrame, maxZoom, pinchFrame } from '../photos/framing';
+import { MAX_CAPTION, cleanCaption, dragFrame, fitLongSide, maxZoom, pinchFrame } from '../photos/framing';
 import { el, place } from '../ui/dom';
 import { cropRect, zoomOf, type CropAt } from './crop';
 import { computeNewPhotoLayout } from './layout';
@@ -99,8 +99,10 @@ export function openNewPhoto(parent: HTMLElement, image: HTMLImageElement, optio
       place(shown, { x: layout.frame.x - crop.x * scale, y: layout.frame.y - crop.y * scale, w: width * scale, h: height * scale });
     };
 
-    // Zoomed in no further than the photo allows, or than it already was (the kept copy is smaller than the original).
-    const most = Math.max(maxZoom(width, height), zoomOf(options.frame));
+    // Zoomed in no further than the copy that's kept allows (it may be smaller than the photo shown here, and Change
+    // framing cuts from it later), or than it already was.
+    const kept = fitLongSide(width, height);
+    const most = Math.max(maxZoom(kept.w, kept.h), zoomOf(options.frame));
     /** Where an event is on the photo area (the frame's coordinates). */
     const local = (event: { clientX: number; clientY: number }): Point => ({
       x: event.clientX - layout.photoArea.x,

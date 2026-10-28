@@ -96,9 +96,9 @@ export class JigsawGame {
 
   /**
    * A new puzzle, dealt from `seed`. Board and Table pieces start spread out in `spots` (needs at least one per piece,
-   * in pieces like every position), shuffled; Tray pieces wait in the tray and its queue.
+   * in pieces like every position), shuffled; Tray pieces wait in the tray and its queue, corners first, or in any
+   * order when `mixed` (Hide edges).
    */
-  /** A new puzzle; `mixed` (edges hidden) deals the tray in any order instead of corners first. */
   static fresh(style: JigsawStyle, count: PieceCount, seed: number, spots: readonly Point[] = [], mixed = false): JigsawGame {
     const { cols, rows } = GRID_SIZES[count];
     // Not the same numbers as the cut, so which pieces come first isn't tied to their shapes.

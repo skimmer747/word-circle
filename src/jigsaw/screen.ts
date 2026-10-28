@@ -299,11 +299,11 @@ export class JigsawScreen implements GameScreen {
         hasBack: page.hasBack,
         hasMore: page.hasMore,
         canClose: this.picture !== null,
-        canAdd: this.options.photos != null,
+        canAdd: this.canAdd(),
       },
       animateIn,
     );
-    const offset = this.options.photos ? 1 : 0;
+    const offset = this.canAdd() ? 1 : 0;
     const buttons: ButtonGeometry[] = page.pictures.map((_, i) => ({ id: `pic:${i}`, ...layout.tiles[i + offset] }));
     if (offset) buttons.unshift({ id: 'pic:add', ...layout.tiles[0] });
     if (page.hasBack) buttons.push({ id: 'pics-back', ...layout.back });
@@ -622,6 +622,11 @@ export class JigsawScreen implements GameScreen {
     this.resetIdle();
   }
 
+  /** Add a photo shows once the pictures are in (a photo added before would be lost when they arrive). */
+  private canAdd(): boolean {
+    return this.options.photos != null && this.pictures !== null;
+  }
+
   /** Pictures per page: five beside Add a photo, or six where photos can't be kept. */
   private perPage(): number {
     return this.options.photos ? PAGE_WITH_ADD : PAGE_SIZE;
@@ -630,7 +635,7 @@ export class JigsawScreen implements GameScreen {
   /** Add a photo: the iPad's picker, then "Your new puzzle"; Start puzzle starts it straight away. */
   private addPhoto(): void {
     const photos = this.options.photos;
-    if (!photos || this.mode !== 'pictures') return;
+    if (!photos || !this.canAdd() || this.mode !== 'pictures') return;
     void photos.pick().then(async (file) => {
       if (!file) return;
       const uncover = this.host.cover();
