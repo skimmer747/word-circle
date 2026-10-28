@@ -14,9 +14,11 @@ export function analyticsAllowed(production: boolean, host: string): boolean {
   return production && host === LIVE_HOST;
 }
 
-/** What a finished puzzle tells Google: only the game, its level and whether Hint helped. */
+/** What a finished puzzle tells Google: only the game, its level (and Jigsaw's style) and whether Hint helped. */
 export function puzzleEvent(record: PlayRecord): Params {
-  return { game: record.game, level: record.level ?? 'none', used_hint: record.hints > 0 ? 'yes' : 'no' };
+  const params: Params = { game: record.game, level: record.level ?? 'none', used_hint: record.hints > 0 ? 'yes' : 'no' };
+  if (record.style) params.style = record.style;
+  return params;
 }
 
 /** Loads Google's tag on the live site, with its ad features off. `installed`: opened from the Home Screen. */

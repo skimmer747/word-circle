@@ -1,5 +1,6 @@
 import { formatDuration } from '../circle/stats';
 import { GAME_IDS, GAME_TITLES, type GameId } from '../frame/games';
+import { LEVEL_COUNTS } from '../jigsaw/types';
 import { addDays } from '../shared/days';
 import { mostPlayedLevel, type PlayLevel, type PlayRecord } from './log';
 
@@ -11,6 +12,8 @@ export const READY_DAYS = 14;
 const PERIOD_DAYS = 28;
 
 const LEVEL_NAMES: Record<PlayLevel, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
+/** Jigsaw's levels are piece counts. */
+const levelName = (game: GameId, level: PlayLevel) => (game === 'jigsaw' ? `${LEVEL_COUNTS[level]} pieces` : LEVEL_NAMES[level]);
 /** Short names, for labels at the ends of chart lines. */
 const SHORT: Record<GameId, string> = { circle: 'Circle', guess: 'Guess', grid: 'Grid', jigsaw: 'Jigsaw' };
 const PARTS = [
@@ -84,7 +87,7 @@ function table(
   };
   for (const game of present) {
     const level = levels.get(game) ?? null;
-    const label = game === 'guess' || level === null ? `${GAME_TITLES[game]}: time per word` : `${GAME_TITLES[game]}, ${LEVEL_NAMES[level]}: time per puzzle`;
+    const label = game === 'guess' || level === null ? `${GAME_TITLES[game]}: time per word` : `${GAME_TITLES[game]}, ${levelName(game, level)}: time per puzzle`;
     row(label, (rs) => rs.filter((r) => r.game === game && r.level === level).map((r) => r.ms), formatDuration);
   }
   for (const game of present.filter((g) => g !== 'guess')) {

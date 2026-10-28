@@ -1,4 +1,5 @@
 import { GAME_IDS, type GameId } from '../frame/games';
+import { JIGSAW_STYLES, type JigsawStyle } from '../jigsaw/types';
 import { addDays } from '../shared/days';
 import type { KeyValueStore } from '../shared/store';
 
@@ -36,6 +37,8 @@ export interface PlayRecord {
   longest: string;
   /** Word Guess: her first guess ('' if none); '' for the other games. */
   first: string;
+  /** Jigsaw: how she played it. */
+  style?: JigsawStyle;
 }
 
 /** Running figures since the log began; they stay when old detail is dropped. */
@@ -91,6 +94,7 @@ function isPlayRecord(v: unknown): v is PlayRecord {
     isCount(v.hour) &&
     (v.hour as number) < 24 &&
     GAME_IDS.includes(v.game as GameId) &&
+    (v.style === undefined || JIGSAW_STYLES.includes(v.style as JigsawStyle)) &&
     (v.level === null || PLAY_LEVELS.includes(v.level as PlayLevel)) &&
     typeof v.ms === 'number' &&
     Number.isFinite(v.ms) &&

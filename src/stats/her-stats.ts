@@ -1,5 +1,6 @@
 import { formatDuration } from '../circle/stats';
 import type { GameId, GameSummary } from '../frame/games';
+import { LEVEL_COUNTS } from '../jigsaw/types';
 import { addDays, isMilestone } from '../shared/days';
 import type { KeyValueStore } from '../shared/store';
 import { PLAY_LEVELS, mostPlayedLevel, type Lifetime, type PlayLevel, type PlayRecord } from './log';
@@ -94,11 +95,14 @@ function totalCard({ games, streak, lifetime, today, seen }: HerStatsInput): Her
 
 function podiumCard({ games, log }: HerStatsInput): HerStats['podium'] {
   const ranked = [...games].sort((a, b) => b.solved - a.solved);
-  const order = ranked.length === 3 ? [ranked[1], ranked[0], ranked[2]] : ranked.length === 2 ? [ranked[1], ranked[0]] : ranked;
+  // The favorite in the middle (second from the left with four).
+  const order =
+    ranked.length >= 3 ? [ranked[1], ranked[0], ...ranked.slice(2)] : ranked.length === 2 ? [ranked[1], ranked[0]] : ranked;
   const top = ranked[0];
   const entries = order.map((g) => ({ id: g.id, title: g.title, solved: g.solved, top: g === top && g.solved > 0 }));
   const level = top && top.id !== 'guess' ? mostPlayedLevel(log.filter((r) => r.game === top.id)) : null;
-  return { entries, note: level ? `Mostly on ${LEVEL_NAMES[level]}` : null };
+  const note = level === null ? null : top.id === 'jigsaw' ? `Mostly ${LEVEL_COUNTS[level]} pieces` : `Mostly on ${LEVEL_NAMES[level]}`;
+  return { entries, note };
 }
 
 /** Word Circle's most-played level, if her last 7 days there beat the 7 before (at least 3 puzzles in each). */

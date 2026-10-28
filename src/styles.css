@@ -2158,3 +2158,8 @@ body {
   width: calc(var(--pu) * 30);
   height: calc(var(--pu) * 22.5);
 }
+
+.stats-bar.jigsaw {
+  background: #ece6fb;
+  border-color: var(--shuffle);
+}

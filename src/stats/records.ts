@@ -1,5 +1,6 @@
 import { answerWords } from '../grid/puzzle';
 import type { GridPuzzle } from '../grid/types';
+import { COUNT_LEVELS, type JigsawStyle, type PieceCount } from '../jigsaw/types';
 import { dayKey } from '../shared/days';
 import type { PlayLevel, PlayRecord } from './log';
 
@@ -72,5 +73,24 @@ export function gridRecord(p: { puzzle: GridPuzzle; hinted: readonly number[]; l
     daily: false,
     ...wordFacts(answerWords(p.puzzle)),
     first: '',
+  };
+}
+
+/** Jigsaw: no words; 9, 16 and 30 pieces are logged as Easy, Medium and Hard. Each Hint places one piece. */
+export function jigsawRecord(p: { count: PieceCount; style: JigsawStyle; hints: number; ms: number; now: Date }): PlayRecord {
+  return {
+    ...when(p.now),
+    game: 'jigsaw',
+    level: COUNT_LEVELS[p.count],
+    ms: Math.round(p.ms),
+    hints: p.hints,
+    tries: 0,
+    typed: true,
+    daily: false,
+    words: 0,
+    letters: 0,
+    longest: '',
+    first: '',
+    style: p.style,
   };
 }
