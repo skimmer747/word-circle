@@ -2302,3 +2302,74 @@ body {
   color: var(--ink);
   animation: grid-fade-in 400ms ease-out;
 }
+
+/* Jigsaw's "Pick a picture" page */
+.pics-title {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: var(--navy);
+}
+
+.pics-note {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  text-align: center;
+  color: var(--label);
+}
+
+.pic-tile {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 4px solid #fff;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pic-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pic-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--found);
+  color: #fff;
+}
+
+.pic-check svg {
+  width: 32px;
+  height: 32px;
+}
+
+.pic-caption {
+  position: absolute;
+  overflow: hidden;
+  font-size: 22px;
+  line-height: 34px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.button.pics-more {
+  border-color: var(--shuffle);
+}
