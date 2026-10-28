@@ -179,6 +179,10 @@ export class JigsawView {
     photo.classList.add('shown');
     await wait(FADE_MS);
     for (const piece of this.pieces.values()) piece.remove();
+    // The piece images aren't needed any more (several MB at 30 pieces).
+    this.pieces.clear();
+    this.canvases = [];
+    this.cutKey = '';
     board.classList.add('done');
     place(photo, this.layout.finished);
     if (picture.caption) {
@@ -187,6 +191,15 @@ export class JigsawView {
       place(caption, this.layout.caption);
     }
     await wait(GROW_MS);
+  }
+
+  /** The screen changed while the finished picture shows: it and its caption move to fit (nothing is redrawn). */
+  placeFinished(layout: JigsawLayout): void {
+    this.layout = layout;
+    const photo = this.board?.querySelector<HTMLElement>('.jigsaw-photo.shown');
+    const caption = this.board?.querySelector<HTMLElement>('.jigsaw-caption');
+    if (photo && this.board?.classList.contains('done')) place(photo, layout.finished);
+    if (caption) place(caption, layout.caption);
   }
 
   private addPiece(id: number, fadeIn: boolean): HTMLElement | null {

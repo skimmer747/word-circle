@@ -84,6 +84,8 @@ export class JigsawScreen implements GameScreen {
   private frozen: Map<number, PieceSpot> | null = null;
   /** True while Jigsaw is on screen (between resume and pause). */
   private shown = false;
+  /** The pictures or the photo arrived while it couldn't be redrawn: redraw when she's back. */
+  private stale = false;
   private view: JigsawView | null = null;
   private layout: JigsawLayout | null = null;
   private idleTimer = 0;
@@ -108,7 +110,13 @@ export class JigsawScreen implements GameScreen {
   render(layer: HTMLElement, frame: FrameLayout, animateIn: boolean): GameTargets {
     if (!this.view) this.view = new JigsawView(layer);
     this.held = null;
+    this.stale = false;
     this.layout = computeJigsawLayout(frame);
+    // The finished picture is on screen (fading in, or behind "Well done!"): keep it, only moved to fit.
+    if (this.busy && this.mode === 'puzzle') {
+      this.view.placeFinished(this.layout);
+      return { tiles: [], buttons: [], reviewButton: this.layout.reviewButton };
+    }
     if (this.mode === 'pictures') return this.renderPictures(layer, frame, animateIn);
     this.ensureGame(this.layout);
     // The screen may have changed since the table was laid out: every group comes back into view.
@@ -201,8 +209,12 @@ export class JigsawScreen implements GameScreen {
     this.shown = true;
     if (this.mode === 'puzzle') this.timer.resume(performance.now());
     // A puzzle finished just before she switched away (by a piece while a hint star flew) is celebrated when she's back.
-    if (this.game?.solved && !this.busy && !this.hintFlying) void this.finish();
-    else if (!this.busy) this.resetIdle();
+    if (this.game?.solved && !this.busy && !this.hintFlying) return void this.finish();
+    if (this.busy) return;
+    this.resetIdle();
+    if (this.stale) this.host.redraw(false);
+    // A hint star that landed while she was away couldn't set the touch targets then.
+    else if (this.mode === 'puzzle' && this.game && !this.hintFlying) this.host.updateTargets(this.targets());
   }
 
   activity(): void {
@@ -218,14 +230,22 @@ export class JigsawScreen implements GameScreen {
     const current = this.saved.current;
     if (current && !this.picture) {
       this.picture = pictures.find((p) => p.id === current) ?? null;
-      // Its picture is gone from the site: back to choosing.
       if (!this.picture) {
-        this.saved = { ...this.saved, current: null };
         this.mode = 'pictures';
-        saveSavedJigsaw(this.store, this.saved);
+        // Its picture is gone from the site: back to choosing. (With no list at all, offline, she keeps her place.)
+        if (pictures.length > 0) {
+          this.saved = { ...this.saved, current: null };
+          saveSavedJigsaw(this.store, this.saved);
+        }
       }
     }
+    this.redrawWhenFree();
+  }
+
+  /** Redraws now if nothing is in the way, otherwise when she's next back. */
+  private redrawWhenFree(): void {
     if (this.shown && !this.busy && !this.held) this.host.redraw(false);
+    else this.stale = true;
   }
 
   private renderPictures(layer: HTMLElement, frame: FrameLayout, animateIn: boolean): GameTargets {
@@ -290,7 +310,7 @@ export class JigsawScreen implements GameScreen {
       image = new Image();
       image.decoding = 'async';
       image.onload = () => {
-        if (this.picture?.src === picture.src && this.mode === 'puzzle' && this.shown && !this.busy && !this.held) this.host.redraw(false);
+        if (this.picture?.src === picture.src && this.mode === 'puzzle') this.redrawWhenFree();
       };
       image.src = picture.src;
       this.images.set(picture.src, image);
@@ -410,9 +430,10 @@ export class JigsawScreen implements GameScreen {
         if (spot.where === 'placed' || this.frozen?.has(spot.id)) continue;
         draggables.push({ id: `piece:${spot.id}`, ...(spot.slot ?? spot.body) });
       }
-      // With a piece lifted by a tap, the board's empty spots can be tapped.
+      // With a piece lifted by a tap, the board's empty spots can be tapped. They come after the pieces (the touch
+      // tracker would put buttons first), so a piece lying over a spot is still picked up.
       if (this.lifted !== null) {
-        for (let id = 0; id < game.count; id++) if (!game.isPlaced(id)) buttons.push({ id: `spot:${id}`, ...this.fromPieces(layout, game, game.home(id)) });
+        for (let id = 0; id < game.count; id++) if (!game.isPlaced(id)) draggables.push({ id: `spot:${id}`, ...this.fromPieces(layout, game, game.home(id)) });
       }
     }
     return { tiles: [], buttons, draggables, reviewButton: layout.reviewButton };
@@ -478,15 +499,19 @@ export class JigsawScreen implements GameScreen {
     this.save();
     this.resetIdle();
     this.refresh();
-    await this.view?.flyStar(target);
-    this.hintFlying = false;
-    this.frozen = null;
+    try {
+      await this.view?.flyStar(target);
+    } finally {
+      this.hintFlying = false;
+      this.frozen = null;
+    }
     // If she chose another picture, style or piece count while the star flew, that puzzle is gone from the screen.
     if (this.game === game && this.mode === 'puzzle') {
       this.view?.update(this.viewState());
       if (this.shown) this.view?.land(id);
-      // Setting the touch targets while she holds a piece would drop it; they're set when she lets go.
-      if (!this.held) this.host.updateTargets(this.targets());
+      // Only while Jigsaw is on screen (another game's targets would be replaced; resume sets ours), and not while she
+      // holds a piece (it would drop; they're set when she lets go).
+      if (this.shown && !this.held) this.host.updateTargets(this.targets());
     }
     if (game.solved && this.game === game && (this.busy || this.shown)) void this.finish();
   }
@@ -561,32 +586,38 @@ export class JigsawScreen implements GameScreen {
     this.lifted = null;
     window.clearTimeout(this.idleTimer);
     this.view?.setHintPulse(false);
-    if (this.shown) await this.view?.finish(picture, this.assembled(layout));
-    this.timer.activity(performance.now());
-    this.host.logPlay(jigsawRecord({ count: game.count, style: game.style, hints: game.hints, ms: this.timer.elapsedMs, now: this.now() }));
-    const done = withFinished(withoutPlace(this.saved, picture.id, game.style, game.count), picture.id);
-    this.saved = { ...done, current: null, stats: recordJigsawSolve(this.saved.stats, dayKey(this.now())) };
-    const streakDays = this.host.recordPlayDay();
-    // Saved as done now, so closing the app mid-celebration loses nothing.
-    this.game = null;
-    this.picture = null;
-    this.timer.pause();
-    saveSavedJigsaw(this.store, this.saved);
-    if (this.shown) await wait(ADMIRE_MS);
-    await this.host.celebrate({
-      lines: jigsawLines({
-        hinted: game.hints > 0,
-        streakDays,
-        todaySolved: this.saved.stats.todaySolved,
-        puzzleNumber: this.saved.stats.totalSolved,
-      }),
-      nextLabel: 'Next picture',
-      timeoutMs: CELEBRATION_MS,
-    });
-    this.mode = 'pictures';
-    this.page = 0;
-    this.busy = false;
-    this.host.redraw(true);
+    // Whatever happens, she ends up on the picture page, never stuck with the Games button waiting on "busy".
+    try {
+      if (this.shown) await this.view?.finish(picture, this.assembled(layout));
+      // The pieces and the decoded photo aren't needed any more (the finished photo is its own image).
+      this.images.clear();
+      this.timer.activity(performance.now());
+      this.host.logPlay(jigsawRecord({ count: game.count, style: game.style, hints: game.hints, ms: this.timer.elapsedMs, now: this.now() }));
+      const done = withFinished(withoutPlace(this.saved, picture.id, game.style, game.count), picture.id);
+      this.saved = { ...done, current: null, stats: recordJigsawSolve(this.saved.stats, dayKey(this.now())) };
+      const streakDays = this.host.recordPlayDay();
+      // Saved as done now, so closing the app mid-celebration loses nothing.
+      this.game = null;
+      this.picture = null;
+      this.timer.pause();
+      saveSavedJigsaw(this.store, this.saved);
+      if (this.shown) await wait(ADMIRE_MS);
+      await this.host.celebrate({
+        lines: jigsawLines({
+          hinted: game.hints > 0,
+          streakDays,
+          todaySolved: this.saved.stats.todaySolved,
+          puzzleNumber: this.saved.stats.totalSolved,
+        }),
+        nextLabel: 'Next picture',
+        timeoutMs: CELEBRATION_MS,
+      });
+    } finally {
+      this.mode = 'pictures';
+      this.page = 0;
+      this.busy = false;
+      this.host.redraw(true);
+    }
   }
 
   private resetIdle(): void {
