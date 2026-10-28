@@ -50,7 +50,7 @@ export interface JigsawLayout {
   /** Where the finished picture is shown, and its caption under it. */
   finished: Rect;
   caption: Rect;
-  /** Next, over the tray's place, while she looks back at a finished picture. */
+  /** Next, across the top (Hint, Pictures and the tray are hidden then), while she looks back at a finished picture. */
   reviewButton: Rect;
 }
 
@@ -94,7 +94,7 @@ export function computeJigsawLayout(frame: FrameLayout): JigsawLayout {
     free: [main, besideRows],
     finished: fit({ x: play.x, y: top, w: play.w, h: caption.y - GAP - top }, PICTURE_ASPECT),
     caption,
-    reviewButton: reviewButtonIn(tray),
+    reviewButton: reviewButtonIn({ x: play.x, y: play.y, w: corner.x - GAP - play.x, h: hintButton.h }),
   };
 }
 

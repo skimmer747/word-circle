@@ -2165,6 +2165,12 @@ body {
 }
 
 /* Jigsaw */
+/* Its own stacking group: pieces and the finished photo are ordered among themselves, always under the frame's
+   card, pop-ups and top-right buttons. */
+.board.jigsaw {
+  isolation: isolate;
+}
+
 .button.pictures {
   border-color: var(--shuffle);
 }
@@ -2222,9 +2228,9 @@ body {
   height: 100%;
 }
 
-.piece.tray,
-.piece.loose,
-.piece.table {
+.piece.at-tray,
+.piece.at-loose,
+.piece.at-table {
   filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
 }
 
@@ -2236,6 +2242,10 @@ body {
 
 .piece.lifted {
   filter: drop-shadow(0 0 4px var(--select)) drop-shadow(0 0 4px var(--select));
+}
+
+.piece.appear {
+  animation: grid-fade-in 200ms ease-out;
 }
 
 .piece.pop {
@@ -2283,6 +2293,8 @@ body {
   opacity: 1;
 }
 
+.board.jigsaw.done .button.hint,
+.board.jigsaw.done .button.pictures,
 .board.jigsaw.done .tray,
 .board.jigsaw.done .level,
 .board.jigsaw.done .jigsaw-board,

@@ -12,6 +12,8 @@ const STYLE_LABELS: Record<JigsawStyle, string> = { tray: 'Tray', board: 'Board'
 const FADE_MS = 600;
 /** ...which then grows into place. */
 const GROW_MS = 500;
+/** A tray piece lifted by a tap is drawn this much bigger. */
+const LIFT = 1.25;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 /** Where one piece is drawn: its body (without tabs) on screen, and what it's doing. */
@@ -43,6 +45,7 @@ const outer = (body: Rect, tab: number): Rect => {
   const room = tab + EDGE_ROOM;
   return { x: body.x - room, y: body.y - room, w: body.w + 2 * room, h: body.h + 2 * room };
 };
+/** Shown as "at-tray", "at-placed"… classes: a plain "tray" is the yellow tray backing (and the board gets "style-tray"). */
 const WHERE = ['tray', 'placed', 'loose', 'table'] as const;
 
 /** Draws Jigsaw and plays its animations. Knows nothing about rules. */
@@ -61,7 +64,7 @@ export class JigsawView {
   render(layout: JigsawLayout, state: JigsawViewState, animateIn: boolean): void {
     this.layout = layout;
     const board = document.createElement('div');
-    board.className = `board jigsaw ${state.style}`;
+    board.className = `board jigsaw style-${state.style}`;
     this.layer.replaceChildren(board);
     this.board = board;
 
@@ -80,13 +83,7 @@ export class JigsawView {
 
     this.cut(state);
     this.pieces.clear();
-    for (const spot of state.pieces) {
-      const piece = el('div', 'piece', board);
-      const canvas = this.canvases[spot.id];
-      if (canvas) piece.appendChild(canvas);
-      this.pieces.set(spot.id, piece);
-    }
-    this.update(state);
+    this.update(state, false);
     if (animateIn) {
       board.classList.add('entering');
       void board.offsetWidth;
@@ -94,17 +91,22 @@ export class JigsawView {
     }
   }
 
-  /** Puts every piece where it is now; pieces that moved glide there (the CSS transition). Held pieces are left alone. */
-  update(state: JigsawViewState): void {
+  /**
+   * Puts every piece where it is now; pieces that moved glide there (the CSS transition). Held pieces are left alone.
+   * A piece seen for the first time (the next one sliding into the tray) is made here, fading in unless it's a redraw.
+   */
+  update(state: JigsawViewState, fadeIn = true): void {
     state.pieces.forEach((spot, i) => {
-      const piece = this.pieces.get(spot.id);
+      const piece = this.pieces.get(spot.id) ?? this.addPiece(spot.id, fadeIn);
       if (!piece || piece.classList.contains('held')) return;
       const rect = outer(spot.body, this.tab);
       place(piece, rect);
       // Stacked with z-index rather than page order: moving an element in the page would stop its glide.
       piece.style.zIndex = String(i + 1);
-      piece.style.transform = spot.slot ? `scale(${Math.min(spot.slot.w / rect.w, spot.slot.h / rect.h)})` : '';
-      for (const where of WHERE) piece.classList.toggle(where, where === spot.where);
+      // Shrunk to fit its tray place; a lifted one grows a little, as its glow is tiny at that size.
+      const lift = state.lifted === spot.id ? LIFT : 1;
+      piece.style.transform = spot.slot ? `scale(${lift * Math.min(spot.slot.w / rect.w, spot.slot.h / rect.h)})` : '';
+      for (const where of WHERE) piece.classList.toggle(`at-${where}`, where === spot.where);
       piece.classList.toggle('lifted', state.lifted === spot.id);
     });
   }
@@ -185,6 +187,15 @@ export class JigsawView {
       place(caption, this.layout.caption);
     }
     await wait(GROW_MS);
+  }
+
+  private addPiece(id: number, fadeIn: boolean): HTMLElement | null {
+    const canvas = this.canvases[id];
+    if (!this.board || !canvas) return null;
+    const piece = el('div', fadeIn ? 'piece appear' : 'piece', this.board);
+    piece.appendChild(canvas);
+    this.pieces.set(id, piece);
+    return piece;
   }
 
   private button(parent: HTMLElement, className: string, html: string, rect: Rect): HTMLButtonElement {

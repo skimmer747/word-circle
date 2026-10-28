@@ -51,12 +51,19 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
     apart([layout.finished, layout.caption, frame.corner]);
   });
 
-  it('fits three tray places, the box lid and the review Next in the tray', () => {
+  it('fits three tray places and the box lid in the tray', () => {
     expect(layout.slots).toHaveLength(3);
     expect(layout.lid.w / layout.lid.h).toBeCloseTo(4 / 3);
-    for (const rect of [...layout.slots, layout.lid, layout.reviewButton]) expect(inside(rect, layout.tray)).toBe(true);
+    for (const rect of [...layout.slots, layout.lid]) expect(inside(rect, layout.tray)).toBe(true);
     apart(layout.slots);
     expect(layout.slots[0].w).toBeGreaterThanOrEqual(60);
+  });
+
+  it("puts the review Next across the top, as big as the card's Next, clear of the corner", () => {
+    const top = { x: frame.play.x, y: frame.play.y, w: frame.corner.x - 16 - frame.play.x, h: frame.hintButton.h };
+    expect(inside(layout.reviewButton, top)).toBe(true);
+    expect(layout.reviewButton.w).toBe(frame.nextButton.w);
+    expect(overlaps(layout.reviewButton, frame.corner)).toBe(false);
   });
 
   it.each(PIECE_COUNTS)('has room on the table for all %i pieces, apart, at least 70 px wide', (count) => {
