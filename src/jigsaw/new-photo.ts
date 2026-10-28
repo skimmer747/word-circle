@@ -29,6 +29,9 @@ export function openNewPhoto(parent: HTMLElement, image: HTMLImageElement, optio
     shown.alt = '';
     shown.draggable = false;
     shown.src = image.src;
+    // The rest of the photo is dimmed by four panels around the frame (a frame-sized hole in one big shadow isn't drawn
+    // by every browser).
+    const dims = [0, 1, 2, 3].map(() => el('div', 'new-photo-dim', area));
     const frameBox = el('div', 'new-photo-frame', area);
     const title = el('h1', 'new-photo-title', page);
     title.textContent = options.title;
@@ -57,6 +60,13 @@ export function openNewPhoto(parent: HTMLElement, image: HTMLImageElement, optio
       layout = computeNewPhotoLayout(window.innerWidth, window.innerHeight);
       place(area, layout.photoArea);
       place(frameBox, layout.frame);
+      const { frame: f, photoArea: a } = layout;
+      const below = f.y + f.h;
+      const right = f.x + f.w;
+      place(dims[0], { x: 0, y: 0, w: a.w, h: f.y });
+      place(dims[1], { x: 0, y: below, w: a.w, h: a.h - below });
+      place(dims[2], { x: 0, y: f.y, w: f.x, h: f.h });
+      place(dims[3], { x: right, y: f.y, w: a.w - right, h: f.h });
       place(title, layout.title);
       if (label) place(label, layout.captionLabel);
       if (caption) place(caption, layout.caption);

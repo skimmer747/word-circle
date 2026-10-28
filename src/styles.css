@@ -2474,12 +2474,17 @@ body {
   -webkit-touch-callout: none;
 }
 
-/* The frame: clear inside, the rest of the photo dimmed (its shadow is clipped by the area). */
+/* The rest of the photo, dimmed around the frame. */
+.new-photo-dim {
+  position: absolute;
+  background: rgba(20, 20, 20, 0.55);
+  pointer-events: none;
+}
+
 .new-photo-frame {
   position: absolute;
   box-sizing: border-box;
   border: 4px solid #fff;
-  box-shadow: 0 0 0 4000px rgba(20, 20, 20, 0.55);
   pointer-events: none;
 }
 
