@@ -2194,6 +2194,15 @@ body {
   color: var(--shuffle);
 }
 
+.button.move-picture {
+  border-color: var(--shuffle);
+  font-size: 22px;
+}
+
+.button.move-picture svg {
+  color: var(--shuffle);
+}
+
 .jigsaw-board {
   position: absolute;
   background: #fff;
@@ -2222,7 +2231,12 @@ body {
   stroke-width: 1.5;
 }
 
-.jigsaw-lid {
+.jigsaw-board.plain .jigsaw-lines path {
+  stroke: var(--grid-line);
+  stroke-opacity: 1;
+}
+
+.jigsaw-small {
   position: absolute;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -2313,7 +2327,8 @@ body {
 .board.jigsaw.done .tray,
 .board.jigsaw.done .level,
 .board.jigsaw.done .jigsaw-board,
-.board.jigsaw.done .jigsaw-lid {
+.board.jigsaw.done .button.move-picture,
+.board.jigsaw.done .jigsaw-small {
   visibility: hidden;
 }
 

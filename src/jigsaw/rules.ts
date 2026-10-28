@@ -11,15 +11,20 @@ export const JOIN = 0.3;
 /** What a drop did: clicked in, went back to the tray, was left lying, joined others on the table, or just moved. */
 export type DropResult = 'placed' | 'back' | 'loose' | 'joined' | 'moved';
 
+/** How many of the picture's edges a piece is on: 2 for a corner, 1 for an edge piece, 0 in the middle. */
+function edgesOf(id: number, cols: number, rows: number): number {
+  const col = id % cols;
+  const row = Math.floor(id / cols);
+  return Number(col === 0 || col === cols - 1) + Number(row === 0 || row === rows - 1);
+}
+
 /** The order the tray hands pieces out: the corners, then the other edge pieces, then the middle, each shuffled. */
 export function trayOrder(cols: number, rows: number, random: () => number): number[] {
   const corners: number[] = [];
   const edges: number[] = [];
   const middle: number[] = [];
   for (let id = 0; id < cols * rows; id++) {
-    const col = id % cols;
-    const row = Math.floor(id / cols);
-    const sides = Number(col === 0 || col === cols - 1) + Number(row === 0 || row === rows - 1);
+    const sides = edgesOf(id, cols, rows);
     (sides === 2 ? corners : sides === 1 ? edges : middle).push(id);
   }
   return [...shuffle(corners, random), ...shuffle(edges, random), ...shuffle(middle, random)];
@@ -45,13 +50,11 @@ function fits(style: JigsawStyle, count: PieceCount, p: JigsawProgress): boolean
   }
   const inTray = p.tray.filter((id): id is number => id !== null);
   const every = [...p.placed, ...p.queue, ...inTray, ...p.loose.map(([id]) => id)];
-  return (
-    p.tray.length === TRAY_SIZE &&
-    isPermutation(every, count) &&
-    (style === 'board' || p.loose.length === 0) &&
-    // A place in the tray is only ever empty once nothing is left to hand out.
-    (p.queue.length === 0 || !p.tray.includes(null))
-  );
+  if (p.tray.length !== TRAY_SIZE || !isPermutation(every, count)) return false;
+  // Board has no tray: every piece is placed or lying around (a save from when it had one starts afresh).
+  if (style === 'board') return p.queue.length === 0 && inTray.length === 0;
+  // Tray: nothing lies around, and a place in the tray is only ever empty once nothing is left to hand out.
+  return p.loose.length === 0 && (p.queue.length === 0 || !p.tray.includes(null));
 }
 
 /**
@@ -89,15 +92,21 @@ export class JigsawGame {
     this.order = [...progress.order];
   }
 
-  /** A new puzzle, dealt from `seed`. Table pieces start in `spots` (needs at least one per piece), shuffled. */
+  /**
+   * A new puzzle, dealt from `seed`. Board and Table pieces start spread out in `spots` (needs at least one per piece,
+   * in pieces like every position), shuffled; Tray pieces wait in the tray and its queue.
+   */
   static fresh(style: JigsawStyle, count: PieceCount, seed: number, spots: readonly Point[] = []): JigsawGame {
     const { cols, rows } = GRID_SIZES[count];
     // Not the same numbers as the cut, so which pieces come first isn't tied to their shapes.
     const random = seededRandom(seed ^ 0x5bd1e995);
     const empty: JigsawProgress = { placed: [], queue: [], tray: [], loose: [], positions: [], groups: [], order: [], hints: 0, elapsedMs: 0 };
-    if (style === 'table') {
+    if (style !== 'tray') {
       const where = shuffle(spots.length > 0 ? spots : [{ x: 0, y: 0 }], random);
       const positions = range(count).map((id): [number, number] => [where[id % where.length].x, where[id % where.length].y]);
+      if (style === 'board') {
+        return new JigsawGame(style, count, { ...empty, tray: [null, null, null], loose: positions.map(([x, y], id): [number, number, number] => [id, x, y]) });
+      }
       return new JigsawGame(style, count, { ...empty, positions, groups: range(count), order: range(count) });
     }
     const order = trayOrder(cols, rows, random);
@@ -182,12 +191,17 @@ export class JigsawGame {
     this.shift(this.groupOf(id), at.x - from.x, at.y - from.y);
   }
 
-  /** Hint: places the tray's first piece (or, with the tray empty, the bottom one lying around). Returns it, or null when done. */
+  /**
+   * Hint: places the tray's first piece (Tray), or a piece lying around, corners first, then edge pieces, then the
+   * middle, the lowest first (Board). Table joins a piece to the biggest group. Returns the piece, or null when done.
+   */
   hint(): number | null {
     if (this.solved) return null;
     if (this.style === 'table') return this.hintOnTable();
-    const id = this.slots.find((slot) => slot !== null) ?? this.looseMap.keys().next().value;
-    if (id === undefined) return null;
+    const lying = [...this.looseMap.keys()];
+    const byEdges = (a: number, b: number) => edgesOf(b, this.cols, this.rows) - edgesOf(a, this.cols, this.rows);
+    const id = this.slots.find((slot) => slot !== null) ?? lying.sort(byEdges)[0];
+    if (id === undefined || id === null) return null;
     this.place(id);
     this.hintCount++;
     return id;

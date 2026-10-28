@@ -64,50 +64,59 @@ describe('Tray style', () => {
   });
 });
 
+/** Places 1.6 pieces apart, for spreading pieces out: nothing starts close enough to join, or near its own spot. */
+const spots = Array.from({ length: 40 }, (_, i) => ({ x: 7 + (i % 8) * 1.6, y: Math.floor(i / 8) * 1.6 }));
+
 describe('Board style', () => {
-  it('leaves a piece where she drops it, and hands her the next one', () => {
-    const game = JigsawGame.fresh('board', 16, 3);
-    const id = game.tray[2]!;
-    expect(game.drop(id, { x: 1.5, y: 1.5 })).toBe('loose');
-    expect(game.loose).toEqual([[id, { x: 1.5, y: 1.5 }]]);
-    expect(game.tray).not.toContain(id);
-    expect(game.tray[2]).not.toBeNull();
+  it('spreads every piece out at the start, with no tray', () => {
+    const game = JigsawGame.fresh('board', 9, 4, spots);
+    expect(game.tray).toEqual([null, null, null]);
+    expect(game.placed).toEqual([]);
+    const where = game.loose.map(([, p]) => p);
+    expect(sorted(game.loose.map(([id]) => id))).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(new Set(where.map((p) => `${p.x},${p.y}`)).size).toBe(9);
+    for (const p of where) expect(spots).toContainEqual(p);
   });
 
-  it('lets her pick a loose piece up again and click it in', () => {
-    const game = JigsawGame.fresh('board', 16, 3);
-    const id = game.tray[0]!;
-    game.drop(id, { x: 1.5, y: 1.5 });
-    expect(game.drop(id, game.home(id))).toBe('placed');
-    expect(game.loose).toEqual([]);
+  it('clicks a piece into its spot when dropped near it, and leaves it where she drops it otherwise', () => {
+    const game = JigsawGame.fresh('board', 16, 3, spots);
+    const [[a], [b]] = game.loose;
+    expect(game.drop(a, { x: game.home(a).x + SNAP - 0.01, y: game.home(a).y })).toBe('placed');
+    expect(game.isPlaced(a)).toBe(true);
+    expect(game.drop(b, { x: 1.5, y: 1.5 })).toBe('loose');
+    expect(game.loose[game.loose.length - 1]).toEqual([b, { x: 1.5, y: 1.5 }]);
+    expect(game.drop(b, game.home(b))).toBe('placed');
   });
 
   it('keeps the most recently moved loose piece on top', () => {
-    const game = JigsawGame.fresh('board', 16, 3);
-    const [a, b] = [game.tray[0]!, game.tray[1]!];
+    const game = JigsawGame.fresh('board', 16, 3, spots);
+    const [[a], [b]] = game.loose;
     game.drop(a, { x: 1.5, y: 1.5 });
     game.drop(b, { x: 1.6, y: 1.6 });
     game.drop(a, { x: 1.7, y: 1.7 });
-    expect(game.loose.map(([id]) => id)).toEqual([b, a]);
+    expect(game.loose.slice(-2).map(([id]) => id)).toEqual([b, a]);
   });
 
-  it('hints a piece from the tray first, then the bottom piece lying around', () => {
-    const game = JigsawGame.fresh('board', 9, 5);
-    const dropped: number[] = [];
-    while (game.tray.some((id) => id !== null)) {
-      const id = firstInTray(game);
-      dropped.push(id);
-      game.drop(id, { x: 1.5, y: 1.5 });
-    }
-    expect(game.hint()).toBe(dropped[0]);
-    expect(game.loose).toHaveLength(8);
+  it('hints the corners first, then the other edge pieces, then the middle', () => {
+    const game = JigsawGame.fresh('board', 9, 5, spots);
+    const hinted = Array.from({ length: 9 }, () => game.hint()!);
+    expect(sorted(hinted.slice(0, 4))).toEqual([0, 2, 6, 8]);
+    expect(sorted(hinted.slice(4, 8))).toEqual([1, 3, 5, 7]);
+    expect(hinted[8]).toBe(4);
+    expect(game.solved).toBe(true);
+    expect(game.hints).toBe(9);
+  });
+
+  it('starts afresh from a Board save made when Board had a tray', () => {
+    const old = JigsawGame.fresh('tray', 9, 1).progress(0);
+    expect(JigsawGame.restore('board', 9, old)).toBeNull();
   });
 });
 
 describe('saving and restoring', () => {
   it('picks up exactly where she left off', () => {
-    const game = JigsawGame.fresh('board', 16, 9);
-    game.drop(game.tray[0]!, { x: 1.5, y: 1.5 });
+    const game = JigsawGame.fresh('board', 16, 9, spots);
+    game.drop(game.loose[0][0], { x: 1.5, y: 1.5 });
     game.hint();
     const saved = game.progress(12_345);
     expect(saved.elapsedMs).toBe(12_345);
@@ -122,9 +131,6 @@ describe('saving and restoring', () => {
     expect(JigsawGame.restore('table', 9, saved)).toBeNull();
   });
 });
-
-/** Table spots 1.6 pieces apart: nothing starts close enough to join. */
-const spots = Array.from({ length: 40 }, (_, i) => ({ x: (i % 8) * 1.6, y: Math.floor(i / 8) * 1.6 }));
 
 describe('Table style', () => {
   it('spreads the pieces over the table, each on its own', () => {
@@ -188,14 +194,16 @@ describe('Table style', () => {
 
 describe('drops that make no sense', () => {
   it.each(['tray', 'board'] as const)('%s: sends back a piece that is waiting, placed, out of range, or dropped nowhere', (style) => {
-    const game = JigsawGame.fresh(style, 9, 42);
-    const waiting = game.progress(0).queue[0];
+    const game = JigsawGame.fresh(style, 9, 42, spots);
     const before = game.progress(0);
-    expect(game.drop(waiting, game.home(waiting))).toBe('back');
+    if (style === 'tray') {
+      const waiting = game.progress(0).queue[0];
+      expect(game.drop(waiting, game.home(waiting))).toBe('back');
+    }
     expect(game.drop(99, { x: 1, y: 1 })).toBe('back');
     expect(game.drop(-1, { x: 1, y: 1 })).toBe('back');
     expect(game.drop(1.5, { x: 1, y: 1 })).toBe('back');
-    const id = game.tray[0]!;
+    const id = style === 'tray' ? game.tray[0]! : game.loose[0][0];
     expect(game.drop(id, { x: NaN, y: 1 })).toBe('back');
     expect(game.drop(id, { x: 1, y: Infinity })).toBe('back');
     expect(game.progress(0)).toEqual(before);
@@ -237,12 +245,12 @@ describe('saves that fit, and saves that would leave her stuck', () => {
   });
 
   it('accepts a Board save with a loose piece lying exactly over its own spot', () => {
-    const game = JigsawGame.fresh('board', 9, 11);
-    const id = game.tray[0]!;
+    const game = JigsawGame.fresh('board', 9, 11, spots);
+    const id = game.loose[0][0];
     const home = game.home(id);
     expect(game.drop(id, { x: home.x + SNAP + 0.01, y: home.y })).toBe('loose');
     const saved = game.progress(0);
-    const over = { ...saved, loose: saved.loose.map(([piece]): [number, number, number] => [piece, home.x, home.y]) };
+    const over = { ...saved, loose: saved.loose.map(([piece, x, y]): [number, number, number] => (piece === id ? [piece, home.x, home.y] : [piece, x, y])) };
     expect(JigsawGame.restore('board', 9, over)!.progress(0)).toEqual(over);
   });
 
@@ -340,7 +348,7 @@ describe('Table style, the finer points', () => {
     table.settle(99, { x: 1, y: 1 });
     table.settle(2, { x: NaN, y: 1 });
     expect(table.progress(0)).toEqual(before);
-    const board = JigsawGame.fresh('board', 9, 4);
+    const board = JigsawGame.fresh('board', 9, 4, spots);
     const boardBefore = board.progress(0);
     board.settle(0, { x: 1, y: 1 });
     expect(board.progress(0)).toEqual(boardBefore);
@@ -396,7 +404,7 @@ describe('the table layout and the rules', () => {
   it('sets the pieces out so that none joins just by lying there', () => {
     const failures: string[] = [];
     for (const [width, height, thumb] of SCREENS_AND_THUMBS) {
-      const layout = computeJigsawLayout(computeFrameLayout(width, height, 4, thumb));
+      const layout = computeJigsawLayout(computeFrameLayout(width, height, 4, thumb), 'table');
       const origin = layout.free[0];
       for (const count of PIECE_COUNTS) {
         const table = tablePieces(layout, count);

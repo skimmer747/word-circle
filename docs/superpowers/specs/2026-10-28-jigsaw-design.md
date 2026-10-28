@@ -42,13 +42,13 @@ Add a fourth game to the site: **Jigsaw**, a big-piece jigsaw puzzle made from p
 - **Safe zones, Games and Clock:** exactly as in the other games.
 - **Hint** in the frame's `hintButton` (top-left of the play area).
 - **Pictures** (the game's own purple button, 4 px purple border, same size as Hint) 16 px to the right of Hint, where Word Circle's Shuffle sits.
-- **Tray** (Tray and Board styles): a soft-yellow backing from 16 px right of Pictures to 16 px left of the top-right corner, the same height as Hint, holding **3 square slots**. Slot size = `min(trayHeight − 12, (trayWidth − 4 × 12) / 3)`, 12 px apart, centered. A piece sits scaled down to fit its slot (tabs included) and grows to full size when picked up. On the smallest iPad (1024×768) the tray is 264 px wide and the slots 72 px, so a tray piece is about half its board size at 30 pieces but only about a quarter at 9; bigger iPads have a wider tray. Worth a close look at the first checkpoint.
-- **Box lid** (Table style): the tray's place shows the whole picture small (4:3, as tall as the tray), like the lid of a puzzle box. It is not a button.
+- **Tray** (Tray style only): a soft-yellow backing from 16 px right of Pictures to 16 px left of the top-right corner, the same height as Hint, holding **3 square slots**. Slot size = `min(trayHeight − 12, (trayWidth − 4 × 12) / 3)`, 12 px apart, centered. A piece sits scaled down to fit its slot (tabs included) and grows to full size when picked up. On the smallest iPad (1024×768) the tray is 264 px wide and the slots 72 px, so a tray piece is about half its board size at 30 pieces but only about a quarter at 9; bigger iPads have a wider tray. Worth a close look at the first checkpoint.
+- **Move picture** (Tray and Board styles; added at the owner's checkpoint): a purple button the size of Hint in the bottom-right corner of the play area, with an arrow pointing to the corner (or back to the board). It moves the guide picture between faint-on-the-board and a **small picture** just left of it (4:3, as tall as the two button rows, about 181 × 136 on the smallest iPad), and back. Her choice is remembered. Table style has no faint picture, so it always shows the small picture there (the old box lid at the top) and has no button. Both hide while she looks back at a finished picture.
 - **Two rows of buttons** at the bottom left, each 100 × 64 px, 8 px apart, in the shared level-button look (white, 3 px gray border; the chosen one has a 6 px purple border and a check above its label):
   - bottom row in the frame's `levelButtons` rects: **9**, **16**, **30**;
   - the row 8 px above it: **Tray**, **Board**, **Table**.
 - **Board** (Tray and Board styles): the largest 4:3 rectangle that fits the full play-area width, from 16 px below the Hint row to 16 px above the style row, centered horizontally. On the smallest iPad it is about 629 × 472, so a piece's body is about 210 × 157 (9 pieces), 157 × 118 (16) and 105 × 94 (30); bigger on bigger iPads.
-- **Free area:** the play area minus Hint, Pictures, the tray or lid, the top-right corner and the two button rows. Loose pieces (Board and Table styles) always stay inside it; one dropped partly outside is nudged back in.
+- **Free area:** the play area between the Hint row and the button rows, plus (in Board and Table styles, which have no tray) the strip between Pictures and the top-right corner. Loose pieces always stay inside it, tabs included; one dropped partly outside is nudged back in. The bottom-right corner belongs to the small picture and Move picture.
 - **Sizing** is a pure layout function, tested at 1024×768, 1080×810, 1133×744, 1180×820, 1194×834, 1366×1024 and 1376×1032, both thumb sides: nothing in the safe zones, nothing overlapping the corner, the rows or each other, 30-piece board pieces at least 95 px wide (the 1133×744 iPad is the tightest, at about 99), Table pieces at least 70 px wide.
 
 ### Pieces
@@ -70,11 +70,11 @@ Add a fourth game to the site: **Jigsaw**, a big-piece jigsaw puzzle made from p
 
 ### Board style
 
-Like Tray, except a piece dropped anywhere other than its spot **stays where she left it** (on the board or in the free area), and the tray hands her the next piece. A piece left lying around can be picked up again at any time and clicks in if dropped near its spot. Tap then tap works the same, except tapping somewhere other than its spot moves the piece there. The most recently moved piece is on top.
+Changed at the owner's checkpoint (it felt too much like Tray): **no tray; every piece starts spread out** over the free area, on and around the board, not touching, at Table size (about 140, 105 and 75 px on the smallest iPad). A piece grows to full size when she picks it up; dropped near its spot it clicks in, anywhere else it shrinks back and **stays where she left it**. Tap then tap: tapping a piece lifts it (a little bigger); tapping its own spot sends it there, tapping another spot leaves it lying there. Hint places a piece lying around: corners first, then edges, then the middle. The most recently moved piece is on top.
 
 ### Table style
 
-- No board and no faint picture; the box lid shows the whole picture small.
+- No board and no faint picture; the small picture at the bottom right shows the whole picture.
 - All the pieces start spread out over the free area in a jittered grid, not touching each other. Piece size is the largest that lets them all fit like that, so they are smaller than on the board: on the smallest iPad about 140, 105 and 75 px wide for 9, 16 and 30 pieces.
 - **Joining:** when she drops a piece or group so that one of its pieces lands within 30% of a piece's size of where it belongs next to another piece, the two snap together and join. A joined group moves as one when she drags any piece in it.
 - When every piece is in one group, the picture is done: it glides to the middle of the screen and grows to the board's size.
@@ -83,7 +83,7 @@ Like Tray, except a piece dropped anywhere other than its spot **stays where she
 ### Hint (all styles)
 
 The Hint star (`src/ui/hint-star.ts`) flies from the Hint button to a piece, and the piece glides home:
-- **Tray and Board:** the first piece in the tray, or, if the tray is empty, a piece left lying around.
+- **Tray:** the first piece in the tray. **Board:** a piece lying around, corners first, then edges, then the middle.
 - **Table:** a piece (with its group) that belongs next to the biggest group glides over and joins it.
 Each counts as one hint. The game is busy (pop-ups wait) until the piece lands.
 
@@ -189,7 +189,7 @@ public/jigsaw/       starter pictures and starters.json (generated)
 ## 5. Saving
 
 `word-games:jigsaw:v1` in local storage:
-- her style and piece count;
+- her style and piece count, and where the guide picture is (faint on the board or small in the corner);
 - the current picture, if a puzzle is in progress;
 - her place in up to the **20 most recently played** picture / style / piece-count mixes: placed pieces, tray order, loose pieces' positions and Table groups. Positions are stored relative to the board or free area, so they still fit after the thumb side changes;
 - the ids of pictures she has finished.

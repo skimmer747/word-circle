@@ -15,8 +15,10 @@ const apart = (rects: readonly Rect[]) => {
 
 describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, height, thumb) => {
   const frame = computeFrameLayout(width, height, 4, thumb);
-  const layout = computeJigsawLayout(frame);
-  const buttons = [layout.hintButton, layout.picturesButton, ...layout.styleButtons, ...layout.countButtons];
+  /** Tray style (the only one with a tray); Board and Table share the same layout otherwise. */
+  const layout = computeJigsawLayout(frame, 'tray');
+  const spread = computeJigsawLayout(frame, 'board');
+  const buttons = [layout.hintButton, layout.picturesButton, ...layout.styleButtons, ...layout.countButtons, layout.pictureButton];
 
   it('puts Hint and the piece counts where every game has Hint and its levels', () => {
     expect(layout.hintButton).toEqual(frame.hintButton);
@@ -33,15 +35,38 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
   });
 
   it('keeps everything in the play area, apart', () => {
-    const parts = [...buttons, layout.tray, layout.board, frame.corner];
-    for (const rect of [...parts, ...layout.free, layout.finished, layout.caption]) expect(inPlayArea(rect, frame)).toBe(true);
+    const parts = [...buttons, layout.tray, layout.board, layout.smallPicture, frame.corner];
+    for (const rect of [...parts, ...layout.free, ...spread.free, layout.finished, layout.caption]) expect(inPlayArea(rect, frame)).toBe(true);
     apart(parts);
   });
 
-  it('keeps the free area clear of the buttons, the tray and the corner', () => {
-    for (const area of layout.free) for (const rect of [...buttons, layout.tray, frame.corner]) expect(overlaps(area, rect)).toBe(false);
+  it('keeps the free area clear of the buttons, the tray, the small picture and the corner', () => {
+    for (const area of layout.free) for (const rect of [...buttons, layout.tray, layout.smallPicture, frame.corner]) expect(overlaps(area, rect)).toBe(false);
+    for (const area of spread.free) for (const rect of [...buttons, spread.smallPicture, frame.corner]) expect(overlaps(area, rect)).toBe(false);
     apart(layout.free);
+    apart(spread.free);
     expect(inside(layout.board, layout.free[0])).toBe(true);
+  });
+
+  it('lets pieces lie in the tray strip when there is no tray', () => {
+    expect(layout.free).toHaveLength(1);
+    expect(spread.free).toHaveLength(2);
+    expect(inside(spread.free[1], layout.tray)).toBe(true);
+    expect(computeJigsawLayout(frame, 'table').free).toEqual(spread.free);
+  });
+
+  it('puts Move picture in the bottom-right corner, with the small picture beside it', () => {
+    const { play } = frame;
+    expect([layout.pictureButton.w, layout.pictureButton.h]).toEqual([layout.hintButton.w, layout.hintButton.h]);
+    expect(layout.pictureButton.x + layout.pictureButton.w).toBeCloseTo(play.x + play.w);
+    expect(layout.pictureButton.y + layout.pictureButton.h).toBeCloseTo(play.y + play.h);
+    const small = layout.smallPicture;
+    expect(small.w / small.h).toBeCloseTo(4 / 3);
+    expect(small.h).toBeCloseTo(play.y + play.h - layout.styleButtons[0].y);
+    expect(small.x + small.w).toBeCloseTo(layout.pictureButton.x - 16);
+    expect(small.y + small.h).toBeCloseTo(play.y + play.h);
+    const lastRow = layout.countButtons[layout.countButtons.length - 1];
+    expect(small.x).toBeGreaterThanOrEqual(lastRow.x + lastRow.w + 16);
   });
 
   it('makes the board and the finished picture 4:3, with big pieces', () => {
@@ -51,10 +76,9 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
     apart([layout.finished, layout.caption, frame.corner]);
   });
 
-  it('fits three tray places and the box lid in the tray', () => {
+  it('fits three tray places in the tray', () => {
     expect(layout.slots).toHaveLength(3);
-    expect(layout.lid.w / layout.lid.h).toBeCloseTo(4 / 3);
-    for (const rect of [...layout.slots, layout.lid]) expect(inside(rect, layout.tray)).toBe(true);
+    for (const rect of layout.slots) expect(inside(rect, layout.tray)).toBe(true);
     apart(layout.slots);
     expect(layout.slots[0].w).toBeGreaterThanOrEqual(60);
   });
@@ -66,32 +90,32 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
     expect(overlaps(layout.reviewButton, frame.corner)).toBe(false);
   });
 
-  it.each(PIECE_COUNTS)('has room on the table for all %i pieces, apart, at least 70 px wide', (count) => {
-    const table = tablePieces(layout, count);
+  it.each(PIECE_COUNTS)('has room to spread all %i pieces out (Board, Table), apart, at least 70 px wide', (count) => {
+    const table = tablePieces(spread, count);
     expect(table.w).toBeGreaterThanOrEqual(70);
-    expect(table.w).toBeLessThanOrEqual(layout.board.w / GRID_SIZES[count].cols);
+    expect(table.w).toBeLessThanOrEqual(spread.board.w / GRID_SIZES[count].cols);
     expect(table.spots.length).toBeGreaterThanOrEqual(count);
     const tab = tabFor(table.w, table.h);
     const outers = table.spots.map((s) => ({ x: s.x - tab, y: s.y - tab, w: s.w + 2 * tab, h: s.h + 2 * tab }));
-    for (const outer of outers) expect(layout.free.some((area) => inside(outer, area))).toBe(true);
+    for (const outer of outers) expect(spread.free.some((area) => inside(outer, area))).toBe(true);
     apart(outers);
   });
 
-  it('makes table pieces smaller for more pieces, and measures each count once', () => {
-    const [nine, sixteen, thirty] = PIECE_COUNTS.map((count) => tablePieces(layout, count).w);
+  it('makes spread-out pieces smaller for more pieces, and measures each count once', () => {
+    const [nine, sixteen, thirty] = PIECE_COUNTS.map((count) => tablePieces(spread, count).w);
     expect(nine).toBeGreaterThanOrEqual(sixteen);
     expect(sixteen).toBeGreaterThanOrEqual(thirty);
-    expect(tablePieces(layout, 30)).toBe(tablePieces(layout, 30));
+    expect(tablePieces(spread, 30)).toBe(tablePieces(spread, 30));
   });
 
   it('keeps a piece the size of a 9-piece one, tabs and all, in the free area', () => {
-    const w = layout.board.w / 3;
-    const h = layout.board.h / 3;
+    const w = spread.board.w / 3;
+    const h = spread.board.h / 3;
     const overhang = tabFor(w, h);
-    const middle = layout.free[1];
-    const body = clampToFree(layout.free, { x: middle.x + middle.w / 2 - w / 2, y: middle.y + middle.h / 2 - h / 2, w, h }, overhang);
+    const strip = spread.free[1];
+    const body = clampToFree(spread.free, { x: strip.x + strip.w / 2 - w / 2, y: strip.y + strip.h / 2 - h / 2, w, h }, overhang);
     const outer = { x: body.x - overhang, y: body.y - overhang, w: w + 2 * overhang, h: h + 2 * overhang };
-    expect(layout.free.some((area) => inside(outer, area))).toBe(true);
+    expect(spread.free.some((area) => inside(outer, area))).toBe(true);
   });
 
   it('lays out the picture page clear of the corner', () => {

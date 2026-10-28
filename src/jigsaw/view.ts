@@ -1,10 +1,11 @@
 import type { Rect } from '../frame/layout';
 import { el, place, restartAnimation, wait } from '../ui/dom';
 import { flyHintStar, landHintLetter } from '../ui/hint-star';
-import { CHECK_ICON, HINT_ICON, PICTURES_ICON } from '../ui/icons';
+import { CHECK_ICON, HINT_ICON, PICTURE_TO_BOARD_ICON, PICTURE_TO_CORNER_ICON, PICTURES_ICON } from '../ui/icons';
 import { piecePath, tabFor, type PieceShape } from './cut';
 import type { JigsawLayout } from './layout';
 import { EDGE_ROOM, drawPieces } from './pieces';
+import type { Guide } from './storage';
 import { JIGSAW_STYLES, PIECE_COUNTS, type JigsawStyle, type Picture, type PieceCount } from './types';
 
 const STYLE_LABELS: Record<JigsawStyle, string> = { tray: 'Tray', board: 'Board', table: 'Table' };
@@ -12,17 +13,19 @@ const STYLE_LABELS: Record<JigsawStyle, string> = { tray: 'Tray', board: 'Board'
 const FADE_MS = 600;
 /** ...which then grows into place. */
 const GROW_MS = 500;
-/** A tray piece lifted by a tap is drawn this much bigger. */
+/** A shrunk piece (in the tray, or lying around in Board style) lifted by a tap is drawn this much bigger. */
 const LIFT = 1.25;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-/** Where one piece is drawn: its body (without tabs) on screen, and what it's doing. */
+/** Where one piece is drawn: its full-size body (without tabs) on screen, and what it's doing. */
 export interface PieceSpot {
   id: number;
   body: Rect;
   where: 'tray' | 'placed' | 'loose' | 'table';
   /** The tray place it sits in, shrunk to fit (where = 'tray'). */
   slot?: Rect;
+  /** Drawn this much smaller, around the middle of `body` (Board pieces lying around). */
+  scale?: number;
 }
 
 export interface JigsawViewState {
@@ -38,6 +41,8 @@ export interface JigsawViewState {
   pieces: readonly PieceSpot[];
   /** The piece lifted by a tap, waiting for a tap on its spot. */
   lifted: number | null;
+  /** Where the guide picture is: faint on the board, or small in the bottom-right corner (always there in Table). */
+  guide: Guide;
 }
 
 /** A piece's element: its body plus its tabs and the room for its edge on every side. */
@@ -72,13 +77,18 @@ export class JigsawView {
     this.button(board, 'button pictures', `${PICTURES_ICON}<span>Pictures</span>`, layout.picturesButton);
     JIGSAW_STYLES.forEach((style, i) => this.choice(board, STYLE_LABELS[style], style === state.style, layout.styleButtons[i]));
     PIECE_COUNTS.forEach((count, i) => this.choice(board, String(count), count === state.count, layout.countButtons[i]));
-    place(el('div', 'tray', board), layout.tray);
-    if (state.style !== 'table') this.drawBoard(board, state);
-    else if (state.picture) {
-      const lid = el('img', 'jigsaw-lid', board);
-      lid.alt = '';
-      lid.src = state.picture.src;
-      place(lid, layout.lid);
+    if (state.style === 'tray') place(el('div', 'tray', board), layout.tray);
+    if (state.style !== 'table') {
+      this.drawBoard(board, state);
+      const toCorner = state.guide === 'board';
+      const icon = toCorner ? PICTURE_TO_CORNER_ICON : PICTURE_TO_BOARD_ICON;
+      this.button(board, 'button move-picture', `${icon}<span>Move picture</span>`, layout.pictureButton);
+    }
+    if (state.guide === 'corner' && state.picture) {
+      const small = el('img', 'jigsaw-small', board);
+      small.alt = '';
+      small.src = state.picture.src;
+      place(small, layout.smallPicture);
     }
 
     this.cut(state);
@@ -103,9 +113,10 @@ export class JigsawView {
       place(piece, rect);
       // Stacked with z-index rather than page order: moving an element in the page would stop its glide.
       piece.style.zIndex = String(i + 1);
-      // Shrunk to fit its tray place; a lifted one grows a little, as its glow is tiny at that size.
+      // Shrunk to fit its tray place, or lying around smaller (Board); a lifted one grows a little, as its glow is tiny then.
+      const shrink = spot.slot ? Math.min(spot.slot.w / rect.w, spot.slot.h / rect.h) : spot.scale;
       const lift = state.lifted === spot.id ? LIFT : 1;
-      piece.style.transform = spot.slot ? `scale(${lift * Math.min(spot.slot.w / rect.w, spot.slot.h / rect.h)})` : '';
+      piece.style.transform = shrink ? `scale(${lift * shrink})` : '';
       for (const where of WHERE) piece.classList.toggle(`at-${where}`, where === spot.where);
       piece.classList.toggle('lifted', state.lifted === spot.id);
     });
@@ -224,14 +235,19 @@ export class JigsawView {
     this.button(parent, on ? 'level on' : 'level', `${on ? CHECK_ICON : ''}<span>${label}</span>`, rect);
   }
 
-  /** The board: the picture faintly, with thin lines along the piece edges. */
+  /** The board: the picture faintly (unless it is small in the corner), with thin lines along the piece edges. */
   private drawBoard(board: HTMLElement, state: JigsawViewState): void {
     const back = el('div', 'jigsaw-board', board);
     place(back, this.layout.board);
     if (!state.picture) return;
-    const faint = el('img', 'jigsaw-faint', back);
-    faint.alt = '';
-    faint.src = state.picture.src;
+    if (state.guide === 'board') {
+      const faint = el('img', 'jigsaw-faint', back);
+      faint.alt = '';
+      faint.src = state.picture.src;
+    } else {
+      // A plain board: the piece lines turn gray, as white lines wouldn't show.
+      back.classList.add('plain');
+    }
     if (state.shapes.length === 0) return;
     const { w, h } = state.pieceSize;
     const tab = tabFor(w, h);

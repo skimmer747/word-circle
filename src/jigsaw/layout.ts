@@ -1,6 +1,6 @@
 import { reviewButtonIn, type FrameLayout, type Rect } from '../frame/layout';
 import { tabFor } from './cut';
-import { GRID_SIZES, PICTURE_ASPECT, type PieceCount } from './types';
+import { GRID_SIZES, PICTURE_ASPECT, type JigsawStyle, type PieceCount } from './types';
 
 /** Space between Hint, Pictures, the tray, the board, the rows and the top-right buttons. */
 const GAP = 16;
@@ -9,8 +9,8 @@ const SLOT_GAP = 12;
 const SLOT_PADDING = 6;
 /** Tray, Board and Table sit this far above 9, 16 and 30. */
 const ROW_GAP = 8;
-/** Table pieces start at least this far apart. */
-const TABLE_GAP = 8;
+/** Spread-out pieces start at least this far apart (enough for 30 pieces of 70 px on the smallest iPad). */
+const TABLE_GAP = 6;
 /** Table pieces are never smaller than this. On every iPad in landscape there is always a spot per piece well above
  * it (portrait shows the turn-the-iPad overlay instead), so this only stops the search for a size. */
 const TABLE_MIN = 40;
@@ -30,12 +30,14 @@ export interface JigsawLayout {
   hintButton: Rect;
   /** The game's own purple button, beside Hint. */
   picturesButton: Rect;
-  /** The yellow backing: the tray (Tray and Board) or the box lid's place (Table). */
+  /** The yellow tray (Tray style; the other styles leave this strip to the pieces). */
   tray: Rect;
   /** The tray's three square places for pieces. */
   slots: Rect[];
-  /** The whole picture, small, in the tray's place (Table). */
-  lid: Rect;
+  /** Move picture, in the bottom-right corner: the guide picture between faint-on-the-board and small (Tray, Board). */
+  pictureButton: Rect;
+  /** The whole picture, small, just left of Move picture. */
+  smallPicture: Rect;
   /** Tray, Board, Table: just above the piece counts. */
   styleButtons: Rect[];
   /** 9, 16, 30: the frame's level row. */
@@ -43,8 +45,8 @@ export interface JigsawLayout {
   /** The 4:3 board (Tray and Board). */
   board: Rect;
   /**
-   * Where loose pieces may lie: everything clear of the buttons, the tray and the rows. The table starts at free[0].
-   * The 16 px gap above the rows, to the right of the buttons, is deliberately not free (it keeps pieces off them).
+   * Where loose pieces may lie: between the Hint row and the button rows (free[0], where spread-out pieces are
+   * counted from), plus the tray's strip in the styles without a tray. The bottom-right corner is the small picture's.
    */
   free: Rect[];
   /** Where the finished picture is shown, and its caption under it. */
@@ -61,9 +63,10 @@ function fit(area: Rect, aspect: number): Rect {
   return { x: area.x + (area.w - w) / 2, y: area.y + (area.h - h) / 2, w, h };
 }
 
-export function computeJigsawLayout(frame: FrameLayout): JigsawLayout {
+export function computeJigsawLayout(frame: FrameLayout, style: JigsawStyle): JigsawLayout {
   // Hint top left and the piece counts in the level row, as in every game; Pictures beside Hint (where Word Circle
-  // has Shuffle); the tray between Pictures and the top-right buttons; Tray, Board and Table above the counts.
+  // has Shuffle); the tray between Pictures and the top-right buttons; Tray, Board and Table above the counts;
+  // Move picture in the bottom-right corner with the small picture beside it.
   const { play, hintButton, levelButtons: countButtons, corner } = frame;
   const picturesButton = { ...hintButton, x: hintButton.x + hintButton.w + GAP };
   const trayLeft = picturesButton.x + picturesButton.w + GAP;
@@ -71,15 +74,16 @@ export function computeJigsawLayout(frame: FrameLayout): JigsawLayout {
   const slot = Math.floor(Math.min(tray.h - 2 * SLOT_PADDING, (tray.w - (SLOT_COUNT + 1) * SLOT_GAP) / SLOT_COUNT));
   const slotsLeft = tray.x + (tray.w - (SLOT_COUNT * slot + (SLOT_COUNT - 1) * SLOT_GAP)) / 2;
   const slots = Array.from({ length: SLOT_COUNT }, (_, i) => ({ x: slotsLeft + i * (slot + SLOT_GAP), y: tray.y + (tray.h - slot) / 2, w: slot, h: slot }));
-  const lid = fit({ x: tray.x, y: tray.y + SLOT_PADDING, w: tray.w, h: tray.h - 2 * SLOT_PADDING }, PICTURE_ASPECT);
   const styleButtons = countButtons.map((rect) => ({ ...rect, y: rect.y - ROW_GAP - rect.h }));
 
   const top = hintButton.y + hintButton.h + GAP;
   const rowsTop = styleButtons[0].y;
+  const bottom = play.y + play.h;
   const main = { x: play.x, y: top, w: play.w, h: rowsTop - GAP - top };
-  const last = countButtons[countButtons.length - 1];
-  const besideRowsLeft = last.x + last.w + GAP;
-  const besideRows = { x: besideRowsLeft, y: rowsTop, w: play.x + play.w - besideRowsLeft, h: play.y + play.h - rowsTop };
+  const pictureButton = { x: play.x + play.w - hintButton.w, y: bottom - hintButton.h, w: hintButton.w, h: hintButton.h };
+  const smallHeight = bottom - rowsTop;
+  const smallWidth = smallHeight * PICTURE_ASPECT;
+  const smallPicture = { x: pictureButton.x - GAP - smallWidth, y: rowsTop, w: smallWidth, h: smallHeight };
   const caption = { x: play.x, y: play.y + play.h - CAPTION_HEIGHT, w: play.w, h: CAPTION_HEIGHT };
   return {
     frame,
@@ -87,11 +91,12 @@ export function computeJigsawLayout(frame: FrameLayout): JigsawLayout {
     picturesButton,
     tray,
     slots,
-    lid,
+    pictureButton,
+    smallPicture,
     styleButtons,
     countButtons,
     board: fit(main, PICTURE_ASPECT),
-    free: [main, besideRows],
+    free: style === 'tray' ? [main] : [main, tray],
     finished: fit({ x: play.x, y: top, w: play.w, h: caption.y - GAP - top }, PICTURE_ASPECT),
     caption,
     reviewButton: reviewButtonIn({ x: play.x, y: play.y, w: corner.x - GAP - play.x, h: hintButton.h }),

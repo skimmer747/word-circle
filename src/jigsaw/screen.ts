@@ -41,7 +41,8 @@ interface Held {
   down: Point;
   /** Where her finger is on the first piece's body; set on the first move. */
   grab: Point | null;
-  fromTray: boolean;
+  /** It was shown smaller (in the tray, or lying around in Board style) and grows to full size under her finger. */
+  grows: boolean;
 }
 
 export interface JigsawOptions {
@@ -58,6 +59,14 @@ const boundsOf = (rects: readonly Rect[]): Rect => {
 };
 
 const moved = (a: PieceSpot, b: PieceSpot) => a.where !== b.where || a.body.x !== b.body.x || a.body.y !== b.body.y;
+
+/** `body` shrunk to `scale` around its middle. */
+const around = (body: Rect, scale: number): Rect => ({
+  x: body.x + (body.w * (1 - scale)) / 2,
+  y: body.y + (body.h * (1 - scale)) / 2,
+  w: body.w * scale,
+  h: body.h * scale,
+});
 
 /** Jigsaw: big-piece puzzles from pictures, played from a tray, on a board, or loose on a table. */
 export class JigsawScreen implements GameScreen {
@@ -111,7 +120,7 @@ export class JigsawScreen implements GameScreen {
     if (!this.view) this.view = new JigsawView(layer);
     this.held = null;
     this.stale = false;
-    this.layout = computeJigsawLayout(frame);
+    this.layout = computeJigsawLayout(frame, this.saved.style);
     // The finished picture is on screen (fading in, or behind "Well done!"): keep it, only moved to fit.
     if (this.busy && this.mode === 'puzzle') {
       this.view.placeFinished(this.layout);
@@ -132,6 +141,7 @@ export class JigsawScreen implements GameScreen {
     else if (id === 'pics-close') this.closePictures();
     else if (id === 'pictures') this.showPictures();
     else if (id === 'hint') void this.hint();
+    else if (id === 'move-picture') this.movePicture();
     else if (id.startsWith('style:')) this.choose({ style: id.slice('style:'.length) as JigsawStyle });
     else if (id.startsWith('count:')) this.choose({ count: Number(id.slice('count:'.length)) as PieceCount });
     else if (id.startsWith('piece:')) this.tapPiece(Number(id.slice('piece:'.length)));
@@ -149,7 +159,8 @@ export class JigsawScreen implements GameScreen {
     const starts = ids.map((p) => spots.find((s) => s.id === p)?.body);
     if (starts.some((s) => !s)) return;
     this.lifted = null;
-    this.held = { id: piece, ids, starts: starts as Rect[], down: { x, y }, grab: null, fromTray: game.tray.includes(piece) };
+    const grows = game.tray.includes(piece) || (game.style === 'board' && !game.isPlaced(piece));
+    this.held = { id: piece, ids, starts: starts as Rect[], down: { x, y }, grab: null, grows };
     this.view.hold(ids);
   }
 
@@ -158,9 +169,9 @@ export class JigsawScreen implements GameScreen {
     if (!held || !this.view) return;
     if (!held.grab) {
       const first = held.starts[0];
-      // A piece from the tray grows to full size under her finger; anything else stays held where she touched it
+      // A piece shown smaller grows to full size under her finger; anything else stays held where she touched it
       // (the finger has already moved a little before a drag starts).
-      if (held.fromTray) {
+      if (held.grows) {
         held.starts[0] = { ...first, x: x - first.w / 2, y: y - first.h / 2 };
         held.grab = { x: first.w / 2, y: first.h / 2 };
       } else {
@@ -177,9 +188,11 @@ export class JigsawScreen implements GameScreen {
     this.held = null;
     if (!held?.grab || !game || !layout || !this.view) return this.dragCancelled();
     const bodies = this.heldBodies(held, x, y).map((b) => b.body);
-    // What she drops stays inside the free area, tabs too (a group as a whole).
-    const box = boundsOf(bodies);
-    const kept = clampToFree(layout.free, box, this.tab(layout, game));
+    // What she drops stays inside the free area, tabs too (a group as a whole; in Board style, the smaller piece it
+    // goes back to being if it doesn't click in).
+    const box = game.style === 'board' ? this.shrunk(layout, game, bodies[0]) : boundsOf(bodies);
+    const boxTab = game.style === 'board' ? tabFor(box.w, box.h) : this.tab(layout, game);
+    const kept = clampToFree(layout.free, box, boxTab);
     const first = { ...bodies[0], x: bodies[0].x + kept.x - box.x, y: bodies[0].y + kept.y - box.y };
     const result = game.drop(held.id, this.toPieces(layout, game, first));
     // A join lines the group up with the piece it fits, which can nudge it partly out of the free area.
@@ -281,7 +294,7 @@ export class JigsawScreen implements GameScreen {
     const seed = pieceSeed(picture.id, count);
     const place = placeFor(this.saved, picture.id, style, count);
     const restored = place ? JigsawGame.restore(style, count, place.progress) : null;
-    this.game = restored ?? JigsawGame.fresh(style, count, seed, style === 'table' ? this.startSpots(layout, count) : []);
+    this.game = restored ?? JigsawGame.fresh(style, count, seed, style === 'tray' ? [] : this.startSpots(layout, style, count));
     this.shapes = cutPieces(cols, rows, seed);
     this.timer = new PlayTimer(restored && place ? place.progress.elapsedMs : 0);
     if (document.hidden) this.timer.pause();
@@ -289,11 +302,24 @@ export class JigsawScreen implements GameScreen {
     this.save();
   }
 
-  /** Where table pieces may start, in table pieces from the table's corner. */
-  private startSpots(layout: JigsawLayout, count: PieceCount): Point[] {
+  /**
+   * Where spread-out pieces start: in table pieces from the table's corner (Table), or, for Board, where a full-size
+   * piece would be (in board pieces from the board's corner) with its middle on the spot's middle.
+   */
+  private startSpots(layout: JigsawLayout, style: JigsawStyle, count: PieceCount): Point[] {
     const table = tablePieces(layout, count);
-    const origin = layout.free[0];
-    return table.spots.map((s) => ({ x: (s.x - origin.x) / table.w, y: (s.y - origin.y) / table.h }));
+    if (style === 'table') {
+      const origin = layout.free[0];
+      return table.spots.map((s) => ({ x: (s.x - origin.x) / table.w, y: (s.y - origin.y) / table.h }));
+    }
+    const { w, h } = this.boardSize(layout, count);
+    const { board } = layout;
+    return table.spots.map((s) => ({ x: (s.x + s.w / 2 - w / 2 - board.x) / w, y: (s.y + s.h / 2 - h / 2 - board.y) / h }));
+  }
+
+  /** A Board piece lying around: the full-size body, shrunk to the spread-out size around its middle. */
+  private shrunk(layout: JigsawLayout, game: JigsawGame, full: Rect): Rect {
+    return around(full, tablePieces(layout, game.count).w / full.w);
   }
 
   private save(): void {
@@ -386,9 +412,15 @@ export class JigsawScreen implements GameScreen {
       spots = game.stacking.map((id) => ({ id, body: this.fromPieces(layout, game, game.positionOf(id)), where: 'table' }));
     } else {
       const { w, h } = this.boardSize(layout, game.count);
-      const tab = tabFor(w, h);
       spots = game.placed.map((id) => ({ id, body: this.fromPieces(layout, game, game.home(id)), where: 'placed' as const }));
-      for (const [id, at] of game.loose) spots.push({ id, body: clampToFree(layout.free, this.fromPieces(layout, game, at), tab), where: 'loose' });
+      // Pieces lying around (Board) are drawn smaller, around the middle of where a full-size one would be, and that
+      // smaller piece is what's kept in the free area (the screen may have changed since it was put down).
+      for (const [id, at] of game.loose) {
+        const full = this.fromPieces(layout, game, at);
+        const small = this.shrunk(layout, game, full);
+        const kept = clampToFree(layout.free, small, tabFor(small.w, small.h));
+        spots.push({ id, body: { ...full, x: full.x + kept.x - small.x, y: full.y + kept.y - small.y }, where: 'loose', scale: small.w / full.w });
+      }
       game.tray.forEach((id, i) => {
         if (id === null) return;
         const slot = layout.slots[i];
@@ -411,6 +443,8 @@ export class JigsawScreen implements GameScreen {
       pieceSize: game && layout ? this.pieceSize(layout, game) : { w: 0, h: 0 },
       pieces: image ? this.pieceSpots() : [],
       lifted: this.lifted,
+      // Table has no faint picture: its small picture is always in the corner.
+      guide: this.saved.style === 'table' ? 'corner' : this.saved.guide,
     };
   }
 
@@ -423,12 +457,13 @@ export class JigsawScreen implements GameScreen {
       ...JIGSAW_STYLES.map((style, i) => ({ id: `style:${style}`, ...layout.styleButtons[i] })),
       ...PIECE_COUNTS.map((count, i) => ({ id: `count:${count}`, ...layout.countButtons[i] })),
     ];
+    if (this.saved.style !== 'table') buttons.push({ id: 'move-picture', ...layout.pictureButton });
     const draggables: ButtonGeometry[] = [];
     if (game && this.ready()) {
-      // Topmost first: the touch tracker takes the first piece under her finger.
+      // Topmost first: the touch tracker takes the first piece under her finger (where she sees it, shrunk or not).
       for (const spot of [...this.pieceSpots()].reverse()) {
         if (spot.where === 'placed' || this.frozen?.has(spot.id)) continue;
-        draggables.push({ id: `piece:${spot.id}`, ...(spot.slot ?? spot.body) });
+        draggables.push({ id: `piece:${spot.id}`, ...(spot.slot ?? (spot.scale ? around(spot.body, spot.scale) : spot.body)) });
       }
       // With a piece lifted by a tap, the board's empty spots can be tapped. They come after the pieces (the touch
       // tracker would put buttons first), so a piece lying over a spot is still picked up.
@@ -564,6 +599,14 @@ export class JigsawScreen implements GameScreen {
     this.host.redraw(true);
     this.timer.resume(performance.now());
     this.resetIdle();
+  }
+
+  /** Move picture: the guide picture between faint-on-the-board and small in the corner. Remembered. */
+  private movePicture(): void {
+    if (this.saved.style === 'table') return;
+    this.saved = { ...this.saved, guide: this.saved.guide === 'board' ? 'corner' : 'board' };
+    saveSavedJigsaw(this.store, this.saved);
+    this.host.redraw(false);
   }
 
   private turnPage(step: number): void {
