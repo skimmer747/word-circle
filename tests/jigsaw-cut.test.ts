@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cutPieces, pieceSeed, piecePath, tabFor, type PieceShape } from '../src/jigsaw/cut';
+import { cutPieces, disguiseEdges, pieceSeed, piecePath, tabFor, type PieceShape } from '../src/jigsaw/cut';
 import { GRID_SIZES, PIECE_COUNTS } from '../src/jigsaw/types';
 
 const numbers = (d: string) => (d.match(/-?\d+(\.\d+)?/g) ?? []).map(Number);
@@ -117,5 +117,30 @@ describe('which way each side bulges, on a 105 × 94 piece', () => {
     const d = outline({ ...flat, left: -1 });
     expect(Math.min(...xs(d))).toBeCloseTo(tab, 2);
     expect(xs(d)).toContainEqual(expect.closeTo(2 * tab, 2));
+  });
+});
+
+describe('hiding the edge pieces', () => {
+  it.each(PIECE_COUNTS)('gives every straight side a tab or a hole, and changes nothing else (%i pieces)', (count) => {
+    const { cols, rows } = GRID_SIZES[count];
+    const real = cutPieces(cols, rows, 7);
+    const hidden = disguiseEdges(real, 7);
+    hidden.forEach((shape, i) => {
+      for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+        expect(shape[side]).not.toBe(0);
+        if (real[i][side] !== 0) expect(shape[side]).toBe(real[i][side]);
+      }
+      expect([shape.col, shape.row]).toEqual([real[i].col, real[i].row]);
+    });
+    // The real cut is left as it was.
+    expect(real.some((shape) => shape.top === 0)).toBe(true);
+  });
+
+  it('hides them the same way every time, with tabs and holes both', () => {
+    const real = cutPieces(6, 5, 3);
+    expect(disguiseEdges(real, 3)).toEqual(disguiseEdges(real, 3));
+    const fake = disguiseEdges(real, 3).flatMap((shape, i) => (['top', 'right', 'bottom', 'left'] as const).filter((side) => real[i][side] === 0).map((side) => shape[side]));
+    expect(fake).toContain(1);
+    expect(fake).toContain(-1);
   });
 });

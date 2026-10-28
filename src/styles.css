@@ -2194,12 +2194,18 @@ body {
   color: var(--shuffle);
 }
 
+/* As tall as a level button, with Hide edges under it: the arrow beside the words. */
 .button.move-picture {
+  flex-direction: row;
+  gap: 6px;
   border-color: var(--shuffle);
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .button.move-picture svg {
+  flex: none;
+  width: 28px;
+  height: 28px;
   color: var(--shuffle);
 }
 

@@ -12,7 +12,7 @@ import { jigsawRecord } from '../stats/records';
 import { wait } from '../ui/dom';
 import { PICTURES_ICON } from '../ui/icons';
 import { jigsawLines } from './celebration';
-import { cutPieces, pieceSeed, tabFor, type PieceShape } from './cut';
+import { cutPieces, disguiseEdges, pieceSeed, tabFor, type PieceShape } from './cut';
 import { clampToFree, computeJigsawLayout, computePicturePageLayout, tablePieces, type JigsawLayout } from './layout';
 import { renderPicturePage } from './picture-page';
 import { PAGE_SIZE, PAGE_WITH_ADD, picturePage } from './pictures';
@@ -99,6 +99,8 @@ export class JigsawScreen implements GameScreen {
   /** Made at the next render (Table pieces start where the layout has room). */
   private game: JigsawGame | null = null;
   private shapes: PieceShape[] = [];
+  /** The same pieces with their straight sides hidden (Hide edges). */
+  private disguises: PieceShape[] = [];
   private readonly images = new Map<string, HTMLImageElement>();
   private held: Held | null = null;
   private lifted: number | null = null;
@@ -157,6 +159,7 @@ export class JigsawScreen implements GameScreen {
     else if (id === 'pictures') this.showPictures();
     else if (id === 'hint') void this.hint();
     else if (id === 'move-picture') this.movePicture();
+    else if (id === 'hide-edges') this.hideEdges();
     else if (id.startsWith('style:')) this.choose({ style: id.slice('style:'.length) as JigsawStyle });
     else if (id.startsWith('count:')) this.choose({ count: Number(id.slice('count:'.length)) as PieceCount });
     else if (id.startsWith('piece:')) this.tapPiece(Number(id.slice('piece:'.length)));
@@ -318,8 +321,10 @@ export class JigsawScreen implements GameScreen {
     const seed = pieceSeed(picture.id, count);
     const place = placeFor(this.saved, picture.id, style, count);
     const restored = place ? JigsawGame.restore(style, count, place.progress) : null;
-    this.game = restored ?? JigsawGame.fresh(style, count, seed, style === 'tray' ? [] : this.startSpots(layout, style, count));
+    const spots = style === 'tray' ? [] : this.startSpots(layout, style, count);
+    this.game = restored ?? JigsawGame.fresh(style, count, seed, spots, this.saved.hideEdges);
     this.shapes = cutPieces(cols, rows, seed);
+    this.disguises = disguiseEdges(this.shapes, seed);
     this.timer = new PlayTimer(restored && place ? place.progress.elapsedMs : 0);
     if (document.hidden) this.timer.pause();
     else this.timer.activity(performance.now());
@@ -451,6 +456,10 @@ export class JigsawScreen implements GameScreen {
         spots.push({ id, body: { x: slot.x + slot.w / 2 - w / 2, y: slot.y + slot.h / 2 - h / 2, w, h }, where: 'tray', slot });
       });
     }
+    // Hide edges: a piece keeps its disguise until it's in place (Tray, Board) or joined to another (Table).
+    if (this.saved.hideEdges) {
+      for (const spot of spots) spot.disguised = game.style === 'table' ? game.groupOf(spot.id).length === 1 : spot.where !== 'placed';
+    }
     const frozen = this.frozen;
     return frozen ? spots.map((s) => frozen.get(s.id) ?? s) : spots;
   }
@@ -469,6 +478,8 @@ export class JigsawScreen implements GameScreen {
       lifted: this.lifted,
       // Table has no faint picture: its small picture is always in the corner.
       guide: this.saved.style === 'table' ? 'corner' : this.saved.guide,
+      hideEdges: this.saved.hideEdges,
+      disguises: image && game && this.saved.hideEdges ? this.disguises : [],
     };
   }
 
@@ -482,6 +493,7 @@ export class JigsawScreen implements GameScreen {
       ...PIECE_COUNTS.map((count, i) => ({ id: `count:${count}`, ...layout.countButtons[i] })),
     ];
     if (this.saved.style !== 'table') buttons.push({ id: 'move-picture', ...layout.pictureButton });
+    buttons.push({ id: 'hide-edges', ...layout.edgesButton });
     const draggables: ButtonGeometry[] = [];
     if (game && this.ready()) {
       // Topmost first: the touch tracker takes the first piece under her finger (where she sees it, shrunk or not).
@@ -653,6 +665,13 @@ export class JigsawScreen implements GameScreen {
     this.host.redraw(true);
     this.timer.resume(performance.now());
     this.resetIdle();
+  }
+
+  /** Hide edges on or off: the pieces change straight away; a new Tray puzzle deals mixed. Remembered. */
+  private hideEdges(): void {
+    this.saved = { ...this.saved, hideEdges: !this.saved.hideEdges };
+    saveSavedJigsaw(this.store, this.saved);
+    this.host.redraw(false);
   }
 
   /** Move picture: the guide picture between faint-on-the-board and small in the corner. Remembered. */

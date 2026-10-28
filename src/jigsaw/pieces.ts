@@ -7,7 +7,8 @@ export const EDGE_ROOM = 2;
 
 /**
  * Cuts a 4:3 picture into piece images, each w × h plus its tabs and EDGE_ROOM on every side: the photo inside the
- * piece's outline, with a thin white edge so neighbors stand apart until the end.
+ * piece's outline, with a thin white edge so neighbors stand apart until the end. A tab on the picture's own edge (Hide
+ * edges) reaches past the photo, so it shows the photo mirrored there.
  */
 export function drawPieces(image: HTMLImageElement, shapes: readonly PieceShape[], cols: number, rows: number, w: number, h: number): HTMLCanvasElement[] {
   const tab = tabFor(w, h);
@@ -31,7 +32,23 @@ export function drawPieces(image: HTMLImageElement, shapes: readonly PieceShape[
     const top = shape.row * h - tab;
     const [x0, y0] = [Math.max(0, left), Math.max(0, top)];
     const [x1, y1] = [Math.min(cols * w, left + w + 2 * tab), Math.min(rows * h, top + h + 2 * tab)];
-    context.drawImage(image, x0 * sx, y0 * sy, (x1 - x0) * sx, (y1 - y0) * sy, x0 - left, y0 - top, x1 - x0, y1 - y0);
+    const draw = () => context.drawImage(image, x0 * sx, y0 * sy, (x1 - x0) * sx, (y1 - y0) * sy, x0 - left, y0 - top, x1 - x0, y1 - y0);
+    draw();
+    // Each mirror flips the photo over one of the picture's edges (where the piece is), filling a fake tab beyond it.
+    const mirrors: Array<[boolean, number, number, number, number]> = [
+      [shape.row === 0 && shape.top !== 0, 0, 2 * -top, 1, -1],
+      [shape.row === rows - 1 && shape.bottom !== 0, 0, 2 * (rows * h - top), 1, -1],
+      [shape.col === 0 && shape.left !== 0, 2 * -left, 0, -1, 1],
+      [shape.col === cols - 1 && shape.right !== 0, 2 * (cols * w - left), 0, -1, 1],
+    ];
+    for (const [needed, dx, dy, flipX, flipY] of mirrors) {
+      if (!needed) continue;
+      context.save();
+      context.translate(dx, dy);
+      context.scale(flipX, flipY);
+      draw();
+      context.restore();
+    }
     context.restore();
     context.strokeStyle = 'rgba(255, 255, 255, 0.9)';
     context.lineWidth = 2;

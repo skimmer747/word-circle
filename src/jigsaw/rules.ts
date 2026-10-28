@@ -19,7 +19,9 @@ function edgesOf(id: number, cols: number, rows: number): number {
 }
 
 /** The order the tray hands pieces out: the corners, then the other edge pieces, then the middle, each shuffled. */
-export function trayOrder(cols: number, rows: number, random: () => number): number[] {
+export function trayOrder(cols: number, rows: number, random: () => number, mixed = false): number[] {
+  // With edges hidden, corners first would give them away.
+  if (mixed) return shuffle(range(cols * rows), random);
   const corners: number[] = [];
   const edges: number[] = [];
   const middle: number[] = [];
@@ -96,7 +98,8 @@ export class JigsawGame {
    * A new puzzle, dealt from `seed`. Board and Table pieces start spread out in `spots` (needs at least one per piece,
    * in pieces like every position), shuffled; Tray pieces wait in the tray and its queue.
    */
-  static fresh(style: JigsawStyle, count: PieceCount, seed: number, spots: readonly Point[] = []): JigsawGame {
+  /** A new puzzle; `mixed` (edges hidden) deals the tray in any order instead of corners first. */
+  static fresh(style: JigsawStyle, count: PieceCount, seed: number, spots: readonly Point[] = [], mixed = false): JigsawGame {
     const { cols, rows } = GRID_SIZES[count];
     // Not the same numbers as the cut, so which pieces come first isn't tied to their shapes.
     const random = seededRandom(seed ^ 0x5bd1e995);
@@ -109,7 +112,7 @@ export class JigsawGame {
       }
       return new JigsawGame(style, count, { ...empty, positions, groups: range(count), order: range(count) });
     }
-    const order = trayOrder(cols, rows, random);
+    const order = trayOrder(cols, rows, random, mixed);
     return new JigsawGame(style, count, { ...empty, queue: order.slice(TRAY_SIZE), tray: order.slice(0, TRAY_SIZE) });
   }
 

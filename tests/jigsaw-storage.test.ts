@@ -24,7 +24,7 @@ const place = (picture: string, o: Partial<SavedPlace> = {}): SavedPlace => ({ p
 describe('saving Jigsaw', () => {
   it('starts on Tray with 9 pieces and nothing done', () => {
     expect(loadSavedJigsaw(new MemoryStore())).toEqual(freshJigsaw());
-    expect(freshJigsaw()).toMatchObject({ style: 'tray', count: 9, guide: 'board', current: null, places: [], finished: [] });
+    expect(freshJigsaw()).toMatchObject({ style: 'tray', count: 9, guide: 'board', hideEdges: false, current: null, places: [], finished: [] });
   });
 
   it('saves and loads everything', () => {
@@ -33,6 +33,7 @@ describe('saving Jigsaw', () => {
       style: 'table',
       count: 30,
       guide: 'corner',
+      hideEdges: true,
       current: 'starter:lake',
       places: [place('starter:lake')],
       finished: ['starter:barn'],
@@ -49,6 +50,7 @@ describe('saving Jigsaw', () => {
       JSON.stringify({
         style: 'puzzle',
         guide: 'sideways',
+        hideEdges: 'yes',
         count: 12,
         current: 5,
         places: [place('starter:a'), { picture: 'starter:b', style: 'tray', count: 9, progress: { placed: 'all' } }, null],

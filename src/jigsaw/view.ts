@@ -26,6 +26,8 @@ export interface PieceSpot {
   slot?: Rect;
   /** Drawn this much smaller, around the middle of `body` (Board pieces lying around). */
   scale?: number;
+  /** Hide edges: drawn with fake tabs and holes instead of its straight sides, until it's in place. */
+  disguised?: boolean;
 }
 
 export interface JigsawViewState {
@@ -43,6 +45,9 @@ export interface JigsawViewState {
   lifted: number | null;
   /** Where the guide picture is: faint on the board, or small in the bottom-right corner (always there in Table). */
   guide: Guide;
+  hideEdges: boolean;
+  /** The pieces' shapes with their straight sides hidden (Hide edges), or none when it's off. */
+  disguises: readonly PieceShape[];
 }
 
 /** A piece's element: its body plus its tabs and the room for its edge on every side. */
@@ -60,6 +65,8 @@ export class JigsawView {
   private hintButton: HTMLElement | null = null;
   private readonly pieces = new Map<number, HTMLElement>();
   private canvases: HTMLCanvasElement[] = [];
+  /** The edge pieces drawn with their straight sides hidden, by piece. */
+  private disguised = new Map<number, HTMLCanvasElement>();
   private cutKey = '';
   private tab = 0;
 
@@ -84,6 +91,7 @@ export class JigsawView {
       const icon = toCorner ? PICTURE_TO_CORNER_ICON : PICTURE_TO_BOARD_ICON;
       this.button(board, 'button move-picture', `${icon}<span>Move picture</span>`, layout.pictureButton);
     }
+    this.choice(board, 'Hide edges', state.hideEdges, layout.edgesButton);
     if (state.guide === 'corner' && state.picture) {
       const small = el('img', 'jigsaw-small', board);
       small.alt = '';
@@ -108,7 +116,11 @@ export class JigsawView {
   update(state: JigsawViewState, fadeIn = true): void {
     state.pieces.forEach((spot, i) => {
       const piece = this.pieces.get(spot.id) ?? this.addPiece(spot.id, fadeIn);
-      if (!piece || piece.classList.contains('held')) return;
+      if (!piece) return;
+      // Its real shape once it's in place, or its disguise (Hide edges) until then.
+      const canvas = (spot.disguised && this.disguised.get(spot.id)) || this.canvases[spot.id];
+      if (canvas && piece.firstChild !== canvas) piece.replaceChildren(canvas);
+      if (piece.classList.contains('held')) return;
       const rect = outer(spot.body, this.tab);
       place(piece, rect);
       // Stacked with z-index rather than page order: moving an element in the page would stop its glide.
@@ -193,6 +205,7 @@ export class JigsawView {
     // The piece images aren't needed any more (several MB at 30 pieces).
     this.pieces.clear();
     this.canvases = [];
+    this.disguised.clear();
     this.cutKey = '';
     board.classList.add('done');
     place(photo, this.layout.finished);
@@ -268,14 +281,23 @@ export class JigsawView {
     this.tab = tabFor(pieceSize.w, pieceSize.h);
     if (!image || !picture || shapes.length === 0) {
       this.canvases = [];
+      this.disguised.clear();
       this.cutKey = '';
       return;
     }
-    const key = `${picture.src}|${shapes.length}|${pieceSize.w.toFixed(2)}x${pieceSize.h.toFixed(2)}`;
+    const hidden = state.disguises.length === shapes.length;
+    const key = `${picture.src}|${shapes.length}|${pieceSize.w.toFixed(2)}x${pieceSize.h.toFixed(2)}|${hidden}`;
     if (key === this.cutKey) return;
     const cols = Math.max(...shapes.map((s) => s.col)) + 1;
     const rows = Math.max(...shapes.map((s) => s.row)) + 1;
     this.canvases = drawPieces(image, shapes, cols, rows, pieceSize.w, pieceSize.h);
+    this.disguised.clear();
+    if (hidden) {
+      // Only the corner and side pieces look different disguised (a 30-piece cut is several MB of images).
+      const edgeIds = shapes.flatMap((s, id) => (s.top === 0 || s.right === 0 || s.bottom === 0 || s.left === 0 ? [id] : []));
+      const drawn = drawPieces(image, edgeIds.map((id) => state.disguises[id]), cols, rows, pieceSize.w, pieceSize.h);
+      edgeIds.forEach((id, i) => this.disguised.set(id, drawn[i]));
+    }
     this.cutKey = key;
   }
 }

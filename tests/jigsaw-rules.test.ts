@@ -20,6 +20,25 @@ describe('the tray', () => {
     expect(sorted(big.slice(0, 4))).toEqual([0, 5, 24, 29]);
   });
 
+  it('mixes the pieces in, corners and all, when edges are hidden', () => {
+    const counts = Array.from({ length: 20 }, (_, seed) => {
+      const order = trayOrder(6, 5, seededRandom(seed), true);
+      expect(sorted(order)).toEqual(Array.from({ length: 30 }, (_, i) => i));
+      return order.slice(0, 4).filter((id) => [0, 5, 24, 29].includes(id)).length;
+    });
+    // Corners first every time would be 4 each; mixed, they rarely all come first.
+    expect(counts.filter((n) => n === 4).length).toBeLessThan(3);
+    expect(trayOrder(6, 5, seededRandom(7), true)).toEqual(trayOrder(6, 5, seededRandom(7), true));
+  });
+
+  it('deals a new Tray puzzle mixed when edges are hidden', () => {
+    const dealt = (game: JigsawGame) => [...game.progress(0).tray, ...game.progress(0).queue] as number[];
+    const plain = dealt(JigsawGame.fresh('tray', 30, 42));
+    const mixed = dealt(JigsawGame.fresh('tray', 30, 42, [], true));
+    expect(mixed).not.toEqual(plain);
+    expect(sorted(mixed)).toEqual(Array.from({ length: 30 }, (_, i) => i));
+  });
+
   it('starts with three corners in the tray', () => {
     const game = JigsawGame.fresh('tray', 9, 42);
     expect(game.tray).toHaveLength(3);

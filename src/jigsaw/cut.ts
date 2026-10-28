@@ -57,6 +57,17 @@ export function cutPieces(cols: number, rows: number, seed: number): PieceShape[
   return pieces;
 }
 
+/**
+ * Hide edges: the same pieces with every straight side (the picture's edge) given a tab or a hole, so corner and side
+ * pieces look like middle ones. Fixed for each picture and piece count, like the real cut.
+ */
+export function disguiseEdges(shapes: readonly PieceShape[], seed: number): PieceShape[] {
+  // Not the cut's own numbers, so the fake sides aren't tied to the real ones.
+  const random = seededRandom(seed ^ 0x2545f491);
+  const fake = (edge: Edge): Edge => (edge !== 0 ? edge : random() < 0.5 ? 1 : -1);
+  return shapes.map((shape) => ({ ...shape, top: fake(shape.top), right: fake(shape.right), bottom: fake(shape.bottom), left: fake(shape.left) }));
+}
+
 const n = (value: number) => String(Math.round(value * 100) / 100);
 
 /** One side from (x0, y0) to (x1, y1); (nx, ny) points out of the piece. A tab is a round knob on a narrower neck. */

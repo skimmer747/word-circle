@@ -18,7 +18,7 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
   /** Tray style (the only one with a tray); Board and Table share the same layout otherwise. */
   const layout = computeJigsawLayout(frame, 'tray');
   const spread = computeJigsawLayout(frame, 'board');
-  const buttons = [layout.hintButton, layout.picturesButton, ...layout.styleButtons, ...layout.countButtons, layout.pictureButton];
+  const buttons = [layout.hintButton, layout.picturesButton, ...layout.styleButtons, ...layout.countButtons, layout.pictureButton, layout.edgesButton];
 
   it('puts Hint and the piece counts where every game has Hint and its levels', () => {
     expect(layout.hintButton).toEqual(frame.hintButton);
@@ -55,11 +55,16 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
     expect(computeJigsawLayout(frame, 'table').free).toEqual(spread.free);
   });
 
-  it('puts Move picture in the bottom-right corner, with the small picture beside it', () => {
+  it('puts Move picture above Hide edges in the bottom-right corner, with the small picture beside them', () => {
     const { play } = frame;
-    expect([layout.pictureButton.w, layout.pictureButton.h]).toEqual([layout.hintButton.w, layout.hintButton.h]);
-    expect(layout.pictureButton.x + layout.pictureButton.w).toBeCloseTo(play.x + play.w);
-    expect(layout.pictureButton.y + layout.pictureButton.h).toBeCloseTo(play.y + play.h);
+    const [move, edges] = [layout.pictureButton, layout.edgesButton];
+    // Level-button height, beside the two rows; as wide as the top-right buttons, lined up under them.
+    expect([move.y, move.h]).toEqual([layout.styleButtons[0].y, layout.styleButtons[0].h]);
+    expect([edges.y, edges.h]).toEqual([layout.countButtons[0].y, layout.countButtons[0].h]);
+    for (const button of [move, edges]) {
+      expect(button.x + button.w).toBeCloseTo(play.x + play.w);
+      expect(button.w).toBeCloseTo(frame.corner.w);
+    }
     const small = layout.smallPicture;
     expect(small.w / small.h).toBeCloseTo(4 / 3);
     expect(small.h).toBeCloseTo(play.y + play.h - layout.styleButtons[0].y);

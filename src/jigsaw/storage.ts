@@ -29,6 +29,8 @@ export interface SavedJigsaw {
   count: PieceCount;
   /** Where the guide picture is: faint on the board, or small in the bottom-right corner (Tray and Board). */
   guide: Guide;
+  /** Hide edges: corner and side pieces look like middle ones until they're in place. */
+  hideEdges: boolean;
   /** The picture in progress, or null while she's choosing one. */
   current: string | null;
   places: SavedPlace[];
@@ -37,7 +39,7 @@ export interface SavedJigsaw {
 }
 
 export function freshJigsaw(): SavedJigsaw {
-  return { style: 'tray', count: 9, guide: 'board', current: null, places: [], finished: [], stats: { totalSolved: 0, todaySolved: 0, lastPlayedDay: null } };
+  return { style: 'tray', count: 9, guide: 'board', hideEdges: false, current: null, places: [], finished: [], stats: { totalSolved: 0, todaySolved: 0, lastPlayedDay: null } };
 }
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
@@ -102,6 +104,7 @@ export function loadSavedJigsaw(store: KeyValueStore): SavedJigsaw {
   if (JIGSAW_STYLES.includes(value.style as JigsawStyle)) saved.style = value.style as JigsawStyle;
   if (PIECE_COUNTS.includes(value.count as PieceCount)) saved.count = value.count as PieceCount;
   if (GUIDES.includes(value.guide as Guide)) saved.guide = value.guide as Guide;
+  if (typeof value.hideEdges === 'boolean') saved.hideEdges = value.hideEdges;
   if (typeof value.current === 'string') saved.current = value.current;
   if (Array.isArray(value.places)) saved.places = value.places.map(readPlace).filter((p): p is SavedPlace => p !== null).slice(0, MAX_PLACES);
   if (Array.isArray(value.finished)) saved.finished = [...new Set(value.finished.filter((id): id is string => typeof id === 'string'))];

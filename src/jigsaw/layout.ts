@@ -37,7 +37,9 @@ export interface JigsawLayout {
   slots: Rect[];
   /** Move picture, in the bottom-right corner: the guide picture between faint-on-the-board and small (Tray, Board). */
   pictureButton: Rect;
-  /** The whole picture, small, just left of Move picture. */
+  /** Hide edges, under Move picture. */
+  edgesButton: Rect;
+  /** The whole picture, small, just left of Move picture and Hide edges. */
   smallPicture: Rect;
   /** Tray, Board, Table: just above the piece counts. */
   styleButtons: Rect[];
@@ -67,7 +69,7 @@ function fit(area: Rect, aspect: number): Rect {
 export function computeJigsawLayout(frame: FrameLayout, style: JigsawStyle): JigsawLayout {
   // Hint top left and the piece counts in the level row, as in every game; Pictures beside Hint (where Word Circle
   // has Shuffle); the tray between Pictures and the top-right buttons; Tray, Board and Table above the counts;
-  // Move picture in the bottom-right corner with the small picture beside it.
+  // Move picture and Hide edges in the bottom-right corner, with the small picture beside them.
   const { play, hintButton, levelButtons: countButtons, corner } = frame;
   const picturesButton = { ...hintButton, x: hintButton.x + hintButton.w + GAP };
   const trayLeft = picturesButton.x + picturesButton.w + GAP;
@@ -81,7 +83,10 @@ export function computeJigsawLayout(frame: FrameLayout, style: JigsawStyle): Jig
   const rowsTop = styleButtons[0].y;
   const bottom = play.y + play.h;
   const main = { x: play.x, y: top, w: play.w, h: rowsTop - GAP - top };
-  const pictureButton = { x: play.x + play.w - hintButton.w, y: bottom - hintButton.h, w: hintButton.w, h: hintButton.h };
+  // Move picture over Hide edges, each as tall as a level button, lined up under the top-right buttons.
+  const columnX = play.x + play.w - corner.w;
+  const pictureButton = { x: columnX, y: styleButtons[0].y, w: corner.w, h: styleButtons[0].h };
+  const edgesButton = { x: columnX, y: countButtons[0].y, w: corner.w, h: countButtons[0].h };
   const smallHeight = bottom - rowsTop;
   const smallWidth = smallHeight * PICTURE_ASPECT;
   const smallPicture = { x: pictureButton.x - GAP - smallWidth, y: rowsTop, w: smallWidth, h: smallHeight };
@@ -93,6 +98,7 @@ export function computeJigsawLayout(frame: FrameLayout, style: JigsawStyle): Jig
     tray,
     slots,
     pictureButton,
+    edgesButton,
     smallPicture,
     styleButtons,
     countButtons,
