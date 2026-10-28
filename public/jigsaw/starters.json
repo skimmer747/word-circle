@@ -34,5 +34,11 @@
     "file": "storm-is-coming.jpg",
     "thumb": "storm-is-coming.thumb.jpg",
     "caption": "Storm is coming"
+  },
+  {
+    "id": "mount-hood",
+    "file": "mount-hood.jpg",
+    "thumb": "mount-hood.thumb.jpg",
+    "caption": "Mount Hood"
   }
 ]
