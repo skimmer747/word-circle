@@ -21,7 +21,7 @@ export function openWelcomePage(root: HTMLElement, options: WelcomeOptions): voi
   const sheet = el('div', 'settings-sheet', page);
   el('h1', 'settings-title', sheet).textContent = 'Word Circle';
   el('p', 'welcome-about', sheet).textContent =
-    'Calm, large-print word games for an iPad: Word Circle, Word Guess and Word Grid. No ads, no accounts, no losing.';
+    'Calm, large-print word games and jigsaws for an iPad: Word Circle, Word Guess, Word Grid and Jigsaw. No ads, no accounts, no losing.';
   const steps = el('section', 'settings-section', sheet);
   el('h2', '', steps).textContent = 'First, put it on the Home Screen';
   const list = el('ol', 'welcome-steps', steps);
