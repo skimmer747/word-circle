@@ -45,7 +45,13 @@ function fits(style: JigsawStyle, count: PieceCount, p: JigsawProgress): boolean
   }
   const inTray = p.tray.filter((id): id is number => id !== null);
   const every = [...p.placed, ...p.queue, ...inTray, ...p.loose.map(([id]) => id)];
-  return p.tray.length === TRAY_SIZE && isPermutation(every, count) && (style === 'board' || p.loose.length === 0);
+  return (
+    p.tray.length === TRAY_SIZE &&
+    isPermutation(every, count) &&
+    (style === 'board' || p.loose.length === 0) &&
+    // A place in the tray is only ever empty once nothing is left to hand out.
+    (p.queue.length === 0 || !p.tray.includes(null))
+  );
 }
 
 /**
@@ -55,7 +61,7 @@ function fits(style: JigsawStyle, count: PieceCount, p: JigsawProgress): boolean
 export class JigsawGame {
   readonly cols: number;
   readonly rows: number;
-  hints: number;
+  private hintCount: number;
   private readonly placedSet: Set<number>;
   private readonly queue: number[];
   private readonly slots: Array<number | null>;
@@ -73,7 +79,7 @@ export class JigsawGame {
     const { cols, rows } = GRID_SIZES[count];
     this.cols = cols;
     this.rows = rows;
-    this.hints = progress.hints;
+    this.hintCount = progress.hints;
     this.placedSet = new Set(progress.placed);
     this.queue = [...progress.queue];
     this.slots = [...progress.tray];
@@ -83,7 +89,7 @@ export class JigsawGame {
     this.order = [...progress.order];
   }
 
-  /** A new puzzle, dealt from `seed`. Table pieces start in `spots` (one each), shuffled. */
+  /** A new puzzle, dealt from `seed`. Table pieces start in `spots` (needs at least one per piece), shuffled. */
   static fresh(style: JigsawStyle, count: PieceCount, seed: number, spots: readonly Point[] = []): JigsawGame {
     const { cols, rows } = GRID_SIZES[count];
     // Not the same numbers as the cut, so which pieces come first isn't tied to their shapes.
@@ -108,6 +114,11 @@ export class JigsawGame {
     return { x: id % this.cols, y: Math.floor(id / this.cols) };
   }
 
+  /** How many times Hint has helped. */
+  get hints(): number {
+    return this.hintCount;
+  }
+
   isPlaced(id: number): boolean {
     return this.placedSet.has(id);
   }
@@ -119,7 +130,7 @@ export class JigsawGame {
 
   /** The tray's places, left to right: a piece, or null. */
   get tray(): ReadonlyArray<number | null> {
-    return this.slots;
+    return [...this.slots];
   }
 
   /** Pieces lying around (Board), bottom first. */
@@ -148,10 +159,12 @@ export class JigsawGame {
     return this.placedSet.size === this.count;
   }
 
-  /** She let go of piece `id` with its body at `at`. */
+  /** She let go of piece `id`; `at` is where its body's top-left corner is, in pieces. */
   drop(id: number, at: Point): DropResult {
-    if (this.style === 'table') return this.dropOnTable(id, at);
-    if (this.placedSet.has(id)) return 'back';
+    if (!Number.isFinite(at.x) || !Number.isFinite(at.y)) return this.style === 'table' ? 'moved' : 'back';
+    if (this.style === 'table') return this.positions[id] ? this.dropOnTable(id, at) : 'moved';
+    // Only a piece in the tray or lying around can be moved.
+    if (!this.slots.includes(id) && !this.looseMap.has(id)) return 'back';
     if (near(at, this.home(id), SNAP)) {
       this.place(id);
       return 'placed';
@@ -162,6 +175,13 @@ export class JigsawGame {
     return 'loose';
   }
 
+  /** Table: moves `id`'s group so `id` lies at `at`, without joining or raising it (the screen keeping a group in view). */
+  settle(id: number, at: Point): void {
+    if (this.style !== 'table' || !this.positions[id] || !Number.isFinite(at.x) || !Number.isFinite(at.y)) return;
+    const from = this.positions[id];
+    this.shift(this.groupOf(id), at.x - from.x, at.y - from.y);
+  }
+
   /** Hint: places the tray's first piece (or, with the tray empty, the bottom one lying around). Returns it, or null when done. */
   hint(): number | null {
     if (this.solved) return null;
@@ -169,7 +189,7 @@ export class JigsawGame {
     const id = this.slots.find((slot) => slot !== null) ?? this.looseMap.keys().next().value;
     if (id === undefined) return null;
     this.place(id);
-    this.hints++;
+    this.hintCount++;
     return id;
   }
 
@@ -182,7 +202,7 @@ export class JigsawGame {
       positions: this.positions.map((p) => [p.x, p.y]),
       groups: [...this.groups],
       order: [...this.order],
-      hints: this.hints,
+      hints: this.hintCount,
       elapsedMs: Math.round(elapsedMs),
     };
   }
@@ -223,7 +243,7 @@ export class JigsawGame {
         const target = this.beside(p, q);
         this.shift(this.groupOf(q), target.x - this.positions[q].x, target.y - this.positions[q].y);
         this.raise(this.merge(members, this.groupOf(q)));
-        this.hints++;
+        this.hintCount++;
         return q;
       }
     }
@@ -250,14 +270,19 @@ export class JigsawGame {
     return out;
   }
 
-  /** A piece of `members` and a neighbor outside the group that lies close to where it belongs. */
+  /** A piece of `members` and a neighbor outside the group that lies close to where it belongs: the closest such pair. */
   private closePair(members: readonly number[]): [number, number] | null {
+    let best: [number, number] | null = null;
+    let bestDistance = Infinity;
     for (const p of members) {
       for (const q of this.neighbors(p)) {
-        if (this.groups[q] !== this.groups[p] && near(this.positions[q], this.beside(p, q), JOIN)) return [p, q];
+        if (this.groups[q] === this.groups[p]) continue;
+        const want = this.beside(p, q);
+        const distance = Math.max(Math.abs(this.positions[q].x - want.x), Math.abs(this.positions[q].y - want.y));
+        if (distance <= JOIN && distance < bestDistance) [best, bestDistance] = [[p, q], distance];
       }
     }
-    return null;
+    return best;
   }
 
   /** The first join moves what she dropped onto the piece it fits; anything else that then fits is pulled in. */
