@@ -1,16 +1,21 @@
 import { GAME_TITLES, type FrameHost, type GameScreen, type GameSummary, type GameTargets } from '../frame/games';
 import type { FrameLayout, Rect } from '../frame/layout';
+import type { NoticeCard } from '../frame/view';
 import type { ButtonGeometry } from '../input/touch';
+import type { PhotoAdder } from '../photos/adder';
+import { FAMILY, type PictureList } from '../photos/family';
+import { PhotoError } from '../photos/shrink';
 import { dayKey } from '../shared/days';
 import type { KeyValueStore } from '../shared/store';
 import { PlayTimer } from '../shared/timer';
 import { jigsawRecord } from '../stats/records';
 import { wait } from '../ui/dom';
+import { PICTURES_ICON } from '../ui/icons';
 import { jigsawLines } from './celebration';
 import { cutPieces, pieceSeed, tabFor, type PieceShape } from './cut';
 import { clampToFree, computeJigsawLayout, computePicturePageLayout, tablePieces, type JigsawLayout } from './layout';
 import { renderPicturePage } from './picture-page';
-import { picturePage } from './pictures';
+import { PAGE_SIZE, PAGE_WITH_ADD, picturePage } from './pictures';
 import { JigsawGame } from './rules';
 import {
   loadSavedJigsaw,
@@ -19,6 +24,7 @@ import {
   saveSavedJigsaw,
   withFinished,
   withPlace,
+  withoutPictures,
   withoutPlace,
   type SavedJigsaw,
 } from './storage';
@@ -46,11 +52,19 @@ interface Held {
 }
 
 export interface JigsawOptions {
-  /** The pictures she can choose from. */
-  loadPictures: () => Promise<Picture[]>;
+  /** The pictures she can choose from, and which family photos there are. */
+  loadPictures: () => Promise<PictureList>;
+  /** Adding a family photo; null where photos can't be kept (no Add a photo tile). */
+  photos?: PhotoAdder | null;
   /** The current time; tests can pass a fixed one. */
   now?: () => Date;
 }
+
+/** What she's told when a photo can't be added. */
+const photoProblem = (error: unknown): NoticeCard =>
+  error instanceof PhotoError && error.reason === 'unsaved'
+    ? { icon: PICTURES_ICON, title: "That photo couldn't be saved", lines: ['The iPad may be full.'] }
+    : { icon: PICTURES_ICON, title: "That photo can't be used", lines: ['Try another one.'] };
 
 const boundsOf = (rects: readonly Rect[]): Rect => {
   const x = Math.min(...rects.map((r) => r.x));
@@ -136,7 +150,8 @@ export class JigsawScreen implements GameScreen {
 
   buttonTapped(id: string): void {
     if (this.busy) return;
-    if (id.startsWith('pic:')) this.openPicture(Number(id.slice('pic:'.length)));
+    if (id === 'pic:add') this.addPhoto();
+    else if (id.startsWith('pic:')) this.openPicture(Number(id.slice('pic:'.length)));
     else if (id === 'pics-back' || id === 'pics-more') this.turnPage(id === 'pics-more' ? 1 : -1);
     else if (id === 'pics-close') this.closePictures();
     else if (id === 'pictures') this.showPictures();
@@ -238,9 +253,15 @@ export class JigsawScreen implements GameScreen {
     return { solved: this.saved.stats.totalSolved };
   }
 
-  private picturesLoaded(pictures: Picture[]): void {
+  private picturesLoaded({ pictures, family }: PictureList): void {
     this.pictures = pictures;
+    // Family photos removed on the settings page: their places and checks go too (only when the photos could be read).
+    if (family) {
+      this.saved = withoutPictures(this.saved, (id) => id.startsWith(FAMILY) && !family.includes(id));
+      saveSavedJigsaw(this.store, this.saved);
+    }
     const current = this.saved.current;
+    if (!current && !this.picture) this.mode = 'pictures';
     if (current && !this.picture) {
       this.picture = pictures.find((p) => p.id === current) ?? null;
       if (!this.picture) {
@@ -263,7 +284,7 @@ export class JigsawScreen implements GameScreen {
 
   private renderPictures(layer: HTMLElement, frame: FrameLayout, animateIn: boolean): GameTargets {
     const layout = computePicturePageLayout(frame);
-    const page = picturePage(this.pictures ?? [], this.page);
+    const page = picturePage(this.pictures ?? [], this.page, this.perPage());
     // The list may have shrunk since she turned to this page.
     this.page = page.page;
     renderPicturePage(
@@ -275,11 +296,13 @@ export class JigsawScreen implements GameScreen {
         hasBack: page.hasBack,
         hasMore: page.hasMore,
         canClose: this.picture !== null,
-        canAdd: false,
+        canAdd: this.options.photos != null,
       },
       animateIn,
     );
-    const buttons: ButtonGeometry[] = page.pictures.map((_, i) => ({ id: `pic:${i}`, ...layout.tiles[i] }));
+    const offset = this.options.photos ? 1 : 0;
+    const buttons: ButtonGeometry[] = page.pictures.map((_, i) => ({ id: `pic:${i}`, ...layout.tiles[i + offset] }));
+    if (offset) buttons.unshift({ id: 'pic:add', ...layout.tiles[0] });
     if (page.hasBack) buttons.push({ id: 'pics-back', ...layout.back });
     if (this.picture) buttons.push({ id: 'pics-close', ...layout.close });
     if (page.hasMore) buttons.push({ id: 'pics-more', ...layout.more });
@@ -568,8 +591,12 @@ export class JigsawScreen implements GameScreen {
   }
 
   private openPicture(index: number): void {
-    const picture = picturePage(this.pictures ?? [], this.page).pictures[index];
-    if (!picture) return;
+    const picture = picturePage(this.pictures ?? [], this.page, this.perPage()).pictures[index];
+    if (picture) this.startPicture(picture);
+  }
+
+  /** Starts `picture` in her style and piece count, or picks up where she left off in it. */
+  private startPicture(picture: Picture): void {
     this.save();
     this.picture = picture;
     this.game = null;
@@ -581,6 +608,32 @@ export class JigsawScreen implements GameScreen {
     this.host.redraw(true);
     this.timer.resume(performance.now());
     this.resetIdle();
+  }
+
+  /** Pictures per page: five beside Add a photo, or six where photos can't be kept. */
+  private perPage(): number {
+    return this.options.photos ? PAGE_WITH_ADD : PAGE_SIZE;
+  }
+
+  /** Add a photo: the iPad's picker, then "Your new puzzle"; Start puzzle starts it straight away. */
+  private addPhoto(): void {
+    const photos = this.options.photos;
+    if (!photos || this.mode !== 'pictures') return;
+    void photos.pick().then(async (file) => {
+      if (!file) return;
+      const uncover = this.host.cover();
+      try {
+        const picture = await photos.create(file);
+        if (!picture) return;
+        // Newest first, ahead of every other picture.
+        this.pictures = [picture, ...(this.pictures ?? [])];
+        this.startPicture(picture);
+      } catch (error) {
+        this.host.notice(photoProblem(error));
+      } finally {
+        uncover();
+      }
+    });
   }
 
   private showPictures(): void {

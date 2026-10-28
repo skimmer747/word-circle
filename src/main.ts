@@ -15,6 +15,9 @@ import { GuessScreen } from './guess/screen';
 import { loadStarters } from './jigsaw/pictures';
 import { JigsawScreen } from './jigsaw/screen';
 import type { GuessWords } from './guess/words';
+import { photoAdder } from './photos/adder';
+import { loadPictureList } from './photos/family';
+import { openPhotoStore } from './photos/store';
 import { startAnalytics } from './analytics';
 import { setupUpdates } from './pwa';
 import { firstScreen, isInstalled } from './settings/first-screen';
@@ -29,6 +32,8 @@ import { loadLifetime, loadLog } from './stats/log';
 const root = document.getElementById('app');
 if (!root) throw new Error('Missing #app element');
 const store = window.localStorage;
+/** The family's photos for Jigsaw, in this app's own IndexedDB database; null where it can't keep them. */
+const photoStore = openPhotoStore();
 
 /** The daily Wordle words, published with the site each morning. */
 async function fetchDaily(): Promise<string> {
@@ -77,7 +82,12 @@ function startApp(settings: Settings): void {
     circle: () => new CircleScreen(puzzleData as PuzzleSet, store, { startLevel: settings.startLevel, avoided }),
     guess: () => new GuessScreen(guessWords as GuessWords, store, { fetchDaily, share: settings.share ? share : null, avoided }),
     grid: () => new GridScreen(gridPuzzles as GridPuzzleSet, gridWords as GridWords, store, { startLevel: settings.startLevel, avoided }),
-    jigsaw: () => new JigsawScreen(store, { loadPictures: () => loadStarters(import.meta.env.BASE_URL) }),
+    jigsaw: () =>
+      new JigsawScreen(store, {
+        loadPictures: () =>
+          loadPictureList(photoStore, settings.jigsawStarters ? () => loadStarters(import.meta.env.BASE_URL) : async () => []),
+        photos: photoStore && photoAdder(root!, photoStore),
+      }),
   };
   frame = new Frame(root!, store, updates, settings.games.map((id) => makers[id]()), loadSavedGame(store).stats, {
     name: settings.name,
