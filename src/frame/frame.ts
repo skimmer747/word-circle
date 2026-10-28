@@ -206,12 +206,12 @@ export class Frame implements FrameHost {
     else if (id === 'share') this.shareCelebration();
     else if (id === 'back') this.reviewPuzzle();
     else if (id === 'card-stats') this.openStatsFromCard();
-    else if (id === 'clock') this.openClock();
+    else if (id === 'clock') this.afterReview(() => this.openClock());
     else if (id === 'close') this.closeClock();
-    else if (id === 'games') this.openGames();
+    else if (id === 'games') this.afterReview(() => this.openGames());
     else if (id === 'games-close') this.closeGames();
     else if (id.startsWith('game:')) this.chooseGame(id.slice('game:'.length) as GameId);
-    else if (id === 'stats') this.openStats();
+    else if (id === 'stats') this.afterReview(() => this.openStats());
     else if (id === 'games-stats') this.openStatsFromGames();
     else if (id === 'stats-next') this.nextStatsCard();
     else if (id === 'stats-close') this.closeStats();
@@ -261,6 +261,19 @@ export class Frame implements FrameHost {
 
   private reviewButton() {
     return this.targets.reviewButton ?? this.layout!.nextButton;
+  }
+
+  /**
+   * A top-right button while she looks back at a finished puzzle: looking back ends, as if she'd tapped Next, and the
+   * button does its job once the game has moved on (it does that as soon as the card's promise settles).
+   */
+  private afterReview(open: () => void): void {
+    if (!this.celebration?.reviewing) {
+      open();
+      return;
+    }
+    this.celebration.done();
+    window.setTimeout(open, 0);
   }
 
   private closeNotice(): void {
@@ -421,7 +434,7 @@ export class Frame implements FrameHost {
     this.holdRing = window.setTimeout(() => {
       if (this.layout) this.view.showHoldRing(this.layout, HOLD_OPEN_MS - HOLD_RING_MS);
     }, HOLD_RING_MS);
-    this.holdOpen = window.setTimeout(() => this.openSettings(), HOLD_OPEN_MS);
+    this.holdOpen = window.setTimeout(() => this.afterReview(() => this.openSettings()), HOLD_OPEN_MS);
   }
 
   private holdEnded(id: string): void {
@@ -513,7 +526,8 @@ export class Frame implements FrameHost {
 
   /**
    * What the touch tracker listens for: only a pop-up's buttons while one is open (her stats can open over the card),
-   * only the card's buttons while celebrating, otherwise the game and the top-right buttons.
+   * only the card's buttons while celebrating (Next and the top-right buttons once she's looking back at the puzzle),
+   * otherwise the game and the top-right buttons.
    */
   private updateTouchTargets(): void {
     const layout = this.layout;
@@ -527,7 +541,7 @@ export class Frame implements FrameHost {
         { id: 'stats-next', ...layout.nextWordButton },
       ];
     } else if (this.celebration?.reviewing) {
-      buttons = [{ id: 'next', ...this.reviewButton() }];
+      buttons = [{ id: 'next', ...this.reviewButton() }, ...this.cornerButtons(layout)];
     } else if (this.celebration) {
       buttons = this.celebration.card.share
         ? [
@@ -549,9 +563,7 @@ export class Frame implements FrameHost {
     } else {
       tiles = this.targets.tiles;
       draggables = this.targets.draggables ?? [];
-      buttons = [...this.targets.buttons, { id: 'clock', ...layout.clockButton }];
-      // With one game, the Games button's place holds Stats.
-      buttons.push({ id: this.games.length > 1 ? 'games' : 'stats', ...layout.gamesButton });
+      buttons = [...this.targets.buttons, ...this.cornerButtons(layout)];
     }
     this.tracer.setGeometry({
       screenWidth: layout.width,
@@ -570,5 +582,13 @@ export class Frame implements FrameHost {
     if (this.noticeOpen) this.view.placeNotice(layout);
     if (this.statsOpen) this.statsView.place(layout);
     this.tracer.setEnabled(!this.settingsOpen);
+  }
+
+  /** The clock and Games in the top-right corner. With one game, the Games button's place holds Stats. */
+  private cornerButtons(layout: FrameLayout): ButtonGeometry[] {
+    return [
+      { id: 'clock', ...layout.clockButton },
+      { id: this.games.length > 1 ? 'games' : 'stats', ...layout.gamesButton },
+    ];
   }
 }
