@@ -10,5 +10,11 @@
     "file": "my-three-sons.jpg",
     "thumb": "my-three-sons.thumb.jpg",
     "caption": "My three sons"
+  },
+  {
+    "id": "lake-minnehaha",
+    "file": "lake-minnehaha.jpg",
+    "thumb": "lake-minnehaha.thumb.jpg",
+    "caption": "Lake Minnehaha"
   }
 ]
