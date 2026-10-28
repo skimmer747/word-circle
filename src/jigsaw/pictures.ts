@@ -4,8 +4,10 @@ import type { Picture } from './types';
 export const PAGE_SIZE = 6;
 
 const ID = /^[a-z0-9-]+$/;
+/** A plain file name: no folders, not empty, and no leading dot, so no "..". */
+const NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
-/** The published starters.json, checked entry by entry; anything odd is left out. `base` is the site's address. */
+/** The published starters.json, checked entry by entry; anything odd is left out. `base` is the site's address and must end in "/". */
 export function parseStarters(value: unknown, base: string): Picture[] {
   if (!Array.isArray(value)) return [];
   const pictures: Picture[] = [];
@@ -13,7 +15,8 @@ export function parseStarters(value: unknown, base: string): Picture[] {
   for (const entry of value) {
     if (typeof entry !== 'object' || entry === null) continue;
     const { id, file, thumb, caption } = entry as Record<string, unknown>;
-    if (typeof id !== 'string' || !ID.test(id) || seen.has(id) || typeof file !== 'string' || typeof thumb !== 'string') continue;
+    if (typeof id !== 'string' || !ID.test(id) || seen.has(id)) continue;
+    if (typeof file !== 'string' || !NAME.test(file) || typeof thumb !== 'string' || !NAME.test(thumb)) continue;
     seen.add(id);
     pictures.push({
       id: `starter:${id}`,
@@ -37,6 +40,8 @@ export async function loadStarters(base: string, fetcher: (url: string) => Promi
 
 export interface PicturePage {
   pictures: Picture[];
+  /** The page shown (the one asked for, kept inside the list). */
+  page: number;
   /** The first one's place in the whole list. */
   first: number;
   hasBack: boolean;
@@ -45,8 +50,9 @@ export interface PicturePage {
 
 /** One page of `perPage` pictures (fewer than six when the page also holds the Add a photo tile). */
 export function picturePage(pictures: readonly Picture[], page: number, perPage = PAGE_SIZE): PicturePage {
-  const pages = Math.max(1, Math.ceil(pictures.length / perPage));
-  const p = Math.min(Math.max(0, page), pages - 1);
-  const first = p * perPage;
-  return { pictures: pictures.slice(first, first + perPage), first, hasBack: p > 0, hasMore: p < pages - 1 };
+  const size = Math.max(1, Math.floor(perPage));
+  const pages = Math.max(1, Math.ceil(pictures.length / size));
+  const p = Math.min(Math.max(0, Math.trunc(page) || 0), pages - 1);
+  const first = p * size;
+  return { pictures: pictures.slice(first, first + size), page: p, first, hasBack: p > 0, hasMore: p < pages - 1 };
 }
