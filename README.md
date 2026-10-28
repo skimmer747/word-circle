@@ -96,11 +96,13 @@ Regenerating can change the order, so she may start a fresh puzzle or word at he
 
 Jigsaw's starter pictures go to every family's iPad and are public on GitHub, so use only photos you took or that are free to share.
 
-1. Put the photos in `photos/starter/` (kept out of git). iPhone HEIC files are fine.
+1. Put the photos in `photos/starter/` (kept out of git). iPhone HEIC files are fine, but converting them needs a Mac (it uses `sips`).
 2. Optionally list them in `photos/starter/captions.txt`, one line each: `file name | caption | keep`. `keep` is which part to keep when a photo isn't 4:3: `top`, `middle` or `bottom`, and `left`, `center` or `right` (default: centered, a quarter of the way down). Listed photos come first, in that order.
 3. Run `npm run jigsaw-photos`, look over `docs/jigsaw-starters.html`, then commit `public/jigsaw/` and the review page.
 
-`npm run jigsaw-photos -- --stand-ins` makes six numbered test pictures (for building only; never publish them).
+The whole set is rebuilt from `photos/starter/` on every run, so keep every original there. Taking an original out removes that picture, and with it her saved place in that puzzle. A run that fails (the message names the photo) leaves the published pictures as they were.
+
+`npm run jigsaw-photos -- --stand-ins` builds from six numbered test pictures in its own folder, `photos/stand-ins/`, and never touches `photos/starter/`. They are for building and testing only: never publish them.
 
 ## Word list credit
 
