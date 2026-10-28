@@ -7,14 +7,15 @@ export interface CropAt {
 }
 
 /** A frame starts centered across and a quarter of the way down, where faces usually are. */
-export const START_CROP: CropAt = { x: 0.5, y: 0.25 };
+export const START_CROP: Readonly<CropAt> = { x: 0.5, y: 0.25 };
 
-const share = (value: number) => Math.min(1, Math.max(0, value));
+/** Between 0 and 1: anything outside goes to the nearer end, and NaN to 0. */
+const clamp01 = (value: number) => (value > 0 ? Math.min(1, value) : 0);
 
 /** The largest 4:3 rectangle inside a width × height photo, placed `at` within the spare room. */
-export function cropRect(width: number, height: number, at: CropAt = START_CROP): Rect {
-  // 4:3 in whole-number steps: 1500 * (4 / 3) in floating point can land a hair under 2000.
-  const w = Math.floor(Math.min(width, (height * 4) / 3));
-  const h = Math.floor((w * 3) / 4);
-  return { x: Math.round((width - w) * share(at.x)), y: Math.round((height - h) * share(at.y)), w, h };
+export function cropRect(width: number, height: number, at: Readonly<CropAt> = START_CROP): Rect {
+  // Whole steps of 4 across and 3 down: exactly 4:3, whole pixels, never outside the photo.
+  const k = Math.floor(Math.min(width / 4, height / 3));
+  const [w, h] = [4 * k, 3 * k];
+  return { x: Math.round((width - w) * clamp01(at.x)), y: Math.round((height - h) * clamp01(at.y)), w, h };
 }
