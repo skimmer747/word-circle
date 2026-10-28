@@ -79,6 +79,8 @@ export class Frame implements FrameHost {
   private gamesOpen = false;
   private gamesAutoClose = 0;
   private settingsOpen = false;
+  /** How many of the game's own pages cover the screen (the touch tracker stops while any do). */
+  private covered = 0;
   private noticeOpen = false;
   private noticeAutoClose = 0;
   private holdRing = 0;
@@ -181,6 +183,18 @@ export class Frame implements FrameHost {
   updateTargets(targets: GameTargets): void {
     this.targets = targets;
     this.updateTouchTargets();
+  }
+
+  cover(): () => void {
+    this.covered += 1;
+    this.tracer.setEnabled(false);
+    let done = false;
+    return () => {
+      if (done) return;
+      done = true;
+      this.covered -= 1;
+      this.updateTouchTargets();
+    };
   }
 
   recordPlayDay(): number {
@@ -466,7 +480,7 @@ export class Frame implements FrameHost {
 
   private listen(): void {
     const forward = (type: PointerInput['type']) => (event: PointerEvent) => {
-      if (this.settingsOpen) return;
+      if (this.settingsOpen || this.covered > 0) return;
       if (type === 'down') this.interacted = true;
       if (type !== 'move') this.game.activity?.();
       this.tracer.handle({ type, id: event.pointerId, x: event.clientX, y: event.clientY, time: event.timeStamp });
@@ -581,7 +595,7 @@ export class Frame implements FrameHost {
     if (this.gamesOpen) this.view.placeGames(layout);
     if (this.noticeOpen) this.view.placeNotice(layout);
     if (this.statsOpen) this.statsView.place(layout);
-    this.tracer.setEnabled(!this.settingsOpen);
+    this.tracer.setEnabled(!this.settingsOpen && this.covered === 0);
   }
 
   /** The clock and Games in the top-right corner. With one game, the Games button's place holds Stats. */

@@ -2420,3 +2420,14 @@ body {
 .button.pics-more {
   border-color: var(--shuffle);
 }
+
+/* The photo picker's input: in the page (so the iPad opens it) but out of sight. */
+.photo-input {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}

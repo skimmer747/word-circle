@@ -44,6 +44,11 @@ export interface FrameHost {
   redraw(animateIn: boolean): void;
   /** The game's buttons changed without a redraw (e.g. keys hidden): tells the touch tracker. */
   updateTargets(targets: GameTargets): void;
+  /**
+   * A page of the game's own covers the screen (one with a text box, which needs ordinary taps and the keyboard): the
+   * touch tracker stops until the returned function is called.
+   */
+  cover(): () => void;
   /** Marks today as played (in either game) and returns her days in a row. */
   recordPlayDay(): number;
   /** Saves a finished puzzle or word to the play log. */
