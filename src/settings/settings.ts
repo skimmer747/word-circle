@@ -23,6 +23,8 @@ export interface Settings {
   thumb: Thumb;
   /** The games she can pick from, in the usual order; at least one. */
   games: GameId[];
+  /** Every game this iPad has been offered. A game added to the site later is turned on once, then left as the family sets it. */
+  knownGames: GameId[];
   /** Where Word Circle and Word Grid start the first time they're opened. */
   startLevel: StartLevel;
   /** Whether Word Guess offers Share after today's Wordle. */
@@ -38,12 +40,16 @@ export interface LoadedSettings {
   firstTime: boolean;
 }
 
+/** The games every iPad had before settings remembered which games they'd been offered. */
+const FIRST_GAMES: readonly GameId[] = ['circle', 'guess', 'grid'];
+
 /** A new iPad starts with these. */
 export function newIpadSettings(): Settings {
   return {
     name: '',
     thumb: 'left',
     games: [...GAME_IDS],
+    knownGames: [...GAME_IDS],
     startLevel: 'medium',
     share: true,
     schedule: { source: 'device', lines: [] },
@@ -79,10 +85,12 @@ function readSettings(value: unknown): Settings {
   if (!isRecord(value)) return settings;
   if (typeof value.name === 'string') settings.name = cleanName(value.name);
   if (THUMBS.includes(value.thumb as Thumb)) settings.thumb = value.thumb as Thumb;
+  const known = Array.isArray(value.knownGames) ? GAME_IDS.filter((id) => (value.knownGames as unknown[]).includes(id)) : FIRST_GAMES;
   if (Array.isArray(value.games)) {
     const saved = value.games as unknown[];
-    const games = GAME_IDS.filter((id) => saved.includes(id));
-    if (games.length > 0) settings.games = games;
+    const kept = GAME_IDS.filter((id) => saved.includes(id));
+    // Games this iPad hasn't been offered yet are turned on.
+    if (kept.length > 0) settings.games = GAME_IDS.filter((id) => kept.includes(id) || !known.includes(id));
   }
   if (START_LEVELS.includes(value.startLevel as StartLevel)) settings.startLevel = value.startLevel as StartLevel;
   if (typeof value.share === 'boolean') settings.share = value.share;

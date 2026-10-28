@@ -12,7 +12,7 @@ const PERIOD_DAYS = 28;
 
 const LEVEL_NAMES: Record<PlayLevel, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
 /** Short names, for labels at the ends of chart lines. */
-const SHORT: Record<GameId, string> = { circle: 'Circle', guess: 'Guess', grid: 'Grid' };
+const SHORT: Record<GameId, string> = { circle: 'Circle', guess: 'Guess', grid: 'Grid', jigsaw: 'Jigsaw' };
 const PARTS = [
   ['Morning', 5, 11],
   ['Afternoon', 12, 16],

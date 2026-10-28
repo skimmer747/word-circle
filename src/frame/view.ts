@@ -1,4 +1,5 @@
 import type { ClockFace, UpcomingEvent } from '../clock/clock';
+import { cutPieces, piecePath, tabFor } from '../jigsaw/cut';
 import { el, place } from '../ui/dom';
 import { fitFontScale } from '../ui/fit';
 import { ARROW_ICON, CHECK_ICON, CLOCK_ICON, CLOSE_ICON, EVENT_ICON, GAMES_ICON, SHARE_ICON, STAR_ICON } from '../ui/icons';
@@ -82,6 +83,20 @@ function gridPicture(rows: readonly string[], sections: readonly string[]): stri
     .join('');
 }
 
+/** Four joined jigsaw pieces in the board's colors. */
+function jigsawPicture(): string {
+  const [w, h] = [30, 22.5];
+  const tab = tabFor(w, h);
+  const colors = ['#9fd3f5', '#7bbf6a', '#f7c948', '#4a90c2'];
+  const pieces = cutPieces(2, 2, 7)
+    .map(
+      (shape, i) =>
+        `<path d="${piecePath(shape, w, h, tab)}" transform="translate(${shape.col * w - tab} ${shape.row * h - tab})" fill="${colors[i]}" stroke="#1b3a6b" stroke-width="1.2"/>`,
+    )
+    .join('');
+  return `<span class="pic-jigsaw"><svg viewBox="-1 -1 ${2 * w + 2} ${2 * h + 2}" aria-hidden="true">${pieces}</svg></span>`;
+}
+
 /** A small picture of each game for its card in the Games pop-up. */
 const GAME_PICTURES: Record<GameId, string> = {
   circle: `<span class="pic-circle">${[...'STONE'].map((letter, i) => `<b style="--i:${i}">${letter}</b>`).join('')}</span>`,
@@ -90,6 +105,7 @@ const GAME_PICTURES: Record<GameId, string> = {
     ['right', 'right', 'right', 'right', 'right'],
   )}${pictureRow('     ', ['', '', '', '', ''])}</span>`,
   grid: `<span class="pic-grid">${gridPicture(['GNAT', 'NO.A', 'ANTS', 'WE.K'], ['aabb', 'aa.c', 'dddc', 'ee.c'])}</span>`,
+  jigsaw: jigsawPicture(),
 };
 
 /** Draws what every game shares: the top-right buttons, the pop-ups and the "Well done!" card. */

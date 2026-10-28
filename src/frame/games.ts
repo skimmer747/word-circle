@@ -3,11 +3,11 @@ import type { FrameLayout, Rect } from './layout';
 import type { PlayRecord } from '../stats/log';
 import type { CelebrationCard, NoticeCard } from './view';
 
-export const GAME_IDS = ['circle', 'guess', 'grid'] as const;
+export const GAME_IDS = ['circle', 'guess', 'grid', 'jigsaw'] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 /** Each game's name, in the Games pop-up and on the settings page. */
-export const GAME_TITLES: Record<GameId, string> = { circle: 'Word Circle', guess: 'Word Guess', grid: 'Word Grid' };
+export const GAME_TITLES: Record<GameId, string> = { circle: 'Word Circle', guess: 'Word Guess', grid: 'Word Grid', jigsaw: 'Jigsaw' };
 
 /** What the touch tracker listens for in a game: its letter tiles (for tracing words) and its buttons. */
 export interface GameTargets {

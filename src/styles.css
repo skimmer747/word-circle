@@ -2151,3 +2151,10 @@ body {
   border-radius: 50%;
   background: var(--star);
 }
+
+/* Jigsaw's picture in the Games pop-up. */
+.pic-jigsaw svg {
+  display: block;
+  width: calc(var(--pu) * 30);
+  height: calc(var(--pu) * 22.5);
+}

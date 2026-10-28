@@ -3,8 +3,8 @@ import type { GameId } from '../frame/games';
 import { el } from '../ui/dom';
 import { niceMax, shortDay, type FamilyStats, type Series } from './family-stats';
 
-/** Word Circle, Word Guess, Word Grid: the reference palette's first three slots, validated as a set. */
-const COLORS: Record<GameId, string> = { circle: '#2a78d6', guess: '#eb6834', grid: '#1baf7a' };
+/** Word Circle, Word Guess, Word Grid, Jigsaw: the reference palette's first four slots (lines, direct-labeled). */
+const COLORS: Record<GameId, string> = { circle: '#2a78d6', guess: '#eb6834', grid: '#1baf7a', jigsaw: '#eda100' };
 const NS = 'http://www.w3.org/2000/svg';
 /** The chart box in SVG units; the plot runs from L to R across and T to B down. */
 const W = 600;

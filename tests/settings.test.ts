@@ -33,7 +33,8 @@ describe('loading settings', () => {
     expect(momsIpadSettings()).toEqual({
       name: '',
       thumb: 'left',
-      games: ['circle', 'guess', 'grid'],
+      games: ['circle', 'guess', 'grid', 'jigsaw'],
+      knownGames: ['circle', 'guess', 'grid', 'jigsaw'],
       startLevel: 'easy',
       share: true,
       schedule: { source: 'web' },
@@ -45,7 +46,8 @@ describe('loading settings', () => {
     expect(newIpadSettings()).toEqual({
       name: '',
       thumb: 'left',
-      games: ['circle', 'guess', 'grid'],
+      games: ['circle', 'guess', 'grid', 'jigsaw'],
+      knownGames: ['circle', 'guess', 'grid', 'jigsaw'],
       startLevel: 'medium',
       share: true,
       schedule: { source: 'device', lines: [] },
@@ -58,6 +60,7 @@ describe('loading settings', () => {
       name: 'Ruth',
       thumb: 'right',
       games: ['grid'],
+      knownGames: ['circle', 'guess', 'grid', 'jigsaw'],
       startLevel: 'hard',
       share: false,
       schedule: { source: 'device', lines: ['every day 6:00 PM Supper'] },
@@ -89,7 +92,17 @@ describe('loading settings', () => {
   it('tidies what it loads', () => {
     const store = new MemoryStore();
     store.setItem(SETTINGS_KEY, JSON.stringify({ name: '  Ruth   Anne ', games: ['grid', 'circle', 'grid'], avoid: ['Grave', 'grave', 'ill!'] }));
-    expect(loadSettings(store).settings).toMatchObject({ name: 'Ruth Anne', games: ['circle', 'grid'], avoid: ['grave', 'ill'] });
+    expect(loadSettings(store).settings).toMatchObject({ name: 'Ruth Anne', games: ['circle', 'grid', 'jigsaw'], avoid: ['grave', 'ill'] });
+  });
+
+  it('turns a game added to the site on once, then leaves it as the family set it', () => {
+    const store = new MemoryStore();
+    // Saved before Jigsaw existed: no knownGames.
+    store.setItem(SETTINGS_KEY, JSON.stringify({ ...newIpadSettings(), games: ['circle', 'guess'], knownGames: undefined }));
+    expect(loadSettings(store).settings).toMatchObject({ games: ['circle', 'guess', 'jigsaw'], knownGames: ['circle', 'guess', 'grid', 'jigsaw'] });
+    // Saved since: Jigsaw turned off stays off.
+    saveSettings(store, { ...newIpadSettings(), games: ['circle', 'guess'] });
+    expect(loadSettings(store).settings.games).toEqual(['circle', 'guess']);
   });
 
   it('plays with the defaults, without setup, if storage is unavailable', () => {
