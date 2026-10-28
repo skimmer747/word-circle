@@ -13,7 +13,7 @@ import { addPlay, loadLifetime, loadLog, type PlayRecord } from '../stats/log';
 import type { FrameHost, GameId, GameScreen, GameTargets } from './games';
 import { computeFrameLayout, type FrameLayout, type Thumb } from './layout';
 import { loadSavedFrame, saveSavedFrame, type SavedFrame } from './storage';
-import { FrameView, type CelebrationCard } from './view';
+import { FrameView, type CelebrationCard, type NoticeCard } from './view';
 
 /** The clock pop-up closes by itself after this long. */
 const CLOCK_OPEN_MS = 60_000;
@@ -27,6 +27,8 @@ const SCHEDULE_REFRESH_MS = 5 * 60_000;
 const HOLD_OPEN_MS = 3000;
 /** ...and a ring starts filling around it after this long, so a quick tap looks just as before. */
 const HOLD_RING_MS = 500;
+/** A notice closes by itself after this long. */
+const NOTICE_OPEN_MS = 30_000;
 /** Her stats close by themselves after this long untouched. */
 const STATS_OPEN_MS = 120_000;
 /** Looking back at a finished puzzle moves on to the next one by itself after this long. */
@@ -77,6 +79,8 @@ export class Frame implements FrameHost {
   private gamesOpen = false;
   private gamesAutoClose = 0;
   private settingsOpen = false;
+  private noticeOpen = false;
+  private noticeAutoClose = 0;
   private holdRing = 0;
   private holdOpen = 0;
   private statsOpen = false;
@@ -162,6 +166,14 @@ export class Frame implements FrameHost {
     });
   }
 
+  notice(card: NoticeCard): void {
+    if (this.blocked() || !this.layout) return;
+    this.noticeOpen = true;
+    this.view.showNotice(card, this.layout);
+    this.noticeAutoClose = window.setTimeout(() => this.closeNotice(), NOTICE_OPEN_MS);
+    this.updateTouchTargets();
+  }
+
   redraw(animateIn: boolean): void {
     this.relayout(animateIn);
   }
@@ -203,6 +215,7 @@ export class Frame implements FrameHost {
     else if (id === 'games-stats') this.openStatsFromGames();
     else if (id === 'stats-next') this.nextStatsCard();
     else if (id === 'stats-close') this.closeStats();
+    else if (id === 'notice-close') this.closeNotice();
     else this.game.buttonTapped(id);
   }
 
@@ -214,6 +227,7 @@ export class Frame implements FrameHost {
       this.statsOpen ||
       this.clockOpen ||
       this.gamesOpen ||
+      this.noticeOpen ||
       this.game.busy ||
       this.tracer.isTracing ||
       this.tracer.isDragging ||
@@ -247,6 +261,14 @@ export class Frame implements FrameHost {
 
   private reviewButton() {
     return this.targets.reviewButton ?? this.layout!.nextButton;
+  }
+
+  private closeNotice(): void {
+    if (!this.noticeOpen) return;
+    window.clearTimeout(this.noticeAutoClose);
+    this.noticeOpen = false;
+    this.view.hideNotice();
+    this.updateTouchTargets();
   }
 
   private openGames(): void {
@@ -516,6 +538,8 @@ export class Frame implements FrameHost {
       buttons.push({ id: 'back', ...layout.backButton }, { id: 'card-stats', ...layout.cardStatsButton });
     } else if (this.clockOpen) {
       buttons = [{ id: 'close', ...layout.closeButton }];
+    } else if (this.noticeOpen) {
+      buttons = [{ id: 'notice-close', ...layout.closeButton }];
     } else if (this.gamesOpen) {
       buttons = [
         ...this.games.map((game, i) => ({ id: `game:${game.id}`, ...layout.gameCards[i] })),
@@ -543,6 +567,7 @@ export class Frame implements FrameHost {
     if (this.celebration && !this.celebration.reviewing) this.view.placeCelebration(layout);
     if (this.clockOpen) this.view.placeClock(layout);
     if (this.gamesOpen) this.view.placeGames(layout);
+    if (this.noticeOpen) this.view.placeNotice(layout);
     if (this.statsOpen) this.statsView.place(layout);
     this.tracer.setEnabled(!this.settingsOpen);
   }

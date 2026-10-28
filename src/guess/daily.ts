@@ -30,6 +30,14 @@ export function dailyFor(words: readonly DailyWord[], day: string): DailyWord | 
   return words.find((word) => word.date === day) ?? null;
 }
 
+/**
+ * True while her word is the real Wordle on its own day, when there are no hints. After midnight it finishes like
+ * any other word, hints and all.
+ */
+export function isTodaysWordle(saved: SavedGuess, day: string): boolean {
+  return saved.daily?.date === day;
+}
+
 export function cachedDailyWords(store: KeyValueStore): DailyWord[] {
   try {
     return parseDailyWords(store.getItem(DAILY_CACHE_KEY) ?? '');

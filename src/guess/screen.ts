@@ -1,17 +1,18 @@
 import { GAME_TITLES, type FrameHost, type GameScreen, type GameSummary, type GameTargets } from '../frame/games';
 import type { FrameLayout } from '../frame/layout';
-import type { CelebrationCard } from '../frame/view';
+import type { CelebrationCard, NoticeCard } from '../frame/view';
 import { NOTHING_AVOIDED, type AvoidCheck } from '../shared/avoid';
 import { dayKey } from '../shared/days';
 import type { KeyValueStore } from '../shared/store';
 import { PlayTimer } from '../shared/timer';
 import { guessRecord } from '../stats/records';
 import { guessLines } from './celebration';
-import { cachedDailyWords, dailyFor, finishWord, refreshDailyWords, swapInDaily, type DailyWord } from './daily';
+import { cachedDailyWords, dailyFor, finishWord, isTodaysWordle, refreshDailyWords, swapInDaily, type DailyWord } from './daily';
 import { computeGuessLayout, type GuessLayout } from './layout';
 import { firstVisibleGuess, GuessGame, VISIBLE_ROWS } from './rules';
 import { shareText } from './share';
 import { loadSavedGuess, recordGuessSolve, saveSavedGuess, type SavedGuess } from './storage';
+import { HINT_ICON } from '../ui/icons';
 import { GuessView, type DailyMode, type SquareView } from './view';
 import { acceptedChecker, type GuessWords } from './words';
 
@@ -23,6 +24,16 @@ const CELEBRATION_MS = 15_000;
 const DAILY_CELEBRATION_MS = 60_000;
 /** How often to check for a new daily Wordle word. */
 const DAILY_REFRESH_MS = 5 * 60_000;
+/** What Hint says on today's Wordle, where there are no hints. */
+const NO_HINTS: NoticeCard = {
+  icon: HINT_ICON,
+  title: "No hints on today's Wordle",
+  lines: [
+    'This is the real Wordle, the same word everyone is playing today.',
+    "A hint would give the answer away, so they're off for this word.",
+    'Hints are back with your next word.',
+  ],
+};
 
 export interface GuessOptions {
   /** Fetches daily-word.txt. */
@@ -175,9 +186,13 @@ export class GuessScreen implements GameScreen {
     if (this.shown) this.host.redraw(true);
   }
 
+  private todaysWordle(): boolean {
+    return isTodaysWordle(this.saved, dayKey(this.now()));
+  }
+
   private dailyMode(): DailyMode {
     const day = dayKey(this.now());
-    if (this.saved.daily?.date === day) return 'label';
+    if (isTodaysWordle(this.saved, day)) return 'label';
     if (this.saved.dailyDone?.date === day && this.saved.dailyDone.share && this.options.share) return 'share';
     return 'none';
   }
@@ -266,6 +281,10 @@ export class GuessScreen implements GameScreen {
   }
 
   private async hint(): Promise<void> {
+    if (this.todaysWordle()) {
+      this.host.notice(NO_HINTS);
+      return;
+    }
     // One star at a time, so a double tap doesn't use two hints.
     if (this.hiddenHint) return;
     const result = this.game.hint();
@@ -360,6 +379,8 @@ export class GuessScreen implements GameScreen {
   private resetIdle(): void {
     window.clearTimeout(this.idleTimer);
     this.view?.setHintPulse(false);
+    // No nudge toward a hint she can't have.
+    if (this.todaysWordle()) return;
     this.idleTimer = window.setTimeout(() => this.view?.setHintPulse(true), IDLE_HINT_MS);
   }
 }

@@ -144,9 +144,10 @@ Every letter is `#141414` on white.
 
 ### Hint
 
-- Free and unlimited. Puts the right letter into the highlighted square (the next one she would type in), keeping the letters she typed before it. When her row is full, it goes in the leftmost square whose letter isn't yet known to be right, replacing the letter she typed there. That letter is locked and carries down like any right-spot letter.
+- Free and unlimited on every word except today's Wordle. Puts the right letter into the highlighted square (the next one she would type in), keeping the letters she typed before it. When her row is full, it goes in the leftmost square whose letter isn't yet known to be right, replacing the letter she typed there. That letter is locked and carries down like any right-spot letter.
 - If the hint makes all five letters known, the word is complete: "Well done!".
 - After 2 minutes without a guess, the Hint button gently pulses every 4 seconds until she guesses or taps Hint. It never reveals anything by itself.
+- **No hints on today's Wordle** (added 2026-10-28, owner's request): while the daily word is her word on its own day (the Today's Wordle label is showing), tapping Hint reveals nothing. Instead a card like the clock's (gold border, lightbulb) says **"No hints on today's Wordle"**: it's the real Wordle, the same word everyone is playing today; a hint would give the answer away, so they're off for this word; hints are back with the next word. It has a big **Close** button and closes by itself after 30 seconds. The Hint button doesn't pulse on today's Wordle. After midnight the word finishes like any other, hints and all.
 
 ### All letters
 

@@ -1,7 +1,7 @@
 import type { ButtonGeometry, TileGeometry } from '../input/touch';
 import type { FrameLayout, Rect } from './layout';
 import type { PlayRecord } from '../stats/log';
-import type { CelebrationCard } from './view';
+import type { CelebrationCard, NoticeCard } from './view';
 
 export const GAME_IDS = ['circle', 'guess', 'grid'] as const;
 export type GameId = (typeof GAME_IDS)[number];
@@ -38,6 +38,8 @@ export interface FrameHost {
    * finished puzzle first, so the game leaves it on screen (not redrawn) until this resolves.
    */
   celebrate(card: CelebrationCard): Promise<void>;
+  /** Shows a card telling her something (e.g. why Hint does nothing) until she taps Close. */
+  notice(card: NoticeCard): void;
   /** Redraws the game (and tells the touch tracker about its new targets). */
   redraw(animateIn: boolean): void;
   /** The game's buttons changed without a redraw (e.g. keys hidden): tells the touch tracker. */
@@ -50,7 +52,8 @@ export interface FrameHost {
 
 /**
  * A game the frame can show. Button ids "next", "share", "back", "card-stats", "clock", "close", "games",
- * "games-close", "games-stats", "stats", "stats-next", "stats-close" and "game:…" belong to the frame.
+ * "games-close", "games-stats", "stats", "stats-next", "stats-close", "notice-close" and "game:…" belong to the
+ * frame.
  */
 export interface GameScreen {
   readonly id: GameId;

@@ -28,6 +28,15 @@ export interface CelebrationCard {
   share?: () => Promise<void>;
 }
 
+/** A card telling her something, with a Close button. */
+export interface NoticeCard {
+  /** Shown beside the title. */
+  icon: string;
+  title: string;
+  /** Short sentences, one paragraph each. */
+  lines: string[];
+}
+
 /** A game's card in the Games pop-up. */
 export interface GameEntry {
   id: GameId;
@@ -93,6 +102,7 @@ export class FrameView {
   private readonly celebrate: HTMLElement;
   private readonly clockPopup: HTMLElement;
   private readonly gamesPopup: HTMLElement;
+  private readonly noticePopup: HTMLElement;
   private readonly rotate: HTMLElement;
 
   /** Buttons are drawn here but tapped through the touch tracker, which works with a resting thumb. */
@@ -102,6 +112,7 @@ export class FrameView {
     this.celebrate = el('div', 'celebrate', root);
     this.clockPopup = el('div', 'clock-popup', root);
     this.gamesPopup = el('div', 'games-popup', root);
+    this.noticePopup = el('div', 'notice-popup', root);
     this.statsLayer = el('div', 'stats-layer', root);
     this.rotate = el('div', 'rotate', root);
     this.rotate.innerHTML = `${SIDEWAYS_IPAD}<div>Please turn the iPad sideways</div>`;
@@ -327,6 +338,56 @@ export class FrameView {
   hideClock(): void {
     this.clockPopup.classList.remove('visible');
     this.clockPopup.replaceChildren();
+  }
+
+  /** A card telling her something. Its Close button is tapped through the touch tracker. */
+  showNotice(notice: NoticeCard, layout: FrameLayout): void {
+    this.noticePopup.replaceChildren();
+    el('div', 'celebrate-dim', this.noticePopup);
+    const card = el('div', 'notice-card', this.noticePopup);
+    const title = el('div', 'notice-title', card);
+    title.innerHTML = `${notice.icon}<span></span>`;
+    title.querySelector('span')!.textContent = notice.title;
+    for (const line of notice.lines) el('p', 'notice-line', card).textContent = line;
+    const close = el('button', 'next close', this.noticePopup);
+    close.type = 'button';
+    close.innerHTML = `${CLOSE_ICON}<span>Close</span>`;
+    this.noticePopup.classList.add('visible');
+    this.placeNotice(layout);
+  }
+
+  placeNotice(layout: FrameLayout): void {
+    const card = this.noticePopup.querySelector<HTMLElement>('.notice-card');
+    const close = this.noticePopup.querySelector<HTMLElement>('.close');
+    if (close) place(close, layout.closeButton);
+    if (!card) return;
+    place(card, layout.card);
+    // Text sizes in the stylesheet are multiples of 1% of the card's height, shrunk together if they'd run into Close.
+    let u = layout.card.h / 100;
+    card.style.setProperty('--u', `${u}px`);
+    const last = card.lastElementChild as HTMLElement | null;
+    if (!last) return;
+    for (let i = 0; i < 3; i++) {
+      const top = parseFloat(getComputedStyle(card).paddingTop);
+      const room = layout.closeButton.y - CARD_BUTTON_GAP - layout.card.y - card.clientTop - top;
+      const used = last.offsetTop + last.offsetHeight - top;
+      if (used <= room) break;
+      u *= (room / used) * FIT_SPARE;
+      card.style.setProperty('--u', `${u}px`);
+    }
+    // The title stays on one line beside its icon, shrinking if it's too wide.
+    const title = card.querySelector<HTMLElement>('.notice-title');
+    if (!title) return;
+    title.style.fontSize = '';
+    const style = getComputedStyle(card);
+    const width = card.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 1;
+    const scale = fitFontScale(title.scrollWidth, width, 0.4);
+    if (scale < 1) title.style.fontSize = `${parseFloat(getComputedStyle(title).fontSize) * scale * FIT_SPARE}px`;
+  }
+
+  hideNotice(): void {
+    this.noticePopup.classList.remove('visible');
+    this.noticePopup.replaceChildren();
   }
 
   /** Shrinks everything on the card together if it would run into its buttons (a long Word Guess card). */

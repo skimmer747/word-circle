@@ -4,6 +4,7 @@ import {
   cachedDailyWords,
   dailyFor,
   finishWord,
+  isTodaysWordle,
   parseDailyWords,
   refreshDailyWords,
   swapInDaily,
@@ -132,5 +133,19 @@ describe('finishWord with words she should never see', () => {
 describe('play time and the daily word', () => {
   it('starts the daily word at no time', () => {
     expect(swapInDaily({ ...ON_LIST, elapsedMs: 5000 }, TODAY, true)?.elapsedMs).toBeUndefined();
+  });
+});
+
+describe('isTodaysWordle (no hints on it)', () => {
+  it('is true on the daily word on its own day', () => {
+    expect(isTodaysWordle(ON_DAILY, '2026-10-20')).toBe(true);
+  });
+
+  it('is false on a list word', () => {
+    expect(isTodaysWordle(ON_LIST, '2026-10-20')).toBe(false);
+  });
+
+  it('is false once its day is over, when it finishes like any other word', () => {
+    expect(isTodaysWordle(ON_DAILY, '2026-10-21')).toBe(false);
   });
 });

@@ -731,6 +731,59 @@ body {
   color: var(--ink);
 }
 
+/* A card telling her something (why Hint does nothing on today's Wordle): fills almost the screen like the
+   clock, with Hint's gold. Sizes use --u (1% of the card's height, set by the view, which shrinks it if the
+   text would run into Close). The bottom padding leaves room for the Close button. */
+.notice-popup {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.notice-popup.visible {
+  display: block;
+}
+
+.notice-card {
+  --u: 7.4px;
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(var(--u) * 4) 64px 248px;
+  border-radius: 32px;
+  background: #fff;
+  border: 8px solid var(--hint);
+  text-align: center;
+  animation: card-in 400ms ease-out;
+}
+
+.notice-title {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  margin-bottom: calc(var(--u) * 3);
+  font-size: calc(var(--u) * 9);
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.notice-title svg {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  color: var(--hint);
+}
+
+.notice-line {
+  margin: 0 0 calc(var(--u) * 2.4);
+  font-size: calc(var(--u) * 6.4);
+  line-height: 1.25;
+  color: var(--label);
+}
+
 /* "Pick a game": fills almost the screen like the clock. Sizes use --u (1% of the card's height, set by the
    view on the pop-up). */
 .games-popup {
