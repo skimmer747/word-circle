@@ -1,7 +1,7 @@
 # Jigsaw — Design
 
 **Date:** 2026-10-28
-**Status:** Approved in brainstorming 2026-10-28; not built yet.
+**Status:** Approved in brainstorming 2026-10-28. Built 2026-10-28 on the `jigsaw` branch: part 1 (the game, starter pictures) and part 2 (family photos, the settings section), with the owner's additions (Move picture, spread-out Board, pinch to zoom, Hide edges).
 **Builds on:** `2026-10-19-word-circle-design.md` (player, constraints, colors, font, touch rules), `2026-10-19-word-grid-design.md` (shared layout, dragging, tray), `2026-10-19-caregiver-settings-design.md` (settings page), `2026-10-20-stats-design.md` and `2026-10-20-hint-star-design.md`
 
 ## Purpose
@@ -117,8 +117,8 @@ Active play time is measured as in the other games (`src/shared/timer.ts`); she 
 
 - Opens the first time she opens Jigsaw, after every finished puzzle (Next), and from the Pictures button. Opening Jigsaw later returns to the puzzle in progress, or to this page if there is none.
 - Drawn by the game across the play area, like the frame's pop-ups; Games and Clock stay on top and usable, so she can still switch games.
-- A grid of 3 × 2 tiles in the play area (about 224 × 168 each on the smallest iPad). The first tile on every page is **Add a photo** (dashed purple border, big +), so it is always in the same place; the other five are pictures.
-- Under each picture, its caption on one line, cut short with "…" if it doesn't fit.
+- A grid of 3 × 2 tiles in the play area (about 224 × 168 each on the smallest iPad). The first tile on every page is **Add a photo** (dashed purple border, big +), so it is always in the same place; the other five are pictures. Where photos can't be kept (no IndexedDB, e.g. some private windows) there is no Add a photo and all six are pictures.
+- Under each picture, its caption on up to two lines (a family caption keeps a typed line break), cut short with "…" past that.
 - **Order:** family photos newest first, then the starter pictures (if shown) in the owner's order.
 - A **green check** on every picture she has finished, in any style or piece count.
 - Big **‹ Back** and **More pictures ›** buttons at the bottom instead of scrolling; Back is hidden on the first page and More pictures on the last.
@@ -129,8 +129,9 @@ Active play time is measured as in the other games (`src/shared/timer.ts`); she 
 ### Adding a photo in the game
 
 1. **Add a photo** opens the iPad's own picker through a hidden `<input type="file" accept="image/*">`. iPadOS first shows its own menu (Photo Library / Take Photo / Choose File); a web page can't skip it. Cancelling adds nothing.
-2. The **"Your new puzzle"** screen is an ordinary page layer above the game (not inside the touch tracker), because it needs a real text box and the on-screen keyboard. So the keyboard never hides what she needs, the photo is on the left, and the caption box and buttons are on the right, top-aligned.
-   - The photo is shown with a 4:3 white frame over it; outside the frame is dimmed. Dragging the photo moves it under the frame, which always stays inside the photo.
+2. The **"Your new puzzle"** screen is an ordinary page layer above the game (the game pauses the frame's touch tracker with `FrameHost.cover()` while it's open), because it needs a real text box and the on-screen keyboard. So the keyboard never hides what she needs, the photo is on the left, and the caption box and buttons are on the right, top-aligned.
+   - The photo is shown under a fixed 4:3 white frame; the rest of the photo is dimmed (four plain panels: iPad Safari doesn't draw a frame-sized hole in one big shadow). Dragging the photo moves it under the frame, which always stays inside the photo.
+   - **Pinch to zoom** (added at the owner's request): two fingers zoom in, so a smaller part of the photo fills the frame, and back out to the whole photo; the spot under the fingers stays under them. Zooming in stops at 3×, or sooner so the framed part is never under 800 px wide (the puzzle is 1600 px). A thumb that was resting on the photo (down a second without moving) is left out. A trackpad pinch works on a Mac too (Safari's gesture events, or a wheel with Ctrl). A tip under the buttons says "Drag the photo to move it. Pinch to zoom in or out."
    - Starting frame: centered across; up and down, the frame starts a quarter of the way into the spare height (near the top, where faces usually are).
    - **Caption (optional)** box: up to two lines, 80 characters, with the grayed example "Rose and Al, Lake George, 1987".
    - **Start puzzle** saves the photo and starts its puzzle in her current style and piece count. **Cancel** adds nothing.
@@ -139,13 +140,14 @@ Active play time is measured as in the other games (`src/shared/timer.ts`); she 
 ### Settings page: "Jigsaw pictures"
 
 A folded section on the caregiver settings page:
-- **Add photos:** the same picker, allowing several at once; each lands at the top of the list with the starting frame and no caption.
-- Each family photo in a row: its framed thumbnail, its caption box (saved as they type), **Change framing** (the framing screen) and **Remove**, which asks "Remove this picture from Jigsaw? It stays in Photos." first.
+- **Add photos:** the same picker, allowing several at once; each lands at the top of the list with the starting frame and no caption, with a line saying how many were added and how many couldn't be used.
+- Each family photo in a row: its framed thumbnail, its caption box (saved half a second after the last key, and when it loses focus), **Change framing** (the framing screen, with zoom, titled "Change framing" with Save and no caption box) and **Remove**, which asks "Remove this picture from Jigsaw? It stays in Photos." first, with Remove and Keep.
+- Photo changes are saved straight away, so Cancel doesn't undo them: Cancel after a photo change reloads the app (like Done) so the game shows them. The starter tick box is part of the settings and applies on Done.
 - **Show the starter pictures** tick box, on by default.
 
 ### Where family photos live
 
-- Each photo is shrunk so its long side is at most 2000 px (keeping the whole photo, so the framing can change later) and saved as a JPEG with its caption, its frame and a 448 × 336 framed thumbnail.
+- Each photo is shrunk so its long side is at most 2000 px (keeping the whole photo, so the framing can change later) and saved as a JPEG with its caption, its frame (where it sits and its zoom), a framed 1600 × 1200 copy (so the game treats it exactly like a starter picture) and a 448 × 336 framed thumbnail.
 - They are kept in the Home Screen app's own IndexedDB database on that iPad. The app asks the iPad to keep its storage permanently (`navigator.storage.persist()`).
 - They are never uploaded and never appear in Share, the family stats or Google Analytics. They don't move to a new iPad, and deleting the Home Screen icon deletes them; the originals stay in Photos.
 
@@ -203,7 +205,7 @@ public/jigsaw/       starter pictures and starters.json (generated)
 - her place in up to the **20 most recently played** picture / style / piece-count mixes: placed pieces, tray order, loose pieces' positions and Table groups. Positions are stored relative to the board or free area, so they still fit after the thumb side changes;
 - the ids of pictures she has finished.
 
-Family photos are in IndexedDB (§3). If a family photo is removed, its saved places and check go too; if it was the current puzzle, she lands on the picture page. Unreadable saved data starts afresh, as in the other games.
+Family photos are in IndexedDB (§3). If a family photo is removed, its saved places and check go too; if it was the current puzzle, she lands on the picture page. Jigsaw does this itself when its picture list loads (only when the photos could be read), since it's the only one that writes its saved state. Unreadable saved data starts afresh, as in the other games.
 
 ## 6. Testing
 
@@ -219,8 +221,8 @@ Each step is tested and committed before the next; the owner tries it at the two
 
 1. Tray style with stand-in pictures: cutting, layout, tray, snapping, Hint, finishing, the picture page, saving. **Checkpoint: the owner tries it.**
 2. Board and Table styles, and the two rows.
-3. Family photos: the picker, "Your new puzzle" (framing and caption), the photo store. **Checkpoint: the owner tries it, including adding a photo.**
-4. The settings section, `knownGames` and the starter tick box.
+3. Family photos: the picker, "Your new puzzle" (framing and caption), the photo store. **Checkpoint: the owner tries it, including adding a photo.** (Built; the picker opening from a tap through the touch tracker was checked in the iOS 26 Simulator.)
+4. The settings section, `knownGames` and the starter tick box. (Built.)
 5. The starter pipeline and the owner's first batch; stats, analytics and the Games pop-up card.
 
 ## Out of scope
