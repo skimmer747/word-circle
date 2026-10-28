@@ -1778,6 +1778,21 @@ body {
   font-size: calc(var(--u) * 5.2);
 }
 
+.stats-podium.four {
+  gap: calc(var(--u) * 2.5);
+}
+
+.stats-podium.four .stats-col {
+  width: calc(var(--u) * 27);
+}
+
+.stats-podium.four .stats-col-name {
+  font-size: calc(var(--u) * 4.2);
+  line-height: 1.1;
+  text-align: center;
+  white-space: normal;
+}
+
 .stats-crown {
   width: calc(var(--u) * 7);
   height: calc(var(--u) * 7);

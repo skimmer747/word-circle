@@ -68,7 +68,8 @@ function totalCard(card: HTMLElement, s: HerStats): void {
 
 function podiumCard(card: HTMLElement, s: HerStats): void {
   title(card, 'Your favorite game');
-  const row = el('div', 'stats-podium', card);
+  // Four games need narrower columns to fit where three did.
+  const row = el('div', s.podium.entries.length > 3 ? 'stats-podium four' : 'stats-podium', card);
   const most = Math.max(1, ...s.podium.entries.map((e) => e.solved));
   s.podium.entries.forEach((entry, i) => {
     const col = el('div', entry.top ? 'stats-col top' : 'stats-col', row);
