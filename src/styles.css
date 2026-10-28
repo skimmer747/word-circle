@@ -2403,12 +2403,17 @@ body {
 
 .pic-caption {
   position: absolute;
+  box-sizing: border-box;
+  /* Two lines (TILE_CAPTION in layout.ts), with "…" only if it needs more. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
+  padding-top: 4px;
   font-size: 22px;
-  line-height: 34px;
+  line-height: 26px;
   text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   color: var(--ink);
 }
 

@@ -19,7 +19,8 @@ const CAPTION_HEIGHT = 96;
 /** "Pick a picture". */
 const TITLE_HEIGHT = 72;
 const TILE_GAP = 24;
-const TILE_CAPTION = 34;
+/** A picture's caption under it: up to two lines (matches the CSS). */
+const TILE_CAPTION = 56;
 const PAGE_BUTTON_HEIGHT = 96;
 const BACK_WIDTH = 200;
 const CLOSE_WIDTH = 180;
@@ -178,7 +179,7 @@ export function clampToFree(free: readonly Rect[], body: Rect, overhang = 0): Re
 
 export interface PicturePageLayout {
   title: Rect;
-  /** Six 4:3 places, three across and two down, with a caption line under each. */
+  /** Six 4:3 places, three across and two down, with up to two lines of caption under each. */
   tiles: Rect[];
   captions: Rect[];
   back: Rect;
