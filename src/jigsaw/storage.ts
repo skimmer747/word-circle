@@ -135,6 +135,16 @@ export function withoutPlace(saved: SavedJigsaw, picture: string, style: JigsawS
 }
 
 /** Gives the picture its check on the picture page. */
+/** Forgets pictures that are gone (removed family photos): their places, their checks, and the puzzle if it was current. */
+export function withoutPictures(saved: SavedJigsaw, gone: (picture: string) => boolean): SavedJigsaw {
+  return {
+    ...saved,
+    current: saved.current !== null && gone(saved.current) ? null : saved.current,
+    places: saved.places.filter((place) => !gone(place.picture)),
+    finished: saved.finished.filter((picture) => !gone(picture)),
+  };
+}
+
 export function withFinished(saved: SavedJigsaw, picture: string): SavedJigsaw {
   return saved.finished.includes(picture) ? saved : { ...saved, finished: [...saved.finished, picture] };
 }

@@ -37,6 +37,7 @@ describe('loading settings', () => {
       knownGames: ['circle', 'guess', 'grid', 'jigsaw'],
       startLevel: 'easy',
       share: true,
+      jigsawStarters: true,
       schedule: { source: 'web' },
       avoid: [],
     });
@@ -50,6 +51,7 @@ describe('loading settings', () => {
       knownGames: ['circle', 'guess', 'grid', 'jigsaw'],
       startLevel: 'medium',
       share: true,
+      jigsawStarters: true,
       schedule: { source: 'device', lines: [] },
       avoid: [],
     });
@@ -63,12 +65,21 @@ describe('loading settings', () => {
       knownGames: ['circle', 'guess', 'grid', 'jigsaw'],
       startLevel: 'hard',
       share: false,
+      jigsawStarters: false,
       schedule: { source: 'device', lines: ['every day 6:00 PM Supper'] },
       avoid: ['grave'],
     };
     const store = new MemoryStore();
     expect(saveSettings(store, saved)).toBe(true);
     expect(loadSettings(store)).toEqual({ settings: saved, firstTime: false });
+  });
+
+  it('shows the starter pictures unless the family turned them off', () => {
+    const store = new MemoryStore();
+    store.setItem(SETTINGS_KEY, JSON.stringify({ ...newIpadSettings(), jigsawStarters: 'no' }));
+    expect(loadSettings(store).settings.jigsawStarters).toBe(true);
+    store.setItem(SETTINGS_KEY, JSON.stringify({ ...newIpadSettings(), jigsawStarters: false }));
+    expect(loadSettings(store).settings.jigsawStarters).toBe(false);
   });
 
   it('replaces only the damaged fields, with new-iPad defaults', () => {

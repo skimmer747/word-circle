@@ -10,6 +10,7 @@ import {
   saveSavedJigsaw,
   withFinished,
   withPlace,
+  withoutPictures,
   withoutPlace,
   type SavedJigsaw,
   type SavedPlace,
@@ -104,5 +105,29 @@ describe('her places', () => {
     const stats = recordJigsawSolve(recordJigsawSolve(freshJigsaw().stats, '2026-10-27'), '2026-10-27');
     expect(stats).toEqual({ totalSolved: 2, todaySolved: 2, lastPlayedDay: '2026-10-27' });
     expect(recordJigsawSolve(stats, '2026-10-28')).toEqual({ totalSolved: 3, todaySolved: 1, lastPlayedDay: '2026-10-28' });
+  });
+});
+
+describe('forgetting pictures that are gone', () => {
+  const progress = { placed: [], queue: [], tray: [null, null, null], loose: [], positions: [], groups: [], order: [], hints: 0, elapsedMs: 0 };
+  const saved: SavedJigsaw = {
+    ...freshJigsaw(),
+    current: 'family:gone',
+    places: [
+      { picture: 'family:gone', style: 'tray', count: 9, progress },
+      { picture: 'starter:lake', style: 'tray', count: 9, progress },
+    ],
+    finished: ['family:gone', 'starter:lake'],
+  };
+
+  it('drops their places, their checks, and the puzzle if it was current', () => {
+    const kept = withoutPictures(saved, (id) => id === 'family:gone');
+    expect(kept.current).toBeNull();
+    expect(kept.places.map((p) => p.picture)).toEqual(['starter:lake']);
+    expect(kept.finished).toEqual(['starter:lake']);
+  });
+
+  it('keeps everything else as it was', () => {
+    expect(withoutPictures(saved, () => false)).toEqual(saved);
   });
 });

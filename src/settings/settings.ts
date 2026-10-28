@@ -29,6 +29,8 @@ export interface Settings {
   startLevel: StartLevel;
   /** Whether Word Guess offers Share after today's Wordle. */
   share: boolean;
+  /** Whether Jigsaw offers the starter pictures as well as the family's own photos. */
+  jigsawStarters: boolean;
   schedule: ScheduleSetting;
   /** Extra words kept out of every game. */
   avoid: string[];
@@ -52,6 +54,7 @@ export function newIpadSettings(): Settings {
     knownGames: [...GAME_IDS],
     startLevel: 'medium',
     share: true,
+    jigsawStarters: true,
     schedule: { source: 'device', lines: [] },
     avoid: [],
   };
@@ -94,6 +97,7 @@ function readSettings(value: unknown): Settings {
   }
   if (START_LEVELS.includes(value.startLevel as StartLevel)) settings.startLevel = value.startLevel as StartLevel;
   if (typeof value.share === 'boolean') settings.share = value.share;
+  if (typeof value.jigsawStarters === 'boolean') settings.jigsawStarters = value.jigsawStarters;
   settings.schedule = readSchedule(value.schedule) ?? settings.schedule;
   if (Array.isArray(value.avoid)) settings.avoid = parseAvoidWords(value.avoid.filter((word) => typeof word === 'string').join(' '));
   return settings;
