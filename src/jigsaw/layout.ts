@@ -11,7 +11,8 @@ const SLOT_PADDING = 6;
 const ROW_GAP = 8;
 /** Table pieces start at least this far apart. */
 const TABLE_GAP = 8;
-/** Table pieces are never smaller than this (the free area always has room well above it). */
+/** Table pieces are never smaller than this. On every iPad in landscape there is always a spot per piece well above
+ * it (portrait shows the turn-the-iPad overlay instead), so this only stops the search for a size. */
 const TABLE_MIN = 40;
 /** The finished picture's caption: up to two lines across the bottom. */
 const CAPTION_HEIGHT = 96;
@@ -41,7 +42,10 @@ export interface JigsawLayout {
   countButtons: Rect[];
   /** The 4:3 board (Tray and Board). */
   board: Rect;
-  /** Where loose pieces may lie: everything clear of the buttons, the tray and the rows. The table starts at free[0]. */
+  /**
+   * Where loose pieces may lie: everything clear of the buttons, the tray and the rows. The table starts at free[0].
+   * The 16 px gap above the rows, to the right of the buttons, is deliberately not free (it keeps pieces off them).
+   */
   free: Rect[];
   /** Where the finished picture is shown, and its caption under it. */
   finished: Rect;
@@ -110,32 +114,56 @@ function cells(area: Rect, cellW: number, cellH: number): Rect[] {
   return Array.from({ length: across * down }, (_, i) => ({ x: x0 + (i % across) * cellW, y: y0 + Math.floor(i / across) * cellH, w: cellW, h: cellH }));
 }
 
-/** The biggest table pieces that still leave room for every piece, apart, in the free area (never bigger than on the board). */
-export function tablePieces(layout: JigsawLayout, count: PieceCount): TablePieces {
+/** The table pieces of width `w`, in as many spots as the free area has room for. */
+function tableAt(layout: JigsawLayout, shape: number, w: number): TablePieces {
+  const h = w * shape;
+  const tab = tabFor(w, h);
+  const cellW = w + 2 * tab + TABLE_GAP;
+  const cellH = h + 2 * tab + TABLE_GAP;
+  const room = layout.free.flatMap((area) => cells(area, cellW, cellH));
+  return { w, h, spots: room.map((cell) => ({ x: cell.x + (cellW - w) / 2, y: cell.y + (cellH - h) / 2, w, h })) };
+}
+
+function measureTable(layout: JigsawLayout, count: PieceCount): TablePieces {
   const { cols, rows } = GRID_SIZES[count];
   const shape = layout.board.h / rows / (layout.board.w / cols);
   let w = Math.floor(layout.board.w / cols);
-  for (;;) {
-    const h = w * shape;
-    const tab = tabFor(w, h);
-    const cellW = w + 2 * tab + TABLE_GAP;
-    const cellH = h + 2 * tab + TABLE_GAP;
-    const room = layout.free.flatMap((area) => cells(area, cellW, cellH));
-    if (room.length >= count || w <= TABLE_MIN) {
-      return { w, h, spots: room.map((cell) => ({ x: cell.x + (cellW - w) / 2, y: cell.y + (cellH - h) / 2, w, h })) };
-    }
+  // Written so that a size that isn't a number ends the search instead of looping for ever.
+  while (w > TABLE_MIN) {
+    const table = tableAt(layout, shape, w);
+    if (table.spots.length >= count) return table;
     w -= 1;
   }
+  return tableAt(layout, shape, TABLE_MIN);
+}
+
+const tables = new WeakMap<JigsawLayout, Map<PieceCount, TablePieces>>();
+
+/**
+ * The biggest table pieces that still leave room for every piece, apart, in the free area (never bigger than on the
+ * board). Cached per layout, since every redraw asks for it for every piece.
+ */
+export function tablePieces(layout: JigsawLayout, count: PieceCount): TablePieces {
+  let byCount = tables.get(layout);
+  if (!byCount) tables.set(layout, (byCount = new Map()));
+  let table = byCount.get(count);
+  if (!table) byCount.set(count, (table = measureTable(layout, count)));
+  return table;
 }
 
 const distance = (area: Rect, x: number, y: number) =>
   Math.hypot(Math.max(area.x - x, 0, x - (area.x + area.w)), Math.max(area.y - y, 0, y - (area.y + area.h)));
 
-/** Moves a piece's body (or a group's bounds) inside the part of the free area its middle is nearest. */
-export function clampToFree(free: readonly Rect[], body: Rect): Rect {
+/**
+ * Moves a piece's body (or a group's bounds) into the free area with its tabs (`overhang`) inside too: into the
+ * nearest part it fits in, or the nearest part at all if it fits in none. `free` must not be empty.
+ */
+export function clampToFree(free: readonly Rect[], body: Rect, overhang = 0): Rect {
   const cx = body.x + body.w / 2;
   const cy = body.y + body.h / 2;
-  const area = free.reduce((best, a) => (distance(a, cx, cy) < distance(best, cx, cy) ? a : best));
+  const inner = free.map((a) => ({ x: a.x + overhang, y: a.y + overhang, w: a.w - 2 * overhang, h: a.h - 2 * overhang }));
+  const fits = inner.filter((a) => body.w <= a.w && body.h <= a.h);
+  const area = (fits.length > 0 ? fits : inner).reduce((best, a) => (distance(a, cx, cy) < distance(best, cx, cy) ? a : best));
   return {
     ...body,
     x: Math.max(area.x, Math.min(body.x, area.x + area.w - body.w)),
