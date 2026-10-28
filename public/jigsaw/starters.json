@@ -1,0 +1,38 @@
+[
+  {
+    "id": "stand-in-1",
+    "file": "stand-in-1.jpg",
+    "thumb": "stand-in-1-thumb.jpg",
+    "caption": "Test picture 1"
+  },
+  {
+    "id": "stand-in-2",
+    "file": "stand-in-2.jpg",
+    "thumb": "stand-in-2-thumb.jpg",
+    "caption": "Test picture 2"
+  },
+  {
+    "id": "stand-in-3",
+    "file": "stand-in-3.jpg",
+    "thumb": "stand-in-3-thumb.jpg",
+    "caption": "Test picture 3"
+  },
+  {
+    "id": "stand-in-4",
+    "file": "stand-in-4.jpg",
+    "thumb": "stand-in-4-thumb.jpg",
+    "caption": "Test picture 4"
+  },
+  {
+    "id": "stand-in-5",
+    "file": "stand-in-5.jpg",
+    "thumb": "stand-in-5-thumb.jpg",
+    "caption": "Test picture 5"
+  },
+  {
+    "id": "stand-in-6",
+    "file": "stand-in-6.jpg",
+    "thumb": "stand-in-6-thumb.jpg",
+    "caption": "Test picture 6"
+  }
+]

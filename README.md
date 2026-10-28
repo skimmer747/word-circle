@@ -92,6 +92,16 @@ The first new word she starts that day is today's Wordle, marked **Today's Wordl
 
 Regenerating can change the order, so she may start a fresh puzzle or word at her current position.
 
+## Jigsaw starter pictures
+
+Jigsaw's starter pictures go to every family's iPad and are public on GitHub, so use only photos you took or that are free to share.
+
+1. Put the photos in `photos/starter/` (kept out of git). iPhone HEIC files are fine.
+2. Optionally list them in `photos/starter/captions.txt`, one line each: `file name | caption | keep`. `keep` is which part to keep when a photo isn't 4:3: `top`, `middle` or `bottom`, and `left`, `center` or `right` (default: centered, a quarter of the way down). Listed photos come first, in that order.
+3. Run `npm run jigsaw-photos`, look over `docs/jigsaw-starters.html`, then commit `public/jigsaw/` and the review page.
+
+`npm run jigsaw-photos -- --stand-ins` makes six numbered test pictures (for building only; never publish them).
+
 ## Word list credit
 
 Words come from SCOWL (Spell Checker Oriented Word Lists) by Kevin Atkinson; see `words/scowl/Copyright`.

@@ -11,7 +11,8 @@
     "puzzles": "tsx scripts/build-puzzles.ts",
     "grid-puzzles": "tsx scripts/build-grid-puzzles.ts",
     "icons": "pwa-assets-generator --preset minimal-2023 public/icon.svg",
-    "daily-word": "tsx scripts/daily-word.ts"
+    "daily-word": "tsx scripts/daily-word.ts",
+    "jigsaw-photos": "tsx scripts/jigsaw-photos.ts"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "5.1.0"
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@types/node": "20.17.6",
     "@vite-pwa/assets-generator": "0.2.6",
+    "sharp": "0.33.5",
     "tsx": "4.19.2",
     "typescript": "5.6.3",
     "vite": "5.4.21",
