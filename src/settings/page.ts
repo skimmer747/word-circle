@@ -5,6 +5,7 @@ import { dayKey } from '../shared/days';
 import type { FamilyStats } from '../stats/family-stats';
 import { renderFamily } from '../stats/family-view';
 import { el } from '../ui/dom';
+import { button, checkbox, section } from './controls';
 import { MAX_NAME_LENGTH, cleanName } from './name';
 import { WEEKDAY_NAMES, currentLines, eventLine, eventRow, type EventEntry, type RepeatChoice } from './schedule-form';
 import { START_LEVELS, type Settings, type StartLevel } from './settings';
@@ -43,20 +44,6 @@ const KEEP_IN_GAME = `
 <p>To leave Guided Access, press the top button three times, enter the passcode, and tap <b>End</b>. On an iPad with a round Home button, triple-click the Home button instead.</p>
 `;
 
-function section(parent: HTMLElement, title: string): HTMLElement {
-  const box = el('section', 'settings-section', parent);
-  el('h2', '', box).textContent = title;
-  return box;
-}
-
-function button(parent: HTMLElement, text: string, onClick: () => void, className = 'settings-button'): HTMLButtonElement {
-  const node = el('button', className, parent);
-  node.type = 'button';
-  node.textContent = text;
-  node.addEventListener('click', onClick);
-  return node;
-}
-
 /** A row of buttons where one is chosen (shown pressed). */
 function choices<T extends string>(
   parent: HTMLElement,
@@ -94,16 +81,6 @@ function field(parent: HTMLElement, label: string, type: string): HTMLInputEleme
 function onValue(input: HTMLInputElement, onChange: () => void): void {
   input.addEventListener('input', onChange);
   input.addEventListener('change', onChange);
-}
-
-function checkbox(parent: HTMLElement, label: string, checked: boolean, onChange: (box: HTMLInputElement) => void): HTMLInputElement {
-  const row = el('label', 'settings-check', parent);
-  const box = el('input', '', row);
-  box.type = 'checkbox';
-  box.checked = checked;
-  row.append(label);
-  box.addEventListener('change', () => onChange(box));
-  return box;
 }
 
 /** The caregiver's settings page: ordinary controls at a comfortable size, over everything. Removes itself when closed. */
