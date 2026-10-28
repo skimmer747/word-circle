@@ -22,5 +22,11 @@
     "file": "sand-hill-cranes.jpg",
     "thumb": "sand-hill-cranes.thumb.jpg",
     "caption": "Sand Hill Cranes"
+  },
+  {
+    "id": "rake-the-beach",
+    "file": "rake-the-beach.jpg",
+    "thumb": "rake-the-beach.thumb.jpg",
+    "caption": "Rake the beach"
   }
 ]
