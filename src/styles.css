@@ -1453,6 +1453,50 @@ body {
   color: var(--label);
 }
 
+.settings-photo-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.settings-photo {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-top: 1px solid var(--grid-line);
+}
+
+.settings-photo-thumb {
+  width: 160px;
+  height: 120px;
+  flex: none;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.settings-photo-side {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.settings-photo-ask {
+  font-weight: 700;
+}
+
+.settings-remove {
+  color: #a32020;
+}
+
 .settings-warn {
   min-height: 1.2em;
   margin: 0;

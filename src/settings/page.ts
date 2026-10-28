@@ -1,11 +1,13 @@
 import { GAME_IDS, GAME_TITLES } from '../frame/games';
 import { THUMBS, type Thumb } from '../frame/layout';
+import type { PhotoStore } from '../photos/store';
 import { parseAvoidWords } from '../shared/avoid';
 import { dayKey } from '../shared/days';
 import type { FamilyStats } from '../stats/family-stats';
 import { renderFamily } from '../stats/family-view';
 import { el } from '../ui/dom';
 import { button, checkbox, section } from './controls';
+import { renderJigsawPictures } from './jigsaw-pictures';
 import { MAX_NAME_LENGTH, cleanName } from './name';
 import { WEEKDAY_NAMES, currentLines, eventLine, eventRow, type EventEntry, type RepeatChoice } from './schedule-form';
 import { START_LEVELS, type Settings, type StartLevel } from './settings';
@@ -22,6 +24,8 @@ export interface SettingsPageOptions {
   cancel(): void;
   /** The family's charts; null on first-time setup. */
   family: FamilyStats | null;
+  /** The family's photos for Jigsaw; null where they can't be kept. */
+  photos: PhotoStore | null;
 }
 
 const THUMB_LABELS: Record<Thumb, string> = { left: 'Left', right: 'Right', none: 'Neither' };
@@ -255,6 +259,9 @@ export function openSettingsPage(root: HTMLElement, settings: Settings, options:
     showCount();
   });
   showCount();
+
+  // Change framing opens inside the page, so its taps keep the page from closing itself as untouched.
+  renderJigsawPictures(sheet, page, options.photos, draft);
 
   const keep = el('details', 'settings-section settings-keep', sheet);
   el('summary', '', keep).textContent = 'Keep them in the game (optional)';

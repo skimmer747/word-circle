@@ -17,7 +17,7 @@ import { JigsawScreen } from './jigsaw/screen';
 import type { GuessWords } from './guess/words';
 import { photoAdder } from './photos/adder';
 import { loadPictureList } from './photos/family';
-import { openPhotoStore } from './photos/store';
+import { openPhotoStore, trackChanges, type PhotoStore } from './photos/store';
 import { startAnalytics } from './analytics';
 import { setupUpdates } from './pwa';
 import { firstScreen, isInstalled } from './settings/first-screen';
@@ -59,11 +59,19 @@ let settingsShowing = false;
 // Updates wait while she's playing, or while a caregiver is filling in the settings page.
 const updates = setupUpdates(() => settingsShowing || (frame?.interacted ?? false));
 
-function showSettings(settings: Settings, firstTime: boolean, family: FamilyStats | null, done: (next: Settings) => void, cancel: () => void): void {
+function showSettings(
+  settings: Settings,
+  firstTime: boolean,
+  family: FamilyStats | null,
+  photos: PhotoStore | null,
+  done: (next: Settings) => void,
+  cancel: () => void,
+): void {
   settingsShowing = true;
   openSettingsPage(root!, settings, {
     firstTime,
     family,
+    photos,
     done: (next) => {
       settingsShowing = false;
       done(next);
@@ -93,18 +101,22 @@ function startApp(settings: Settings): void {
     name: settings.name,
     thumb: settings.thumb,
     schedule: settings.schedule,
-    openSettings: (closed) =>
+    openSettings: (closed) => {
+      const watched = photoStore && trackChanges(photoStore);
       showSettings(
         settings,
         false,
         familyStats(loadLog(store), dayKey(new Date()), loadLifetime(store).since),
+        watched?.store ?? null,
         (next) => {
           saveSettings(store, next);
           // Everything is saved after every move, so she loses nothing; the app comes back built from the new settings.
           window.location.reload();
         },
-        closed,
-      ),
+        // Photos are saved as they're changed, so Cancel still brings the game up to date with them.
+        () => (watched?.changed() ? window.location.reload() : closed()),
+      );
+    },
   });
   frame.start();
 }
@@ -116,6 +128,7 @@ const firstSetup = () =>
     settings,
     true,
     null,
+    photoStore,
     (next) => {
       saveSettings(store, next);
       startApp(next);
