@@ -2449,3 +2449,86 @@ body {
   opacity: 0;
   pointer-events: none;
 }
+
+/* "Your new puzzle" / "Change framing": an ordinary page over the game or the settings page. */
+.new-photo {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: var(--bg);
+  touch-action: none;
+}
+
+.new-photo-area {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #222;
+}
+
+.new-photo-image {
+  position: absolute;
+  max-width: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* The frame: clear inside, the rest of the photo dimmed (its shadow is clipped by the area). */
+.new-photo-frame {
+  position: absolute;
+  box-sizing: border-box;
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 4000px rgba(20, 20, 20, 0.55);
+  pointer-events: none;
+}
+
+.new-photo-title {
+  position: absolute;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 36px;
+  color: var(--navy);
+}
+
+.new-photo-label {
+  position: absolute;
+  font-size: 22px;
+  color: var(--label);
+}
+
+.new-photo-caption {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 3px solid var(--slot-border);
+  border-radius: 12px;
+  font: inherit;
+  font-size: 26px;
+  line-height: 34px;
+  resize: none;
+  color: var(--ink);
+  background: #fff;
+}
+
+.new-photo-confirm,
+.new-photo-cancel {
+  position: absolute;
+  border-radius: 16px;
+  font: inherit;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.new-photo-confirm {
+  border: 4px solid var(--found-ink);
+  background: var(--found);
+  color: #fff;
+}
+
+.new-photo-cancel {
+  border: 4px solid var(--navy);
+  background: #fff;
+  color: var(--navy);
+}

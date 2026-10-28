@@ -212,3 +212,48 @@ export function computePicturePageLayout(frame: FrameLayout): PicturePageLayout 
     more: { x: play.x + play.w - MORE_WIDTH, y: buttonsY, w: MORE_WIDTH, h: PAGE_BUTTON_HEIGHT },
   };
 }
+
+/** The new photo page: margins, the right-hand column, and its parts. */
+const NEW_MARGIN = 24;
+const NEW_COLUMN = 380;
+const NEW_TITLE = 56;
+const NEW_LABEL = 32;
+/** Two lines of 26 px text, with room for the box's padding and border. */
+const NEW_CAPTION = 96;
+const NEW_BUTTONS = 80;
+const NEW_GAP = 16;
+
+export interface NewPhotoLayout {
+  /** Where the photo is shown (it's clipped to this); the 4:3 frame sits in its middle, in its coordinates. */
+  photoArea: Rect;
+  frame: Rect;
+  /** Down the right, all in the top part of the screen, as the keyboard covers the bottom half. */
+  title: Rect;
+  captionLabel: Rect;
+  caption: Rect;
+  confirm: Rect;
+  cancel: Rect;
+}
+
+/** "Your new puzzle": the photo on the left, the title, caption box and buttons on the right, top-aligned. */
+export function computeNewPhotoLayout(width: number, height: number): NewPhotoLayout {
+  const column = Math.min(NEW_COLUMN, width * 0.36);
+  const photoArea = { x: NEW_MARGIN, y: NEW_MARGIN, w: width - column - 3 * NEW_MARGIN, h: height - 2 * NEW_MARGIN };
+  // A little of the photo shows (dimmed) around the frame, so it's clear the photo can move.
+  const room = { x: photoArea.w * 0.08, y: photoArea.h * 0.08, w: photoArea.w * 0.84, h: photoArea.h * 0.84 };
+  const x = photoArea.x + photoArea.w + NEW_MARGIN;
+  const title = { x, y: NEW_MARGIN, w: column, h: NEW_TITLE };
+  const captionLabel = { x, y: title.y + title.h + NEW_GAP, w: column, h: NEW_LABEL };
+  const caption = { x, y: captionLabel.y + captionLabel.h + 4, w: column, h: NEW_CAPTION };
+  const buttonsY = caption.y + caption.h + NEW_GAP;
+  const confirmW = Math.round((column - NEW_GAP) * 0.58);
+  return {
+    photoArea,
+    frame: fit(room, PICTURE_ASPECT),
+    title,
+    captionLabel,
+    caption,
+    confirm: { x, y: buttonsY, w: confirmW, h: NEW_BUTTONS },
+    cancel: { x: x + confirmW + NEW_GAP, y: buttonsY, w: column - confirmW - NEW_GAP, h: NEW_BUTTONS },
+  };
+}

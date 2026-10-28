@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { computeFrameLayout, type Rect } from '../src/frame/layout';
 import { tabFor } from '../src/jigsaw/cut';
-import { clampToFree, computeJigsawLayout, computePicturePageLayout, tablePieces } from '../src/jigsaw/layout';
+import { clampToFree, computeJigsawLayout, computeNewPhotoLayout, computePicturePageLayout, tablePieces } from '../src/jigsaw/layout';
 import { GRID_SIZES, JIGSAW_STYLES, PIECE_COUNTS } from '../src/jigsaw/types';
-import { SCREENS_AND_THUMBS, inPlayArea, overlaps } from './screens';
+import { SCREENS, SCREENS_AND_THUMBS, inPlayArea, overlaps } from './screens';
 
 const inside = (a: Rect, b: Rect) => a.x >= b.x - 0.001 && a.y >= b.y - 0.001 && a.x + a.w <= b.x + b.w + 0.001 && a.y + a.h <= b.y + b.h + 0.001;
 /** Fails with the index pairs that overlap, so a failure says which two. */
@@ -168,5 +168,26 @@ describe('keeping loose pieces in the free area', () => {
     ];
     expect(clampToFree(small, { x: 380, y: 90, w: 200, h: 200 })).toEqual({ x: 400, y: 100, w: 200, h: 200 });
     expect(clampToFree(small, { x: 380, y: 90, w: 200, h: 200 }, 10)).toEqual({ x: 410, y: 110, w: 200, h: 200 });
+  });
+});
+
+describe.each(SCREENS)('the new photo page on a %ix%i iPad', (width, height) => {
+  const layout = computeNewPhotoLayout(width, height);
+  const right = [layout.title, layout.captionLabel, layout.caption, layout.confirm, layout.cancel];
+
+  it('has a 4:3 frame inside the photo area, on the left', () => {
+    expect(layout.frame.w / layout.frame.h).toBeCloseTo(4 / 3);
+    expect(inside(layout.frame, { x: 0, y: 0, w: layout.photoArea.w, h: layout.photoArea.h })).toBe(true);
+    expect(layout.frame.w).toBeGreaterThanOrEqual(400);
+    for (const rect of right) expect(rect.x).toBeGreaterThanOrEqual(layout.photoArea.x + layout.photoArea.w);
+  });
+
+  it('keeps the caption and buttons above the keyboard, on screen and apart', () => {
+    for (const rect of right) {
+      expect(rect.y + rect.h).toBeLessThanOrEqual(height * 0.45);
+      expect(rect.x + rect.w).toBeLessThanOrEqual(width);
+    }
+    apart(right);
+    expect(layout.confirm.h).toBeGreaterThanOrEqual(72);
   });
 });
