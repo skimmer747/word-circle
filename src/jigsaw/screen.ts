@@ -275,6 +275,7 @@ export class JigsawScreen implements GameScreen {
         hasBack: page.hasBack,
         hasMore: page.hasMore,
         canClose: this.picture !== null,
+        canAdd: false,
       },
       animateIn,
     );

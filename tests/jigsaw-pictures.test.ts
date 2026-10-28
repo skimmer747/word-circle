@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
-import { loadStarters, parseStarters, picturePage } from '../src/jigsaw/pictures';
+import { PAGE_WITH_ADD, loadStarters, parseStarters, picturePage } from '../src/jigsaw/pictures';
 import type { Picture } from '../src/jigsaw/types';
 
 describe('the starter pictures', () => {
@@ -111,5 +111,10 @@ describe('pages of pictures', () => {
   it('fits fewer pictures on a page that also holds Add a photo', () => {
     expect(picturePage(pictures, 0, 5).pictures).toHaveLength(5);
     expect(picturePage(pictures, 2, 5)).toMatchObject({ first: 10, hasMore: false });
+  });
+
+  it('has five pictures beside the Add a photo tile', () => {
+    expect(PAGE_WITH_ADD).toBe(5);
+    expect(picturePage(pictures, 2, PAGE_WITH_ADD).pictures.map((p) => p.id)).toEqual(['starter:p10', 'starter:p11', 'starter:p12', 'starter:p13']);
   });
 });

@@ -4,6 +4,7 @@ const ICON_ATTRS =
 export const SHUFFLE_ICON = `<svg ${ICON_ATTRS}><path d="M18 4l3 3l-3 3"/><path d="M18 20l3 -3l-3 -3"/><path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5"/><path d="M21 7h-5a4.978 4.978 0 0 0 -3 1m-4 8a4.984 4.984 0 0 1 -3 1h-3"/></svg>`;
 export const HINT_ICON = `<svg ${ICON_ATTRS}><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"/><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"/><path d="M9.7 17l4.6 0"/></svg>`;
 export const PICTURES_ICON = `<svg ${ICON_ATTRS}><path d="M15 8h.01"/><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z"/><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5"/><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3"/></svg>`;
+export const PLUS_ICON = `<svg ${ICON_ATTRS}><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg>`;
 /** Move picture: an arrow to the bottom-right corner, and back to the board. */
 export const PICTURE_TO_CORNER_ICON = `<svg ${ICON_ATTRS}><path d="M7 7l10 10"/><path d="M17 8l0 9l-9 0"/></svg>`;
 export const PICTURE_TO_BOARD_ICON = `<svg ${ICON_ATTRS}><path d="M7 7l10 10"/><path d="M16 7l-9 0l0 9"/></svg>`;

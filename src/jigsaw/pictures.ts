@@ -2,6 +2,8 @@ import type { Picture } from './types';
 
 /** "Pick a picture" shows six places: three across, two down. */
 export const PAGE_SIZE = 6;
+/** With Add a photo in the first place on every page, five are pictures. */
+export const PAGE_WITH_ADD = 5;
 
 const ID = /^[a-z0-9-]+$/;
 /** A plain file name: no folders, not empty, and no leading dot, so no "..". */
