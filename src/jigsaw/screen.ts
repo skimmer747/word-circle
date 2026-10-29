@@ -15,7 +15,7 @@ import { jigsawLines } from './celebration';
 import { cutPieces, disguiseEdges, pieceSeed, tabFor, type PieceShape } from './cut';
 import { clampToFree, computeJigsawLayout, computePicturePageLayout, tablePieces, type JigsawLayout } from './layout';
 import { renderPicturePage } from './picture-page';
-import { PAGE_SIZE, PAGE_WITH_ADD, picturePage } from './pictures';
+import { PAGE_SIZE, PAGE_WITH_ADD, picturePage, pictureShown } from './pictures';
 import { JigsawGame } from './rules';
 import {
   loadSavedJigsaw,
@@ -156,6 +156,7 @@ export class JigsawScreen implements GameScreen {
     else if (id.startsWith('pic:')) this.openPicture(Number(id.slice('pic:'.length)));
     else if (id === 'pics-back' || id === 'pics-more') this.turnPage(id === 'pics-more' ? 1 : -1);
     else if (id === 'pics-close') this.closePictures();
+    else if (id === 'cartoons') this.cartoons();
     else if (id === 'pictures') this.showPictures();
     else if (id === 'hint') void this.hint();
     else if (id === 'move-picture') this.movePicture();
@@ -266,7 +267,8 @@ export class JigsawScreen implements GameScreen {
     const current = this.saved.current;
     if (!current && !this.picture) this.mode = 'pictures';
     if (current && !this.picture) {
-      this.picture = pictures.find((p) => p.id === current) ?? null;
+      const found = pictures.find((p) => p.id === current);
+      this.picture = found ? this.asShown(found) : null;
       if (!this.picture) {
         this.mode = 'pictures';
         // Its picture is gone from the site: back to choosing. (With no list at all, offline, she keeps her place.)
@@ -294,18 +296,20 @@ export class JigsawScreen implements GameScreen {
       layer,
       layout,
       {
-        pictures: this.pictures && page.pictures,
+        pictures: this.pictures && page.pictures.map((picture) => this.asShown(picture)),
         finished: new Set(this.saved.finished),
         hasBack: page.hasBack,
         hasMore: page.hasMore,
         canClose: this.picture !== null,
         canAdd: this.canAdd(),
+        cartoons: this.hasCartoons() ? this.saved.cartoons : null,
       },
       animateIn,
     );
     const offset = this.canAdd() ? 1 : 0;
     const buttons: ButtonGeometry[] = page.pictures.map((_, i) => ({ id: `pic:${i}`, ...layout.tiles[i + offset] }));
     if (offset) buttons.unshift({ id: 'pic:add', ...layout.tiles[0] });
+    if (this.hasCartoons()) buttons.push({ id: 'cartoons', ...layout.cartoons });
     if (page.hasBack) buttons.push({ id: 'pics-back', ...layout.back });
     if (this.picture) buttons.push({ id: 'pics-close', ...layout.close });
     if (page.hasMore) buttons.push({ id: 'pics-more', ...layout.more });
@@ -610,16 +614,46 @@ export class JigsawScreen implements GameScreen {
   /** Starts `picture` in her style and piece count, or picks up where she left off in it. */
   private startPicture(picture: Picture): void {
     this.save();
-    this.picture = picture;
+    this.picture = this.asShown(picture);
     this.game = null;
     this.lifted = null;
-    // Only the picture on screen is kept decoded: a 1600 × 1200 photo takes several MB.
-    for (const src of [...this.images.keys()]) if (src !== picture.src) this.images.delete(src);
+    this.keepDecodedOnly(this.picture.src);
     this.saved = { ...this.saved, current: picture.id };
     this.mode = 'puzzle';
     this.host.redraw(true);
     this.timer.resume(performance.now());
     this.resetIdle();
+  }
+
+  /** Only the picture on screen is kept decoded: a 1600 × 1200 photo takes several MB. */
+  private keepDecodedOnly(src: string): void {
+    for (const kept of [...this.images.keys()]) if (kept !== src) this.images.delete(kept);
+  }
+
+  /** The picture as she sees it: its drawing while Cartoons is on, if it has one. */
+  private asShown(picture: Picture): Picture {
+    return pictureShown(picture, this.saved.cartoons);
+  }
+
+  /** Cartoons is offered once the pictures are in and one of them has a drawing. */
+  private hasCartoons(): boolean {
+    return this.pictures?.some((picture) => picture.cartoon) ?? false;
+  }
+
+  /**
+   * Cartoons on or off: the pictures on the page change straight away, and so does a puzzle she's in the middle of
+   * (her place is kept, as the pieces are the same shapes). Remembered.
+   */
+  private cartoons(): void {
+    if (this.mode !== 'pictures' || !this.hasCartoons()) return;
+    this.saved = { ...this.saved, cartoons: !this.saved.cartoons };
+    saveSavedJigsaw(this.store, this.saved);
+    const current = this.picture && this.pictures?.find((picture) => picture.id === this.picture?.id);
+    if (current) {
+      this.picture = this.asShown(current);
+      this.keepDecodedOnly(this.picture.src);
+    }
+    this.host.redraw(false);
   }
 
   /** Add a photo shows once the pictures are in (a photo added before would be lost when they arrive). */

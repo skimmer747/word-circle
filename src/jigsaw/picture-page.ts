@@ -14,6 +14,8 @@ export interface PicturePageState {
   canClose: boolean;
   /** Add a photo comes first on every page (photos can be kept on this iPad). */
   canAdd: boolean;
+  /** Cartoons on or off, or null for no Cartoons button (no picture has a drawing). */
+  cartoons: boolean | null;
 }
 
 function button(parent: HTMLElement, className: string, label: string, rect: PicturePageLayout['back']): void {
@@ -23,7 +25,7 @@ function button(parent: HTMLElement, className: string, label: string, rect: Pic
   place(b, rect);
 }
 
-/** Draws "Pick a picture": Add a photo (where photos can be kept), the page's pictures with their captions and checks, and the page's buttons. */
+/** Draws "Pick a picture": Cartoons (where there are drawings), Add a photo (where photos can be kept), the page's pictures with their captions and checks, and the page's buttons. */
 export function renderPicturePage(layer: HTMLElement, layout: PicturePageLayout, state: PicturePageState, animateIn: boolean): void {
   const page = document.createElement('div');
   page.className = 'board pics';
@@ -31,6 +33,13 @@ export function renderPicturePage(layer: HTMLElement, layout: PicturePageLayout,
   const title = el('div', 'pics-title', page);
   title.textContent = 'Pick a picture';
   place(title, layout.title);
+  // In the look of Hide edges: a check when it's on.
+  if (state.cartoons !== null) {
+    const cartoons = el('button', state.cartoons ? 'level on' : 'level', page);
+    cartoons.type = 'button';
+    cartoons.innerHTML = `${state.cartoons ? CHECK_ICON : ''}<span>Cartoons</span>`;
+    place(cartoons, layout.cartoons);
+  }
 
   // Add a photo is always in the first place, so it's easy to find again.
   const offset = state.canAdd ? 1 : 0;
