@@ -43,14 +43,16 @@ async function fetchDaily(): Promise<string> {
   return response.text();
 }
 
-/** Opens the iPad's share sheet with her result. Called straight from her tap. */
+/** Opens the iPad's share sheet with her result, true if she sent it. Called straight from her tap. */
 const share =
   typeof navigator.share === 'function'
     ? async (text: string) => {
         try {
           await navigator.share({ text });
+          return true;
         } catch {
-          // She closed the share sheet without sending: nothing to do.
+          // She closed the share sheet without sending: Share stays for another try.
+          return false;
         }
       }
     : null;

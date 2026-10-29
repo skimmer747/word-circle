@@ -264,17 +264,24 @@ export class Frame implements FrameHost {
     );
   }
 
-  /** Opens the share sheet from the card; the card waits until it closes. */
+  /** Opens the share sheet from the card; the card waits until it closes, and loses Share once she has sent it. */
   private shareCelebration(): void {
     const celebrating = this.celebration;
     const share = celebrating?.card.share;
     if (!celebrating || !share || this.sharing) return;
     this.sharing = true;
     window.clearTimeout(celebrating.timeout);
-    void share().finally(() => {
-      this.sharing = false;
-      if (this.celebration === celebrating) celebrating.timeout = window.setTimeout(celebrating.done, celebrating.card.timeoutMs);
-    });
+    void share()
+      .then((sent) => {
+        if (!sent || this.celebration !== celebrating) return;
+        celebrating.card = { ...celebrating.card, share: undefined };
+        if (this.layout) this.view.hideCelebrationShare(this.layout);
+        this.updateTouchTargets();
+      })
+      .finally(() => {
+        this.sharing = false;
+        if (this.celebration === celebrating) celebrating.timeout = window.setTimeout(celebrating.done, celebrating.card.timeoutMs);
+      });
   }
 
   /** Back to puzzle: the card goes so she can look at what she finished, with Next left over it. */

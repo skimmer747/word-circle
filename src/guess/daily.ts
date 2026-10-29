@@ -71,6 +71,18 @@ export function swapInDaily(saved: SavedGuess, today: DailyWord | null, untouche
   return { ...saved, word: today.word, daily: { date: today.date, number: today.number }, guesses: [], hinted: [], elapsedMs: undefined };
 }
 
+/** Whether Share is offered: she finished `day`'s Wordle and hasn't sent it yet. */
+export function canShareToday(saved: SavedGuess, day: string): boolean {
+  const done = saved.dailyDone;
+  return done !== null && done.date === day && done.share !== '' && !done.shared;
+}
+
+/** After she sends `day`'s Wordle: Share isn't offered again until the next day's. */
+export function markShared(saved: SavedGuess, day: string): SavedGuess {
+  if (saved.dailyDone?.date !== day) return saved;
+  return { ...saved, dailyDone: { ...saved.dailyDone, shared: true } };
+}
+
 /**
  * After she finishes her word on `day`: remembers a finished daily word (with its share text) and picks what
  * comes next, which is today's daily word if she hasn't played it, otherwise the next list word.

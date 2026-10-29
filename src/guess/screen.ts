@@ -7,7 +7,7 @@ import type { KeyValueStore } from '../shared/store';
 import { PlayTimer } from '../shared/timer';
 import { guessRecord } from '../stats/records';
 import { guessLines } from './celebration';
-import { cachedDailyWords, dailyFor, finishWord, isTodaysWordle, refreshDailyWords, swapInDaily, type DailyWord } from './daily';
+import { canShareToday, cachedDailyWords, dailyFor, finishWord, isTodaysWordle, markShared, refreshDailyWords, swapInDaily, type DailyWord } from './daily';
 import { computeGuessLayout, type GuessLayout } from './layout';
 import { firstVisibleGuess, GuessGame, VISIBLE_ROWS } from './rules';
 import { shareText } from './share';
@@ -36,8 +36,8 @@ const NO_HINTS: NoticeCard = {
 export interface GuessOptions {
   /** Fetches daily-word.txt. */
   fetchDaily: () => Promise<string>;
-  /** Opens the iPad's share sheet with the text (straight from her tap), or null if there is none. */
-  share: ((text: string) => Promise<void>) | null;
+  /** Opens the iPad's share sheet with the text (straight from her tap), true if she sent it; null if there is none. */
+  share: ((text: string) => Promise<boolean>) | null;
   /** Words she should never see: never an answer (not even today's Wordle) and not accepted as guesses. */
   avoided?: AvoidCheck;
   /** The current time; tests can pass a fixed one. */
@@ -196,7 +196,7 @@ export class GuessScreen implements GameScreen {
   private dailyMode(): DailyMode {
     const day = dayKey(this.now());
     if (isTodaysWordle(this.saved, day)) return 'label';
-    if (this.saved.dailyDone?.date === day && this.saved.dailyDone.share && this.options.share) return 'share';
+    if (canShareToday(this.saved, day) && this.options.share) return 'share';
     return 'none';
   }
 
@@ -324,8 +324,23 @@ export class GuessScreen implements GameScreen {
 
   /** Called straight from her tap, so the iPad allows the share sheet. */
   private shareToday(): void {
+    const day = dayKey(this.now());
+    const shareSheet = this.options.share;
     const text = this.saved.dailyDone?.share;
-    if (text && this.options.share) void this.options.share(text);
+    if (!canShareToday(this.saved, day) || !shareSheet || !text) return;
+    void shareSheet(text).then((sent) => {
+      if (sent) this.sharedToday(day);
+    });
+  }
+
+  /** She sent today's Wordle: Share goes away until the next day's, so she sends it once. */
+  private sharedToday(day: string): void {
+    this.saved = markShared(this.saved, day);
+    this.save();
+    // While she's celebrating, the redraw after the card puts the button right.
+    if (!this.shown || this.busy) return;
+    this.view?.setDaily(this.dailyMode());
+    this.host.updateTargets(this.targets());
   }
 
   private async finish(): Promise<void> {
@@ -367,7 +382,13 @@ export class GuessScreen implements GameScreen {
       timeoutMs: daily ? DAILY_CELEBRATION_MS : CELEBRATION_MS,
     };
     const shareSheet = this.options.share;
-    if (daily && shareSheet) card.share = () => shareSheet(share);
+    if (daily && shareSheet) {
+      card.share = async () => {
+        const sent = await shareSheet(share);
+        if (sent) this.sharedToday(day);
+        return sent;
+      };
+    }
     await this.host.celebrate(card);
     this.timer.resume(performance.now());
     this.busy = false;

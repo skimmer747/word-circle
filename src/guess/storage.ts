@@ -30,8 +30,8 @@ export interface SavedGuess {
   hinted: number[];
   /** Active play time on this word so far (older saves don't have it). */
   elapsedMs?: number;
-  /** The last daily word she finished, with its text for sharing. */
-  dailyDone: { date: string; share: string } | null;
+  /** The last daily word she finished, with its text for sharing, and whether she has sent it (Share is offered once). */
+  dailyDone: { date: string; share: string; shared?: true } | null;
   stats: GuessStats;
 }
 
@@ -84,6 +84,11 @@ function readStats(value: unknown): GuessStats {
   return emptyGuessStats();
 }
 
+/** A damaged shared mark reads as not shared: Share is offered again rather than lost. */
+function readDailyDone(value: { date: string; share: string; shared?: unknown }): SavedGuess['dailyDone'] {
+  return { date: value.date, share: value.share, ...(value.shared === true ? { shared: true as const } : {}) };
+}
+
 function readSavedGuess(value: unknown): SavedGuess | null {
   if (!isRecord(value)) return null;
   const { index, word, daily, guesses, hinted, dailyDone } = value;
@@ -98,7 +103,7 @@ function readSavedGuess(value: unknown): SavedGuess | null {
     daily: daily as DailyTag | null,
     guesses: guesses as string[],
     hinted: hinted as number[],
-    dailyDone: dailyDone as SavedGuess['dailyDone'],
+    dailyDone: dailyDone === null ? null : readDailyDone(dailyDone as { date: string; share: string; shared?: unknown }),
     stats: readStats(value.stats),
     ...(isTime(value.elapsedMs) ? { elapsedMs: value.elapsedMs as number } : {}),
   };

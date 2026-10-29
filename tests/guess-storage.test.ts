@@ -60,6 +60,17 @@ describe('saving Word Guess', () => {
     }
   });
 
+  it('remembers that she shared today\'s Wordle', () => {
+    const shared: SavedGuess = { ...SAVED, dailyDone: { date: '2026-10-19', share: 'Wordle 1,948 3/6', shared: true } };
+    const store = new MemoryStore();
+    saveSavedGuess(store, shared);
+    expect(loadSavedGuess(store, WORDS)).toEqual(shared);
+  });
+
+  it('reads a damaged shared mark as not shared, keeping her place', () => {
+    expect(loadSavedGuess(stored({ ...SAVED, dailyDone: { ...SAVED.dailyDone, shared: 'yes' } }), WORDS)).toEqual(SAVED);
+  });
+
   it('keeps her place even if her counts are damaged', () => {
     expect(loadSavedGuess(stored({ ...SAVED, stats: { totalSolved: -1 } }), WORDS)).toEqual({ ...SAVED, stats: emptyGuessStats() });
   });

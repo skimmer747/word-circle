@@ -25,8 +25,11 @@ export interface CelebrationCard {
   nextLabel: string;
   /** The card moves on by itself after this long. */
   timeoutMs: number;
-  /** Puts a Share button beside the Next button. The card waits while the share sheet is open. */
-  share?: () => Promise<void>;
+  /**
+   * Puts a Share button beside the Next button. The card waits while the share sheet is open; true if she sent it,
+   * and then the button goes, so she sends it once.
+   */
+  share?: () => Promise<boolean>;
 }
 
 /** A card telling her something, with a Close button. */
@@ -218,6 +221,12 @@ export class FrameView {
     stats.innerHTML = `${STAR_ICON}<span>Your stats</span>`;
     // Visible first, so the rows can be measured when they're fitted.
     this.celebrate.classList.add('visible');
+    this.placeCelebration(layout);
+  }
+
+  /** She sent it from the card: Share goes and Next moves back to the middle. */
+  hideCelebrationShare(layout: FrameLayout): void {
+    this.celebrate.querySelector('.share')?.remove();
     this.placeCelebration(layout);
   }
 

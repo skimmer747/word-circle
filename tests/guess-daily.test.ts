@@ -4,7 +4,9 @@ import {
   cachedDailyWords,
   dailyFor,
   finishWord,
+  canShareToday,
   isTodaysWordle,
+  markShared,
   parseDailyWords,
   refreshDailyWords,
   swapInDaily,
@@ -147,5 +149,37 @@ describe('isTodaysWordle (no hints on it)', () => {
 
   it('is false once its day is over, when it finishes like any other word', () => {
     expect(isTodaysWordle(ON_DAILY, '2026-10-21')).toBe(false);
+  });
+});
+
+describe('sharing today\'s Wordle once', () => {
+  const DONE: SavedGuess = { ...ON_LIST, dailyDone: { date: '2026-10-20', share: 'Wordle 1,949 2/6' } };
+
+  it('offers Share after she finishes today\'s Wordle', () => {
+    expect(canShareToday(DONE, '2026-10-20')).toBe(true);
+  });
+
+  it('offers nothing before she finishes it, on another day, or with no share text', () => {
+    expect(canShareToday(ON_LIST, '2026-10-20')).toBe(false);
+    expect(canShareToday(ON_DAILY, '2026-10-20')).toBe(false);
+    expect(canShareToday(DONE, '2026-10-21')).toBe(false);
+    expect(canShareToday({ ...ON_LIST, dailyDone: { date: '2026-10-20', share: '' } }, '2026-10-20')).toBe(false);
+  });
+
+  it('stops offering Share once she has sent it', () => {
+    const shared = markShared(DONE, '2026-10-20');
+    expect(shared.dailyDone).toEqual({ date: '2026-10-20', share: 'Wordle 1,949 2/6', shared: true });
+    expect(canShareToday(shared, '2026-10-20')).toBe(false);
+  });
+
+  it('only marks today\'s word', () => {
+    expect(markShared(DONE, '2026-10-21')).toBe(DONE);
+    expect(markShared(ON_LIST, '2026-10-20')).toBe(ON_LIST);
+  });
+
+  it('offers Share again for the next day\'s Wordle', () => {
+    const yesterday = markShared(DONE, '2026-10-20');
+    const next = finishWord({ ...yesterday, word: 'crane', daily: { date: '2026-10-21', number: 1950 } }, WORDS, '2026-10-21', 'Wordle 1,950 3/6', null);
+    expect(canShareToday(next, '2026-10-21')).toBe(true);
   });
 });
