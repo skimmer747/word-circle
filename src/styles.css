@@ -2382,6 +2382,11 @@ body {
   visibility: hidden;
 }
 
+/* The finished picture's Cartoon stays (it only appears once she's looking back at the picture). */
+.board.jigsaw.done .level.finished-cartoon {
+  visibility: visible;
+}
+
 .jigsaw-caption {
   position: absolute;
   display: flex;

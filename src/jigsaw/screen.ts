@@ -83,6 +83,18 @@ const around = (body: Rect, scale: number): Rect => ({
 });
 
 /** Jigsaw: big-piece puzzles from pictures, played from a tray, on a board, or loose on a table. */
+/**
+ * Resolves once `image` has loaded, or failed to. (Not decode(), which can wait for the page to draw a frame, and a
+ * page in the background never does.)
+ */
+const loaded = (image: HTMLImageElement): Promise<void> =>
+  image.complete
+    ? Promise.resolve()
+    : new Promise((resolve) => {
+        image.addEventListener('load', () => resolve(), { once: true });
+        image.addEventListener('error', () => resolve(), { once: true });
+      });
+
 export class JigsawScreen implements GameScreen {
   readonly id = 'jigsaw';
   readonly title = GAME_TITLES.jigsaw;
@@ -95,6 +107,8 @@ export class JigsawScreen implements GameScreen {
   private pictures: Picture[] | null = null;
   /** The picture in progress. */
   private picture: Picture | null = null;
+  /** The picture she just finished, while it shows (for its Cartoon button). */
+  private finishedPicture: Picture | null = null;
   private page = 0;
   /** Made at the next render (Table pieces start where the layout has room). */
   private game: JigsawGame | null = null;
@@ -151,6 +165,11 @@ export class JigsawScreen implements GameScreen {
   }
 
   buttonTapped(id: string): void {
+    // The finished picture's Cartoon works while the game is busy celebrating.
+    if (id === 'finished-cartoon') {
+      this.finishedCartoon();
+      return;
+    }
     if (this.busy) return;
     if (id === 'pic:add') this.addPhoto();
     else if (id.startsWith('pic:')) this.openPicture(Number(id.slice('pic:'.length)));
@@ -657,23 +676,20 @@ export class JigsawScreen implements GameScreen {
     if (!listed) return;
     const next = this.asShown(listed);
     const image = this.imageFor(next);
-    void image
-      .decode()
-      .catch(() => undefined)
-      .then(() => {
-        // Unless she has switched again, or moved on to another picture, meanwhile.
-        if (this.picture?.id !== next.id || this.asShown(listed).src !== next.src) return;
-        if (image.naturalWidth > 0) {
-          this.picture = next;
-          this.keepDecodedOnly(next.src);
-        } else {
-          // It couldn't be had (offline before the app ever saved it): she stays as she was.
-          this.images.delete(next.src);
-          this.saved = { ...this.saved, cartoons: !this.saved.cartoons };
-          saveSavedJigsaw(this.store, this.saved);
-        }
-        this.redrawWhenFree();
-      });
+    void loaded(image).then(() => {
+      // Unless she has switched again, or moved on to another picture, meanwhile.
+      if (this.picture?.id !== next.id || this.asShown(listed).src !== next.src) return;
+      if (image.naturalWidth > 0) {
+        this.picture = next;
+        this.keepDecodedOnly(next.src);
+      } else {
+        // It couldn't be had (offline before the app ever saved it): she stays as she was.
+        this.images.delete(next.src);
+        this.saved = { ...this.saved, cartoons: !this.saved.cartoons };
+        saveSavedJigsaw(this.store, this.saved);
+      }
+      this.redrawWhenFree();
+    });
   }
 
   /** Add a photo shows once the pictures are in (a photo added before would be lost when they arrive). */
@@ -773,6 +789,8 @@ export class JigsawScreen implements GameScreen {
       const streakDays = this.host.recordPlayDay();
       // Saved as done now, so closing the app mid-celebration loses nothing.
       this.game = null;
+      // Kept for Cartoon while she looks back at it: the listed picture, which knows its drawing.
+      this.finishedPicture = this.pictures?.find((p) => p.id === picture.id) ?? picture;
       this.picture = null;
       this.timer.pause();
       saveSavedJigsaw(this.store, this.saved);
@@ -784,15 +802,48 @@ export class JigsawScreen implements GameScreen {
           todaySolved: this.saved.stats.todaySolved,
           puzzleNumber: this.saved.stats.totalSolved,
         }),
-        nextLabel: 'Next picture',
+        nextLabel: 'Pick a picture',
         timeoutMs: CELEBRATION_MS,
       });
     } finally {
+      this.finishedPicture = null;
       this.mode = 'pictures';
       this.page = 0;
       this.busy = false;
       this.host.redraw(true);
     }
+  }
+
+  /** She's looking back at the finished picture: Cartoon beside its caption, if it has a drawing. */
+  reviewStarted(): ButtonGeometry[] {
+    const layout = this.layout;
+    if (!layout || !this.finishedPicture?.cartoon) return [];
+    this.view?.showFinishedCartoon(layout, this.saved.cartoons);
+    return [{ id: 'finished-cartoon', ...layout.finishedCartoon }];
+  }
+
+  /** Cartoon on or off over the finished picture: the tick at once, the picture once the other look is loaded. Remembered. */
+  private finishedCartoon(): void {
+    const finished = this.finishedPicture;
+    if (!finished?.cartoon) return;
+    this.saved = { ...this.saved, cartoons: !this.saved.cartoons };
+    saveSavedJigsaw(this.store, this.saved);
+    const on = this.saved.cartoons;
+    this.view?.setFinishedCartoon(on);
+    const image = new Image();
+    image.src = this.asShown(finished).src;
+    void loaded(image).then(() => {
+      // Unless she has switched again, or moved on, meanwhile.
+      if (this.finishedPicture !== finished || this.saved.cartoons !== on) return;
+      if (image.naturalWidth > 0) {
+        this.view?.setFinishedImage(image.src);
+        return;
+      }
+      // It couldn't be had (offline before the app ever saved it): she stays as she was.
+      this.saved = { ...this.saved, cartoons: !on };
+      saveSavedJigsaw(this.store, this.saved);
+      this.view?.setFinishedCartoon(!on);
+    });
   }
 
   private resetIdle(): void {

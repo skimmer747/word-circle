@@ -18,6 +18,8 @@ const TABLE_MIN = 40;
 const CAPTION_HEIGHT = 96;
 /** Cartoon, after Tray, Board and Table. */
 const CARTOON_WIDTH = 110;
+/** Cartoon beside the finished picture's caption. */
+const FINISHED_CARTOON_WIDTH = 170;
 /** "Pick a picture". */
 const TITLE_HEIGHT = 72;
 const TILE_GAP = 24;
@@ -61,6 +63,10 @@ export interface JigsawLayout {
   /** Where the finished picture is shown, and its caption under it. */
   finished: Rect;
   caption: Rect;
+  /** Cartoon at the end of the caption row while she looks back at a finished picture with a drawing... */
+  finishedCartoon: Rect;
+  /** ...and the caption then, still centred, clear of it. */
+  captionBeside: Rect;
   /** Next, across the top (Hint, Pictures and the tray are hidden then), while she looks back at a finished picture. */
   reviewButton: Rect;
 }
@@ -102,6 +108,10 @@ export function computeJigsawLayout(frame: FrameLayout, style: JigsawStyle): Jig
   const smallHeight = smallWidth / PICTURE_ASPECT;
   const smallPicture = { x: smallLeft, y: rowsTop + (rowsHeight - smallHeight) / 2, w: smallWidth, h: smallHeight };
   const caption = { x: play.x, y: play.y + play.h - CAPTION_HEIGHT, w: play.w, h: CAPTION_HEIGHT };
+  const levelHeight = countButtons[0].h;
+  const finishedCartoon = { x: play.x + play.w - FINISHED_CARTOON_WIDTH, y: caption.y + (CAPTION_HEIGHT - levelHeight) / 2, w: FINISHED_CARTOON_WIDTH, h: levelHeight };
+  const beside = FINISHED_CARTOON_WIDTH + GAP;
+  const captionBeside = { ...caption, x: caption.x + beside, w: caption.w - 2 * beside };
   return {
     frame,
     hintButton,
@@ -118,6 +128,8 @@ export function computeJigsawLayout(frame: FrameLayout, style: JigsawStyle): Jig
     free: style === 'tray' ? [main] : [main, tray],
     finished: fit({ x: play.x, y: top, w: play.w, h: caption.y - GAP - top }, PICTURE_ASPECT),
     caption,
+    finishedCartoon,
+    captionBeside,
     reviewButton: reviewButtonIn({ x: play.x, y: play.y, w: corner.x - GAP - play.x, h: hintButton.h }),
   };
 }

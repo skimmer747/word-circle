@@ -223,8 +223,33 @@ export class JigsawView {
     this.layout = layout;
     const photo = this.board?.querySelector<HTMLElement>('.jigsaw-photo.shown');
     const caption = this.board?.querySelector<HTMLElement>('.jigsaw-caption');
+    const cartoon = this.board?.querySelector<HTMLElement>('.finished-cartoon');
     if (photo && this.board?.classList.contains('done')) place(photo, layout.finished);
-    if (caption) place(caption, layout.caption);
+    if (cartoon) place(cartoon, layout.finishedCartoon);
+    if (caption) place(caption, cartoon ? layout.captionBeside : layout.caption);
+  }
+
+  /** Cartoon beside the finished picture's caption, while she looks back at it; the caption moves over for it. */
+  showFinishedCartoon(layout: JigsawLayout, on: boolean): void {
+    const board = this.board;
+    if (!board) return;
+    if (!board.querySelector('.finished-cartoon')) this.button(board, 'level finished-cartoon', '', layout.finishedCartoon);
+    this.setFinishedCartoon(on);
+    this.placeFinished(layout);
+  }
+
+  /** The finished picture's Cartoon button, on or off. */
+  setFinishedCartoon(on: boolean): void {
+    const button = this.board?.querySelector<HTMLElement>('.finished-cartoon');
+    if (!button) return;
+    button.classList.toggle('on', on);
+    button.innerHTML = `${on ? CHECK_ICON : ''}<span>Cartoon</span>`;
+  }
+
+  /** The finished picture, as the photo or the drawing. */
+  setFinishedImage(src: string): void {
+    const photo = this.board?.querySelector<HTMLImageElement>('.jigsaw-photo.shown');
+    if (photo) photo.src = src;
   }
 
   private addPiece(id: number, fadeIn: boolean): HTMLElement | null {

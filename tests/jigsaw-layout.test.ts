@@ -94,6 +94,19 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
     apart([layout.finished, layout.caption, frame.corner]);
   });
 
+  it("puts the finished picture's Cartoon at the end of the caption row, the caption still centred beside it", () => {
+    const { finishedCartoon: cartoon, captionBeside: beside, caption } = layout;
+    expect(inPlayArea(cartoon, frame)).toBe(true);
+    expect(inside(cartoon, caption)).toBe(true);
+    expect(cartoon.x + cartoon.w).toBeCloseTo(frame.play.x + frame.play.w);
+    expect(cartoon.h).toBe(layout.countButtons[0].h);
+    apart([layout.finished, cartoon, beside, frame.corner]);
+    expect(beside.x + beside.w / 2).toBeCloseTo(caption.x + caption.w / 2);
+    expect([beside.y, beside.h]).toEqual([caption.y, caption.h]);
+    // Room for a starter's caption on two lines.
+    expect(beside.w).toBeGreaterThanOrEqual(300);
+  });
+
   it('fits three tray places in the tray', () => {
     expect(layout.slots).toHaveLength(3);
     for (const rect of layout.slots) expect(inside(rect, layout.tray)).toBe(true);

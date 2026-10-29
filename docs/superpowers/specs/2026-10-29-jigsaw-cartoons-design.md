@@ -23,6 +23,11 @@ published for every family.
 - **Room for it:** there is room on most iPads. On the smallest ones (1024 × 768, 1080 × 810, 1133 × 744 with a
   thumb side), the small corner picture from Move picture gets smaller to make room, down to about half size. The
   board never changes.
+- **On the finished picture too:** after Back to puzzle on the "Well done!" card, a **Cartoon** button sits at the
+  right end of the caption row, and the caption moves over to stay centred. Tapping it swaps the finished picture
+  between the photo and the drawing. The card's Next button now reads **Pick a picture** (where it goes), not "Next
+  picture". The frame lets a game add buttons there through `GameScreen.reviewStarted()`, which returns their places;
+  the game changes the screen itself, because a redraw ends the looking back.
 - **Remembered:** the choice is kept, and other pictures with a drawing open the same way. Pick a picture's tiles
   follow it too.
 - **Pictures without a drawing:** family photos and any new starter have no button and stay photos.

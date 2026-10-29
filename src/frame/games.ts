@@ -89,6 +89,11 @@ export interface GameScreen {
   dragCancelled?(id: string): void;
   /** A finger touched down or lifted (for play time). */
   activity?(): void;
+  /**
+   * She tapped Back to puzzle and is looking at what she finished: the game may show buttons of its own beside Next
+   * (Jigsaw's Cartoon) and returns where they are. It must change the screen itself, as a redraw ends the looking back.
+   */
+  reviewStarted?(): ButtonGeometry[];
   /** She left it: she picked another game, or the app went to the background. Save and stop timers. */
   pause(): void;
   /** She's back. */

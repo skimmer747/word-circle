@@ -71,6 +71,8 @@ export class Frame implements FrameHost {
   private layout: FrameLayout | null = null;
   private targets: GameTargets = { tiles: [], buttons: [] };
   private celebration: Celebrating | null = null;
+  /** The game's own buttons while she looks back at a finished puzzle. */
+  private reviewButtons: ButtonGeometry[] = [];
   private sharing = false;
   private schedule: ScheduledEvent[] = [];
   private clockOpen = false;
@@ -270,6 +272,7 @@ export class Frame implements FrameHost {
     window.clearTimeout(celebrating.timeout);
     celebrating.timeout = window.setTimeout(celebrating.done, REVIEW_MS);
     this.view.showReview(this.reviewButton());
+    this.reviewButtons = this.game.reviewStarted?.() ?? [];
     this.updateTouchTargets();
   }
 
@@ -555,7 +558,7 @@ export class Frame implements FrameHost {
         { id: 'stats-next', ...layout.nextWordButton },
       ];
     } else if (this.celebration?.reviewing) {
-      buttons = [{ id: 'next', ...this.reviewButton() }, ...this.cornerButtons(layout)];
+      buttons = [{ id: 'next', ...this.reviewButton() }, ...this.reviewButtons, ...this.cornerButtons(layout)];
     } else if (this.celebration) {
       buttons = this.celebration.card.share
         ? [
