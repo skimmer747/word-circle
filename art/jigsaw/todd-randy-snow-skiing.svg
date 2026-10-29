@@ -1,0 +1,596 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <g id="cloud">
+      <path d="M0 60 C-4 40 14 28 32 32 C38 10 68 0 90 12 C104 -6 140 -4 152 16 C172 8 196 22 194 42 C212 44 220 60 210 70 C206 76 198 78 190 78 L14 78 C2 78 -4 70 0 60 Z" fill="#ffffff" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M18 68 C70 62 150 62 200 68 C194 73 186 73 178 73 L30 73 C24 73 20 71 18 68 Z" fill="#d6ecfa"/>
+    </g>
+
+    <!-- a little fir; its fill comes from each use -->
+    <path id="tf" d="M0 -46 L11 -29 L6 -29 L15 -13 L9 -13 L18 2 L-18 2 L-9 -13 L-15 -13 L-6 -29 L-11 -29 Z" stroke="#26232e" stroke-width="3.5" stroke-linejoin="round"/>
+
+    <!-- a snowy pine -->
+    <g id="sp" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-11 0 V24 H11 V0 Z" fill="#7a5638" stroke="#26232e" stroke-width="5"/>
+      <path d="M0 -200 L46 -126 L26 -128 L68 -58 L40 -60 L90 4 L-90 4 L-40 -60 L-68 -58 L-26 -128 L-46 -126 Z" fill="#2f8f4c"/>
+      <path d="M0 -200 L46 -126 L26 -128 L68 -58 L40 -60 L90 4 L0 4 Z" fill="#267a3f"/>
+      <path d="M-46 -126 L46 -126 L37 -141 C28 -134 20 -142 12 -136 C4 -144 -4 -136 -12 -142 C-20 -134 -28 -142 -37 -141 Z" fill="#ffffff"/>
+      <path d="M-68 -58 L68 -58 L58 -74 C48 -66 38 -76 28 -68 C18 -78 8 -68 -2 -76 C-12 -68 -22 -78 -32 -70 C-42 -78 -50 -68 -58 -74 Z" fill="#ffffff"/>
+      <path d="M-90 4 L90 4 L77 -13 C66 -4 56 -16 44 -6 C34 -16 22 -6 10 -14 C0 -6 -12 -16 -22 -6 C-34 -16 -44 -6 -56 -14 C-66 -4 -72 -14 -77 -13 Z" fill="#ffffff"/>
+      <path d="M0 -200 L21 -166 C14 -160 8 -168 2 -161 C-6 -168 -12 -160 -21 -166 Z" fill="#ffffff"/>
+      <path d="M37 -141 C28 -134 20 -142 12 -136 C4 -144 -4 -136 -12 -142 C-20 -134 -28 -142 -37 -141 M58 -74 C48 -66 38 -76 28 -68 C18 -78 8 -68 -2 -76 C-12 -68 -22 -78 -32 -70 C-42 -78 -50 -68 -58 -74 M77 -13 C66 -4 56 -16 44 -6 C34 -16 22 -6 10 -14 C0 -6 -12 -16 -22 -6 C-34 -16 -44 -6 -56 -14 C-66 -4 -72 -14 -77 -13 M21 -166 C14 -160 8 -168 2 -161 C-6 -168 -12 -160 -21 -166" fill="none" stroke="#26232e" stroke-width="3.5"/>
+      <path d="M0 -200 L46 -126 L26 -128 L68 -58 L40 -60 L90 4 L-90 4 L-40 -60 L-68 -58 L-26 -128 L-46 -126 Z" fill="none" stroke="#26232e" stroke-width="6"/>
+    </g>
+
+    <!-- a snow puff -->
+    <g id="mound">
+      <path d="M0 0 C6 -26 34 -44 66 -38 C86 -58 128 -54 142 -32 C160 -34 178 -18 178 0 C120 10 58 10 0 0 Z" fill="#ffffff" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M16 -3 C60 -14 128 -14 164 -5 C128 3 60 3 16 -3 Z" fill="#cfe2f6"/>
+    </g>
+
+    <!-- a little glint in the snow -->
+    <path id="glint" d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" fill="#a9c8ec"/>
+
+    <!-- boot on a ski: origin at the top of the boot, toe toward +x -->
+    <g id="bootA" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-240 104 L216 104 C248 104 268 94 282 74 C290 62 308 66 304 82 C294 110 266 128 220 128 L-240 128 C-256 128 -256 104 -240 104 Z" fill="#ffd02e" stroke-width="6"/>
+      <path d="M-226 116 L210 116" fill="none" stroke="#e5343a" stroke-width="6"/>
+      <path d="M-64 90 H-38 V104 H-64 Z M94 90 H120 V104 H94 Z" fill="#9aa3b5" stroke-width="4"/>
+      <path d="M-40 0 L38 0 L42 48 C66 50 90 62 96 84 L98 92 L-50 92 L-46 8 C-46 3 -44 0 -40 0 Z" fill="#2f6fd6" stroke-width="6"/>
+      <path d="M-32 10 L-34 70" fill="none" stroke="#5b93ea" stroke-width="8"/>
+      <path d="M-52 90 H100 V104 H-52 Z" fill="#3a3848" stroke-width="5"/>
+      <path d="M-45 20 L40 20 M-47 42 L42 42 M50 60 C64 64 78 72 84 84" fill="none" stroke-width="4"/>
+      <path d="M30 14 H50 V26 H30 Z M34 36 H54 V48 H34 Z" fill="#c9d2dc" stroke-width="3.5"/>
+    </g>
+    <g id="bootB" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-240 104 L216 104 C248 104 268 94 282 74 C290 62 308 66 304 82 C294 110 266 128 220 128 L-240 128 C-256 128 -256 104 -240 104 Z" fill="#ff8a1f" stroke-width="6"/>
+      <path d="M-226 116 L210 116" fill="none" stroke="#ffffff" stroke-width="6"/>
+      <path d="M-64 90 H-38 V104 H-64 Z M94 90 H120 V104 H94 Z" fill="#9aa3b5" stroke-width="4"/>
+      <path d="M-40 0 L38 0 L42 48 C66 50 90 62 96 84 L98 92 L-50 92 L-46 8 C-46 3 -44 0 -40 0 Z" fill="#e5343a" stroke-width="6"/>
+      <path d="M-32 10 L-34 70" fill="none" stroke="#f26a6e" stroke-width="8"/>
+      <path d="M-52 90 H100 V104 H-52 Z" fill="#3a3848" stroke-width="5"/>
+      <path d="M-45 20 L40 20 M-47 42 L42 42 M50 60 C64 64 78 72 84 84" fill="none" stroke-width="4"/>
+      <path d="M30 14 H50 V26 H30 Z M34 36 H54 V48 H34 Z" fill="#c9d2dc" stroke-width="3.5"/>
+    </g>
+
+    <path id="rangeShape" d="M-10 442 C40 412 100 394 160 404 C220 374 300 352 380 380 C440 360 520 354 580 386 C640 366 720 360 790 392 C850 380 920 386 990 412 L990 620 L-10 620 Z"/>
+    <clipPath id="rangeClip"><use xlink:href="#rangeShape"/></clipPath>
+
+    <path id="torsoA" d="M296 404 C316 386 340 378 354 376 L386 376 C400 378 424 386 444 404 C458 456 464 548 468 636 C430 654 310 654 272 636 C276 548 282 456 296 404 Z"/>
+    <clipPath id="clipA"><use xlink:href="#torsoA"/></clipPath>
+    <path id="torsoB" d="M944 410 C966 394 990 388 1004 386 L1036 386 C1050 388 1074 394 1096 410 C1110 462 1116 552 1120 644 C1082 662 958 662 920 644 C924 552 930 462 944 410 Z"/>
+    <clipPath id="clipB"><use xlink:href="#torsoB"/></clipPath>
+  </defs>
+
+  <!-- sky with a paler haze low down -->
+  <rect width="1600" height="700" fill="#8fd3f7"/>
+  <path d="M-10 330 C300 320 700 336 1000 326 C1200 320 1400 330 1610 324 L1610 700 L-10 700 Z" fill="#aee0f8"/>
+
+  <!-- sun -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M194 108 L216 108 M172 162 L187 177 M118 184 L118 206 M64 162 L49 177 M42 108 L20 108 M64 54 L49 39 M118 32 L118 10 M172 54 L187 39" stroke="#26232e" stroke-width="18"/>
+    <path d="M194 108 L216 108 M172 162 L187 177 M118 184 L118 206 M64 162 L49 177 M42 108 L20 108 M64 54 L49 39 M118 32 L118 10 M172 54 L187 39" stroke="#ffb92e" stroke-width="7"/>
+  </g>
+  <circle cx="118" cy="108" r="62" fill="#ffd84a" stroke="#26232e" stroke-width="6"/>
+  <path d="M78 96 C82 74 100 60 122 60" fill="none" stroke="#fff1a8" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- clouds and two birds -->
+  <use xlink:href="#cloud" transform="translate(500 62)"/>
+  <use xlink:href="#cloud" transform="translate(680 236) scale(0.8)"/>
+  <use xlink:href="#cloud" transform="translate(1190 52)"/>
+  <use xlink:href="#cloud" transform="translate(1330 172) scale(0.72)"/>
+  <path d="M828 136 q12 -14 24 0 q12 -14 24 0 M880 170 q10 -12 20 0 q10 -12 20 0 M1478 40 q12 -14 24 0 q12 -14 24 0 M1530 74 q10 -12 20 0 q10 -12 20 0" fill="none" stroke="#26232e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- far blue mountains with snow tops -->
+  <use xlink:href="#rangeShape" fill="#a9b9e3"/>
+  <g clip-path="url(#rangeClip)">
+    <path d="M-10 300 L1000 300 L1000 380 C970 392 950 380 930 390 C900 380 880 394 850 384 C820 396 800 384 770 392 C740 382 720 396 690 386 C660 396 640 384 610 392 C580 384 560 396 530 386 C500 396 480 382 450 392 C420 384 400 396 370 386 C340 396 320 384 290 392 C260 384 240 396 210 386 C180 396 160 384 130 392 C100 384 80 396 50 386 C20 396 0 384 -10 390 Z" fill="#f4f8fe" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+  <use xlink:href="#rangeShape" fill="none" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- the wooded ridge across the valley -->
+  <path d="M-10 470 C120 455 240 448 360 456 C480 464 600 452 720 462 C820 470 900 478 980 490 L1300 560 L1300 640 L-10 640 Z" fill="#8cc4ae" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <g>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(0 487) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(30 484) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(60 481) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(90 478) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(120 476) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(150 474) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(180 472) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(210 471) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(240 471) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(270 471) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(300 471) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(330 472) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(360 474) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(390 476) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(420 477) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(450 477) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(480 477) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(510 477) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(540 476) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(570 476) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(600 476) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(630 476) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(660 477) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(690 478) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(720 480) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(750 482) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(780 485) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(810 488) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(840 491) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(870 494) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(900 497) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(930 501) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(960 505) scale(1)"/>
+    <use xlink:href="#tf" fill="#4f977c" transform="translate(990 508) scale(0.85)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(15 509) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(45 506) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(75 503) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(105 501) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(135 499) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(165 497) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(195 496) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(225 495) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(255 495) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(285 495) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(315 496) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(345 497) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(375 499) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(405 500) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(435 501) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(465 501) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(495 501) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(525 500) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(555 500) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(585 500) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(615 500) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(645 500) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(675 501) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(705 503) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(735 505) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(765 508) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(795 510) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(825 513) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(855 516) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(885 520) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(915 523) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(945 527) scale(1)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(975 531) scale(0.9)"/>
+  </g>
+  <!-- more trees down the ridge, with a few bare winter trees -->
+  <g>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(0 539) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(30 536) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(60 533) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(90 530) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(120 528) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(150 526) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(180 524) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(210 523) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(240 523) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(270 523) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(300 523) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(330 524) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(360 526) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(390 528) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(420 529) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(450 529) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(480 529) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(510 529) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(540 528) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(570 528) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(600 528) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(630 528) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(660 529) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(690 530) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(720 532) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(750 534) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(780 537) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(810 540) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(840 543) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(870 546) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(900 549) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(930 553) scale(0.9)"/>
+    <use xlink:href="#tf" fill="#55a083" transform="translate(960 557) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(15 567) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(45 564) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(75 561) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(105 559) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(135 557) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(165 555) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(195 554) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(225 553) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(255 553) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(285 553) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(315 554) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(345 555) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(375 557) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(405 558) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(435 559) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(465 559) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(495 559) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(525 558) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(555 558) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(585 558) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(615 558) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(645 558) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(675 559) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(705 561) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(735 563) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(765 566) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(795 568) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(825 571) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(855 574) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(885 578) scale(1.05)"/>
+    <use xlink:href="#tf" fill="#5fa58a" transform="translate(915 581) scale(0.95)"/>
+    <use xlink:href="#tf" fill="#4a8f74" transform="translate(945 585) scale(1.05)"/>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M530 604 V538 M530 572 L512 550 M530 560 L546 540 M512 550 L506 536 M530 538 L524 524 M530 538 L538 522 M546 540 L556 530 M668 606 V540 M668 574 L650 552 M668 562 L684 542 M650 552 L644 538 M668 540 L662 526 M668 540 L676 524 M684 542 L694 532" stroke="#26232e" stroke-width="9"/>
+    <path d="M530 604 V538 M530 572 L512 550 M530 560 L546 540 M512 550 L506 536 M530 538 L524 524 M530 538 L538 522 M546 540 L556 530 M668 606 V540 M668 574 L650 552 M668 562 L684 542 M650 552 L644 538 M668 540 L662 526 M668 540 L676 524 M684 542 L694 532" stroke="#9a7a8e" stroke-width="3.5"/>
+  </g>
+
+  <!-- the big wooded hill on the right, with ski runs and a chairlift -->
+  <path d="M740 612 C820 580 900 548 980 520 C1100 478 1240 420 1360 360 C1450 316 1530 282 1610 262 L1610 640 L740 640 Z" fill="#3f9a5e" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(760 632) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(796 617) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(832 603) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(868 589) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(904 576) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(940 562) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(976 549) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1012 536) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1048 523) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1084 509) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1120 496) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1156 480) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1192 466) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1228 450) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1264 434) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1300 417) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1336 400) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1372 382) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1408 365) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1444 349) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1480 334) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1516 320) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1552 307) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1588 296) scale(1.35)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1624 290) scale(1.55)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(778 659) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(814 644) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(850 630) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(886 616) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(922 603) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(958 590) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(994 577) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1030 564) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1066 551) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1102 536) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1138 522) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1174 507) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1210 491) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1246 476) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1282 459) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1318 443) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1354 425) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1390 408) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1426 391) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1462 375) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1498 361) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1534 347) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1570 335) scale(1.25)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1606 325) scale(1.4)"/>
+    <!-- a few more down the hill -->
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1266 540) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1314 506) scale(1.3)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1232 592) scale(1.3)"/>
+    <use xlink:href="#tf" fill="#2f8a4f" transform="translate(1546 430) scale(1.3)"/>
+    <use xlink:href="#tf" fill="#267a43" transform="translate(1598 420) scale(1.4)"/>
+    <use xlink:href="#tf" fill="#2a8047" transform="translate(1570 512) scale(1.4)"/>
+  </g>
+  <!-- ski runs cut through the trees -->
+  <g stroke="#26232e" stroke-width="5" stroke-linejoin="round">
+    <path d="M1452 318 C1440 380 1404 420 1398 480 C1392 540 1352 580 1342 640 L1420 640 C1426 592 1456 548 1462 488 C1468 430 1492 384 1498 304 Z" fill="#ffffff"/>
+    <path d="M1196 446 C1180 490 1140 530 1110 580 C1096 604 1090 622 1086 640 L1146 640 C1150 612 1166 584 1186 556 C1210 520 1232 480 1242 428 Z" fill="#ffffff"/>
+  </g>
+  <g fill="#d6e6f7">
+    <path d="M1458 330 C1446 388 1414 426 1410 484 C1404 540 1366 584 1356 636 L1342 636 C1352 580 1392 540 1398 480 C1404 420 1440 380 1452 322 Z"/>
+    <path d="M1200 452 C1186 494 1148 534 1120 582 C1108 604 1102 622 1098 636 L1090 636 C1094 620 1100 604 1110 584 C1140 532 1180 492 1196 450 Z"/>
+  </g>
+  <!-- chairlift -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M1520 488 V418 M1504 418 H1536 M1572 372 V302 M1556 302 H1588" stroke="#26232e" stroke-width="11"/>
+    <path d="M1520 488 V418 M1504 418 H1536 M1572 372 V302 M1556 302 H1588" stroke="#9aa3b5" stroke-width="4"/>
+    <path d="M1474 520 L1504 418 L1556 302 L1612 177" stroke="#26232e" stroke-width="9"/>
+    <path d="M1474 520 L1504 418 L1556 302 L1612 177" stroke="#c9d2dc" stroke-width="3"/>
+  </g>
+  <g stroke="#26232e" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M1458 504 H1494 V536 H1458 Z" fill="#a8703a"/>
+    <path d="M1450 506 L1476 484 L1502 506 Z" fill="#e5343a"/>
+    <path d="M1470 518 H1482 V536 H1470 Z" fill="#5a3a22"/>
+    <path d="M1530 360 V384" fill="none" stroke-width="4"/>
+    <path d="M1546 368 V392" fill="none" stroke-width="6"/>
+    <circle cx="1532" cy="370" r="8" fill="#f8cda6"/>
+    <path d="M1524 368 C1524 357 1540 357 1540 368 Z" fill="#7d4fd1"/>
+    <path d="M1522 378 H1542 V392 H1522 Z" fill="#ff7fb0"/>
+    <path d="M1512 390 H1550 L1552 404 H1514 Z" fill="#e5343a"/>
+  </g>
+
+  <!-- snowy pine and bare tree on the left -->
+  <use xlink:href="#sp" transform="translate(28 640) scale(1.1)"/>
+  <g stroke-linejoin="round" stroke-linecap="round" fill="none">
+    <path d="M170 600 C172 540 172 480 168 420 M170 500 C150 476 134 452 124 420 M171 470 C190 446 206 424 214 396 M168 430 C156 404 148 382 146 352 M168 420 C176 396 184 372 186 340" stroke="#26232e" stroke-width="15"/>
+    <path d="M124 420 L108 404 M124 420 L122 398 M214 396 L232 386 M214 396 L216 374 M146 352 L132 338 M146 352 L150 330 M186 340 L198 322 M186 340 L176 320" stroke="#26232e" stroke-width="6"/>
+    <path d="M170 600 C172 540 172 480 168 420 M170 500 C150 476 134 452 124 420 M171 470 C190 446 206 424 214 396 M168 430 C156 404 148 382 146 352 M168 420 C176 396 184 372 186 340" stroke="#8a6a52" stroke-width="6"/>
+  </g>
+  <path d="M160 612 C162 560 164 500 162 440 L178 440 C180 500 180 560 184 612 Z" fill="#8a6a52" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- the snowy slope in front -->
+  <path d="M-10 612 C200 600 420 596 640 606 C820 614 1000 604 1200 610 C1380 616 1500 606 1610 612 L1610 1210 L-10 1210 Z" fill="#ffffff" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="#dceaf8">
+    <path d="M-10 622 C200 610 420 606 640 616 C820 624 1000 614 1200 620 C1380 626 1500 616 1610 622 L1610 648 C1400 660 1200 642 1000 654 C800 666 600 646 400 658 C200 670 100 654 -10 662 Z"/>
+    <path d="M480 768 C570 744 700 750 812 774 C760 796 640 798 556 790 C520 786 494 780 480 768 Z"/>
+    <path d="M-10 896 C60 880 140 888 206 906 C140 926 60 922 -10 932 Z"/>
+    <path d="M1350 932 C1440 910 1540 916 1610 930 L1610 980 C1540 970 1440 976 1372 962 C1356 956 1348 944 1350 932 Z"/>
+    <path d="M-10 1150 C200 1136 400 1160 600 1146 C800 1132 1000 1156 1200 1142 C1400 1128 1500 1150 1610 1140 L1610 1210 L-10 1210 Z"/>
+  </g>
+  <!-- ski tracks -->
+  <g fill="none" stroke="#a9c8ec" stroke-width="7" stroke-linecap="round">
+    <path d="M590 668 C630 720 560 780 600 864 C640 950 600 1040 640 1210"/>
+    <path d="M612 668 C652 720 582 780 622 864 C662 950 622 1040 662 1210"/>
+    <path d="M1600 870 C1520 930 1460 990 1490 1070 C1510 1130 1480 1180 1460 1210"/>
+    <path d="M1610 892 C1542 952 1482 1000 1512 1070 C1532 1130 1502 1180 1482 1210"/>
+    <path d="M-10 990 C60 1006 110 1046 140 1104 C160 1144 196 1182 226 1210"/>
+    <path d="M10 980 C82 996 132 1036 162 1094 C182 1134 218 1172 250 1210"/>
+  </g>
+  <use xlink:href="#mound" transform="translate(664 900)"/>
+  <use xlink:href="#mound" transform="translate(1330 1180) scale(0.9)"/>
+  <use xlink:href="#mound" transform="translate(-40 1192) scale(0.8)"/>
+  <use xlink:href="#sp" transform="translate(1556 1004) scale(0.55)"/>
+  <use xlink:href="#glint" transform="translate(728 1010)"/>
+  <use xlink:href="#glint" transform="translate(1100 1160)"/>
+  <use xlink:href="#glint" transform="translate(44 776)"/>
+  <use xlink:href="#glint" transform="translate(1290 900) scale(0.8)"/>
+  <use xlink:href="#glint" transform="translate(470 1182) scale(0.8)"/>
+  <use xlink:href="#glint" transform="translate(880 770)"/>
+  <use xlink:href="#glint" transform="translate(1420 1060) scale(0.8)"/>
+
+  <!-- trail marker pole with a flag -->
+  <g stroke="#26232e" stroke-linejoin="round">
+    <path d="M747 526 L808 546 L747 568 Z" fill="#ffd02e" stroke-width="4"/>
+    <path d="M733 518 H747 V702 H733 Z" fill="#ffffff" stroke="none"/>
+    <path d="M733 518 H747 V540 H733 Z M733 562 H747 V584 H733 Z M733 606 H747 V628 H733 Z M733 650 H747 V672 H733 Z" fill="#e5343a" stroke="none"/>
+    <path d="M733 518 H747 V702 H733 Z" fill="none" stroke-width="4"/>
+    <path d="M712 706 C716 690 764 690 768 706 C750 710 730 710 712 706 Z" fill="#ffffff" stroke-width="4"/>
+  </g>
+
+  <!-- little skiers far off -->
+  <g transform="translate(600 662) scale(0.8)" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-38 -4 L34 -4 C42 -4 46 -8 48 -14 C54 -10 50 4 36 4 L-38 4 C-44 4 -44 -4 -38 -4 Z" fill="#e5343a" stroke-width="3"/>
+    <path d="M-22 -48 L-32 0 M22 -48 L32 0" fill="none" stroke-width="4"/>
+    <path d="M-7 -34 L-9 -6 M7 -34 L9 -6" fill="none" stroke-width="13"/>
+    <path d="M-7 -34 L-9 -6 M7 -34 L9 -6" fill="none" stroke="#3d3b4f" stroke-width="7"/>
+    <path d="M-14 -62 L-22 -46 M14 -62 L22 -46" fill="none" stroke-width="11"/>
+    <path d="M-14 -62 L-22 -46 M14 -62 L22 -46" fill="none" stroke="#7d4fd1" stroke-width="5"/>
+    <path d="M-15 -66 C-10 -71 10 -71 15 -66 L19 -32 C8 -28 -8 -28 -19 -32 Z" fill="#7d4fd1" stroke-width="3.5"/>
+    <circle cy="-80" r="11" fill="#f8cda6" stroke-width="3.5"/>
+    <path d="M-11 -82 C-11 -96 11 -96 11 -82 Z" fill="#ffd02e" stroke-width="3.5"/>
+    <circle cy="-95" r="4.5" fill="#ffffff" stroke-width="3"/>
+  </g>
+  <g transform="translate(1290 664)" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-38 -4 L34 -4 C42 -4 46 -8 48 -14 C54 -10 50 4 36 4 L-38 4 C-44 4 -44 -4 -38 -4 Z" fill="#2f6fd6" stroke-width="3"/>
+    <path d="M-22 -48 L-32 0 M22 -48 L32 0" fill="none" stroke-width="4"/>
+    <path d="M-7 -34 L-9 -6 M7 -34 L9 -6" fill="none" stroke-width="13"/>
+    <path d="M-7 -34 L-9 -6 M7 -34 L9 -6" fill="none" stroke="#3d3b4f" stroke-width="7"/>
+    <path d="M-14 -62 L-22 -46 M14 -62 L22 -46" fill="none" stroke-width="11"/>
+    <path d="M-14 -62 L-22 -46 M14 -62 L22 -46" fill="none" stroke="#ff7fb0" stroke-width="5"/>
+    <path d="M-15 -66 C-10 -71 10 -71 15 -66 L19 -32 C8 -28 -8 -28 -19 -32 Z" fill="#ff7fb0" stroke-width="3.5"/>
+    <circle cy="-80" r="11" fill="#f8cda6" stroke-width="3.5"/>
+    <path d="M-11 -82 C-11 -96 11 -96 11 -82 Z" fill="#2f6fd6" stroke-width="3.5"/>
+    <circle cy="-95" r="4.5" fill="#ffffff" stroke-width="3"/>
+  </g>
+  <g transform="translate(1384 660)" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-38 -4 L34 -4 C42 -4 46 -8 48 -14 C54 -10 50 4 36 4 L-38 4 C-44 4 -44 -4 -38 -4 Z" fill="#ffd02e" stroke-width="3"/>
+    <path d="M-22 -48 L-32 0 M22 -48 L32 0" fill="none" stroke-width="4"/>
+    <path d="M-7 -34 L-9 -6 M7 -34 L9 -6" fill="none" stroke-width="13"/>
+    <path d="M-7 -34 L-9 -6 M7 -34 L9 -6" fill="none" stroke="#2c3d72" stroke-width="7"/>
+    <path d="M-14 -62 L-22 -46 M14 -62 L22 -46" fill="none" stroke-width="11"/>
+    <path d="M-14 -62 L-22 -46 M14 -62 L22 -46" fill="none" stroke="#ff8a1f" stroke-width="5"/>
+    <path d="M-15 -66 C-10 -71 10 -71 15 -66 L19 -32 C8 -28 -8 -28 -19 -32 Z" fill="#ff8a1f" stroke-width="3.5"/>
+    <circle cy="-80" r="11" fill="#f8cda6" stroke-width="3.5"/>
+    <path d="M-11 -82 C-11 -96 11 -96 11 -82 Z" fill="#e5343a" stroke-width="3.5"/>
+    <circle cy="-95" r="4.5" fill="#ffffff" stroke-width="3"/>
+  </g>
+
+  <!-- blue shadows on the snow -->
+  <g fill="#c3d9f2">
+    <ellipse cx="420" cy="1080" rx="262" ry="18"/>
+    <ellipse cx="104" cy="1074" rx="46" ry="10"/>
+    <ellipse cx="985" cy="1090" rx="262" ry="18"/>
+    <ellipse cx="1312" cy="1078" rx="62" ry="10"/>
+  </g>
+
+  <!-- ================= LEFT SKIER: red and white jacket with blue stripes ================= -->
+  <!-- legs: standing on one, the other kicked out with the ski straight up -->
+  <g fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M336 612 L306 808 L190 808" stroke="#26232e" stroke-width="70"/>
+    <path d="M336 612 L306 808 L190 808" stroke="#e3c47e" stroke-width="58"/>
+    <path d="M404 612 L408 790 L395 964" stroke="#26232e" stroke-width="70"/>
+    <path d="M404 612 L408 790 L395 964" stroke="#e3c47e" stroke-width="58"/>
+    <path d="M326 700 L316 770 M412 700 L412 760 M280 820 L230 820" stroke="#cfa962" stroke-width="5"/>
+  </g>
+  <use xlink:href="#bootA" transform="translate(200 808) rotate(90) scale(-0.88 0.88)"/>
+  <use xlink:href="#bootA" transform="translate(395 954) scale(0.88)"/>
+
+  <!-- arms (behind the jacket) -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M304 432 C282 480 264 544 255 598" stroke="#26232e" stroke-width="66"/>
+    <path d="M304 432 C282 480 264 544 255 598" stroke="#e5343a" stroke-width="54"/>
+    <path d="M436 432 C458 480 476 544 485 598" stroke="#26232e" stroke-width="66"/>
+    <path d="M436 432 C458 480 476 544 485 598" stroke="#e5343a" stroke-width="54"/>
+    <path d="M262 500 C272 508 290 512 302 506 M256 548 C266 556 284 560 296 554 M478 500 C468 508 450 512 438 506 M484 548 C474 556 456 560 444 554" stroke="#b81f26" stroke-width="4"/>
+    <path d="M255 598 L254 612" stroke="#26232e" stroke-width="66" stroke-linecap="butt"/>
+    <path d="M255 600 L254 610" stroke="#2f6fd6" stroke-width="54" stroke-linecap="butt"/>
+    <path d="M485 598 L486 612" stroke="#26232e" stroke-width="66" stroke-linecap="butt"/>
+    <path d="M485 600 L486 610" stroke="#2f6fd6" stroke-width="54" stroke-linecap="butt"/>
+  </g>
+
+  <!-- neck and jacket -->
+  <path d="M356 340 V390 H384 V340" fill="#f8cda6" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <use xlink:href="#torsoA" fill="#e5343a"/>
+  <g clip-path="url(#clipA)" stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <path d="M320 476 L420 476 L428 680 L312 680 Z" fill="#ffffff"/>
+    <rect x="250" y="436" width="240" height="16" fill="#2f6fd6"/>
+    <rect x="250" y="452" width="240" height="8" fill="#ffffff"/>
+    <rect x="250" y="460" width="240" height="16" fill="#2f6fd6"/>
+    <path d="M278 524 C288 530 302 530 314 524 M276 576 C286 582 300 582 312 576 M462 524 C452 530 438 530 426 524 M464 576 C454 582 440 582 428 576" fill="none" stroke="#b81f26" stroke-width="4"/>
+    <path d="M338 540 L332 594 M402 540 L408 594" fill="none"/>
+  </g>
+  <use xlink:href="#torsoA" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M370 386 L370 646" fill="none" stroke="#26232e" stroke-width="4"/>
+  <path d="M364 486 H376 V506 H364 Z" fill="#c9d2dc" stroke="#26232e" stroke-width="3" stroke-linejoin="round"/>
+  <!-- turtleneck and big collar -->
+  <path d="M350 366 C362 374 378 374 390 366 L392 390 C378 398 362 398 348 390 Z" fill="#2c3d72" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M352 376 L320 388 L330 428 L364 398 Z M388 376 L420 388 L410 428 L376 398 Z" fill="#ffffff" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- poles and mittens -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M250 602 L266 1112 M488 602 L556 1112" stroke="#26232e" stroke-width="13"/>
+    <path d="M250 602 L266 1112 M488 602 L556 1112" stroke="#c9d2dc" stroke-width="6"/>
+    <path d="M250 600 L252 660 M488 600 L496 660" stroke="#26232e" stroke-width="22"/>
+    <path d="M250 600 L252 660 M488 600 L496 660" stroke="#3a3848" stroke-width="11"/>
+  </g>
+  <g stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <ellipse cx="265" cy="1080" rx="22" ry="7" fill="#e5343a"/>
+    <ellipse cx="552" cy="1080" rx="22" ry="7" fill="#e5343a"/>
+  </g>
+  <g stroke="#26232e" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M228 622 C228 610 276 610 276 622 L278 656 C278 672 226 672 226 656 Z" fill="#2c3d72"/>
+    <path d="M270 628 C288 626 292 646 280 652" fill="#2c3d72"/>
+    <path d="M466 622 C466 610 514 610 514 622 L516 656 C516 672 464 672 464 656 Z" fill="#2c3d72"/>
+    <path d="M470 628 C452 626 448 646 460 652" fill="#2c3d72"/>
+  </g>
+
+  <!-- head -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="294" cy="294" rx="15" ry="21" fill="#f8cda6"/>
+    <ellipse cx="446" cy="294" rx="15" ry="21" fill="#f8cda6"/>
+    <ellipse cx="370" cy="282" rx="78" ry="86" fill="#f8cda6"/>
+    <path d="M296 250 C284 274 282 300 292 322 C298 308 306 296 316 288 C312 276 310 262 314 250 Z" fill="#8a5629" stroke-width="5"/>
+    <path d="M444 250 C456 274 458 300 448 322 C442 308 434 296 424 288 C428 276 430 262 426 250 Z" fill="#8a5629" stroke-width="5"/>
+    <path d="M302 254 C340 248 400 248 438 254 C434 266 424 272 412 272 C404 266 394 262 384 260 C372 268 352 274 332 270 C318 268 308 262 302 254 Z" fill="#8a5629" stroke-width="5"/>
+    <path d="M294 252 C288 198 322 158 370 156 C418 158 452 198 446 252 Z" fill="#2c3d72"/>
+    <path d="M330 178 C346 168 368 164 388 166 C368 172 350 180 338 192 Z" fill="#3f56a6" stroke="none"/>
+    <path d="M288 236 C330 224 410 224 452 236 L454 264 C410 252 330 252 286 264 Z" fill="#3a4e96"/>
+    <path d="M356 226 L384 226 L384 242 C384 252 376 258 370 260 C364 258 356 252 356 242 Z" fill="#ffffff" stroke-width="3.5"/>
+    <path d="M366 227 H374 V258 C372 259 368 259 366 258 Z" fill="#e5343a" stroke="none"/>
+    <path d="M356 226 L384 226 L384 242 C384 252 376 258 370 260 C364 258 356 252 356 242 Z" fill="none" stroke-width="3.5"/>
+    <path d="M330 284 C337 278 349 278 356 282 M384 282 C391 278 403 278 410 284" fill="none" stroke="#6e4424" stroke-width="5"/>
+  </g>
+  <g>
+    <ellipse cx="343" cy="300" rx="9.5" ry="13" fill="#26232e"/>
+    <ellipse cx="397" cy="300" rx="9.5" ry="13" fill="#26232e"/>
+    <circle cx="346" cy="295" r="3.8" fill="#ffffff"/>
+    <circle cx="400" cy="295" r="3.8" fill="#ffffff"/>
+    <ellipse cx="322" cy="328" rx="15" ry="10" fill="#f6a08e"/>
+    <ellipse cx="418" cy="328" rx="15" ry="10" fill="#f6a08e"/>
+    <path d="M366 314 C362 324 372 328 378 322" fill="none" stroke="#26232e" stroke-width="4" stroke-linecap="round"/>
+    <path d="M342 334 C357 340 383 340 398 334 C394 364 346 364 342 334 Z" fill="#7d2432" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M347 337 C360 342 380 342 393 337 L390 345 C378 348 362 348 350 345 Z" fill="#ffffff"/>
+    <path d="M356 354 C364 348 376 348 384 354 C378 358 362 358 356 354 Z" fill="#f07474"/>
+  </g>
+
+  <!-- ================= RIGHT SKIER: royal blue and yellow jacket, big leg kick ================= -->
+  <g fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M984 628 L978 800 L990 974" stroke="#26232e" stroke-width="70"/>
+    <path d="M984 628 L978 800 L990 974" stroke="#3d3b4f" stroke-width="58"/>
+    <path d="M1060 628 L1200 708 L1340 801" stroke="#26232e" stroke-width="70"/>
+    <path d="M1060 628 L1200 708 L1340 801" stroke="#3d3b4f" stroke-width="58"/>
+    <path d="M972 700 L968 770 M1110 668 L1180 708 M1220 734 L1290 780" stroke="#5a5873" stroke-width="5"/>
+  </g>
+  <use xlink:href="#bootB" transform="translate(990 964) scale(-0.88 0.88)"/>
+  <use xlink:href="#bootB" transform="translate(1330 795) rotate(-58.6) scale(0.88)"/>
+
+  <!-- arms (behind the jacket) -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M948 438 C926 488 906 548 894 600" stroke="#26232e" stroke-width="66"/>
+    <path d="M948 438 C926 488 906 548 894 600" stroke="#2f6fd6" stroke-width="54"/>
+    <path d="M948 438 C940 456 934 470 928 486" stroke="#ffd02e" stroke-width="54" stroke-linecap="butt"/>
+    <path d="M1092 438 C1116 488 1136 546 1148 596" stroke="#26232e" stroke-width="66"/>
+    <path d="M1092 438 C1116 488 1136 546 1148 596" stroke="#2f6fd6" stroke-width="54"/>
+    <path d="M1092 438 C1100 456 1106 470 1113 486" stroke="#ffd02e" stroke-width="54" stroke-linecap="butt"/>
+    <path d="M904 476 L954 494 M1138 476 L1088 494" stroke="#26232e" stroke-width="4"/>
+    <path d="M908 540 C918 548 936 552 948 546 M1134 536 C1124 544 1106 548 1094 542" stroke="#2558b0" stroke-width="5"/>
+    <path d="M894 598 L891 612" stroke="#26232e" stroke-width="66" stroke-linecap="butt"/>
+    <path d="M894 600 L891 610" stroke="#ffffff" stroke-width="54" stroke-linecap="butt"/>
+    <path d="M1148 594 L1151 608" stroke="#26232e" stroke-width="66" stroke-linecap="butt"/>
+    <path d="M1148 596 L1151 606" stroke="#ffffff" stroke-width="54" stroke-linecap="butt"/>
+  </g>
+
+  <!-- neck and jacket -->
+  <path d="M1006 350 V396 H1034 V350" fill="#f8cda6" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <use xlink:href="#torsoB" fill="#2f6fd6"/>
+  <g clip-path="url(#clipB)" stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <path d="M900 380 L1140 380 L1140 470 L1020 530 L900 470 Z" fill="#ffffff"/>
+    <path d="M900 380 L1140 380 L1140 456 L1020 516 L900 456 Z" fill="#ffd02e"/>
+    <path d="M940 424 C960 440 990 452 1008 456 M1100 424 C1080 440 1050 452 1032 456" fill="none" stroke="#f2b51c" stroke-width="5"/>
+    <path d="M922 578 C980 590 1060 590 1118 578 M920 620 C980 632 1060 632 1120 620" fill="none" stroke="#2558b0" stroke-width="5"/>
+    <path d="M962 556 L954 606 M1078 556 L1086 606" fill="none"/>
+  </g>
+  <use xlink:href="#torsoB" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M1020 400 L1020 654" fill="none" stroke="#26232e" stroke-width="4"/>
+  <path d="M1014 530 H1026 V550 H1014 Z" fill="#c9d2dc" stroke="#26232e" stroke-width="3" stroke-linejoin="round"/>
+  <!-- rolled white turtleneck -->
+  <path d="M994 372 C1008 380 1032 380 1046 372 L1050 400 C1032 410 1008 410 990 400 Z" fill="#ffffff" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M998 388 C1012 394 1028 394 1042 388" fill="none" stroke="#c9d2dc" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- poles and mittens -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M892 602 L830 1112 M1152 600 L1206 1112" stroke="#26232e" stroke-width="13"/>
+    <path d="M892 602 L830 1112 M1152 600 L1206 1112" stroke="#c9d2dc" stroke-width="6"/>
+    <path d="M892 600 L885 660 M1152 598 L1158 656" stroke="#26232e" stroke-width="22"/>
+    <path d="M892 600 L885 660 M1152 598 L1158 656" stroke="#3a3848" stroke-width="11"/>
+  </g>
+  <g stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <ellipse cx="834" cy="1080" rx="22" ry="7" fill="#ffd02e"/>
+    <ellipse cx="1203" cy="1080" rx="22" ry="7" fill="#ffd02e"/>
+  </g>
+  <g stroke="#26232e" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M866 622 C866 610 914 610 914 622 L916 656 C916 672 864 672 864 656 Z" fill="#e5343a"/>
+    <path d="M908 628 C926 626 930 646 918 652" fill="#e5343a"/>
+    <path d="M1130 618 C1130 606 1178 606 1178 618 L1180 652 C1180 668 1128 668 1128 652 Z" fill="#e5343a"/>
+    <path d="M1134 624 C1116 622 1112 642 1124 648" fill="#e5343a"/>
+  </g>
+
+  <!-- head -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="944" cy="306" rx="15" ry="21" fill="#f8cda6"/>
+    <ellipse cx="1096" cy="306" rx="15" ry="21" fill="#f8cda6"/>
+    <path d="M948 300 C940 306 942 318 950 320 M1092 300 C1100 306 1098 318 1090 320" fill="none" stroke-width="3"/>
+    <ellipse cx="1020" cy="288" rx="78" ry="86" fill="#f8cda6"/>
+    <path d="M946 256 C932 274 926 296 930 318 C936 312 942 306 948 302 C950 310 954 316 960 320 C962 306 964 294 970 284 C968 274 968 264 970 256 Z" fill="#c98b3c" stroke-width="5"/>
+    <path d="M1094 256 C1108 274 1114 296 1110 318 C1104 312 1098 306 1092 302 C1090 310 1086 316 1080 320 C1078 306 1076 294 1070 284 C1072 274 1072 264 1070 256 Z" fill="#c98b3c" stroke-width="5"/>
+    <path d="M944 272 C939 282 937 292 937 300 M1096 272 C1101 282 1103 292 1103 300" fill="none" stroke="#e8b46a" stroke-width="4"/>
+    <path d="M954 258 C990 252 1050 252 1086 258 C1082 268 1072 272 1062 272 C1052 266 1042 263 1032 262 C1018 270 998 274 980 272 C968 270 960 266 954 258 Z" fill="#c98b3c" stroke-width="5"/>
+    <path d="M944 258 C938 204 972 164 1020 162 C1068 164 1102 204 1096 258 Z" fill="#e5343a"/>
+    <path d="M980 184 C996 174 1018 170 1038 172 C1018 178 1000 186 988 198 Z" fill="#f2676b" stroke="none"/>
+    <path d="M938 242 C980 230 1060 230 1102 242 L1104 270 C1060 258 980 258 936 270 Z" fill="#c4262c"/>
+    <path d="M1020 234 L1024.7 245.5 L1037.1 246.4 L1027.6 254.4 L1030.6 266.5 L1020 260 L1009.4 266.5 L1012.4 254.4 L1002.9 246.4 L1015.3 245.5 Z" fill="#ffd02e" stroke-width="3.5"/>
+    <path d="M979 286 C987 279 999 279 1007 283 M1033 283 C1041 279 1053 279 1061 286" fill="none" stroke="#9a6428" stroke-width="6"/>
+  </g>
+  <g>
+    <ellipse cx="993" cy="304" rx="9.5" ry="13" fill="#26232e"/>
+    <ellipse cx="1047" cy="304" rx="9.5" ry="13" fill="#26232e"/>
+    <circle cx="996" cy="299" r="3.8" fill="#ffffff"/>
+    <circle cx="1050" cy="299" r="3.8" fill="#ffffff"/>
+    <ellipse cx="972" cy="332" rx="15" ry="10" fill="#f6a08e"/>
+    <ellipse cx="1068" cy="332" rx="15" ry="10" fill="#f6a08e"/>
+    <path d="M1016 318 C1012 328 1022 332 1028 326" fill="none" stroke="#26232e" stroke-width="4" stroke-linecap="round"/>
+    <path d="M990 338 C1006 344 1034 344 1050 338 C1046 368 994 368 990 338 Z" fill="#7d2432" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M995 341 C1008 346 1032 346 1045 341 L1042 349 C1030 352 1010 352 998 349 Z" fill="#ffffff"/>
+    <path d="M1006 358 C1014 352 1026 352 1034 358 C1028 362 1012 362 1006 358 Z" fill="#f07474"/>
+  </g>
+</svg>

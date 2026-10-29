@@ -70,5 +70,61 @@
     "caption": "Todd's MD-11",
     "cartoon": "todds-md-11.cartoon.png",
     "cartoonThumb": "todds-md-11.cartoon.thumb.png"
+  },
+  {
+    "id": "cody-magic-game",
+    "file": "cody-magic-game.jpg",
+    "thumb": "cody-magic-game.thumb.jpg",
+    "caption": "Cody at the Magic game",
+    "cartoon": "cody-magic-game.cartoon.png",
+    "cartoonThumb": "cody-magic-game.cartoon.thumb.png"
+  },
+  {
+    "id": "todd-in-iceland",
+    "file": "todd-in-iceland.jpg",
+    "thumb": "todd-in-iceland.thumb.jpg",
+    "caption": "Todd in Iceland",
+    "cartoon": "todd-in-iceland.cartoon.png",
+    "cartoonThumb": "todd-in-iceland.cartoon.thumb.png"
+  },
+  {
+    "id": "zane-brody-piano",
+    "file": "zane-brody-piano.jpg",
+    "thumb": "zane-brody-piano.thumb.jpg",
+    "caption": "Zane and Brody on piano",
+    "cartoon": "zane-brody-piano.cartoon.png",
+    "cartoonThumb": "zane-brody-piano.cartoon.thumb.png"
+  },
+  {
+    "id": "water-skiing-columbia",
+    "file": "water-skiing-columbia.jpg",
+    "thumb": "water-skiing-columbia.thumb.jpg",
+    "caption": "Water Skiing in Columbia",
+    "cartoon": "water-skiing-columbia.cartoon.png",
+    "cartoonThumb": "water-skiing-columbia.cartoon.thumb.png"
+  },
+  {
+    "id": "todd-randy-snow-skiing",
+    "file": "todd-randy-snow-skiing.jpg",
+    "thumb": "todd-randy-snow-skiing.thumb.jpg",
+    "caption": "Todd and Randy Snow Skiing",
+    "cartoon": "todd-randy-snow-skiing.cartoon.png",
+    "cartoonThumb": "todd-randy-snow-skiing.cartoon.thumb.png"
+  },
+  {
+    "id": "moose-anchorage",
+    "file": "moose-anchorage.jpg",
+    "thumb": "moose-anchorage.thumb.jpg",
+    "caption": "Moose in Downtown Anchorage",
+    "cartoon": "moose-anchorage.cartoon.png",
+    "cartoonThumb": "moose-anchorage.cartoon.thumb.png"
+  },
+  {
+    "id": "lilly",
+    "file": "lilly.jpg",
+    "thumb": "lilly.thumb.jpg",
+    "caption": "Lilly",
+    "cartoon": "lilly.cartoon.png",
+    "cartoonThumb": "lilly.cartoon.thumb.png"
   }
 ]

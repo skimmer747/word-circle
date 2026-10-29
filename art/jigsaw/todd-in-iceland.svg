@@ -1,0 +1,355 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <clipPath id="cliffClip">
+      <path d="M-10 -10 L285 -10 L296 60 L338 72 L352 160 L392 176 L408 262 L452 282 L470 356 L530 372 L548 438 L612 456 L628 520 L690 540 L706 610 L660 690 L-10 590 Z"/>
+    </clipPath>
+    <clipPath id="rockClip">
+      <path d="M1335 -10 L1610 -10 L1610 900 L1440 900 C1400 600 1372 300 1352 120 C1347 70 1340 30 1335 -10 Z"/>
+    </clipPath>
+    <clipPath id="lowClip">
+      <path d="M-10 505 C150 520 300 560 450 610 C560 645 660 680 760 712 C850 740 930 765 1010 790 L1010 1210 L-10 1210 Z"/>
+    </clipPath>
+    <clipPath id="moundClip">
+      <path d="M-10 960 Q15 930 45 952 Q75 922 108 950 Q140 930 165 962 Q200 952 210 990 Q245 992 240 1035 Q275 1045 262 1090 L330 1210 L-10 1210 Z"/>
+    </clipPath>
+    <clipPath id="stoneClip">
+      <path d="M250 1210 C244 1100 268 1000 330 964 C382 938 452 940 512 958 C562 974 602 1002 622 1042 L622 1210 Z"/>
+    </clipPath>
+    <clipPath id="jacketClip">
+      <path d="M215 1210 C320 1105 450 1018 600 950 C700 905 790 866 852 842 C868 836 884 840 890 856 C900 920 912 1040 930 1210 Z"/>
+    </clipPath>
+    <clipPath id="headClip">
+      <path d="M1270 150 C1440 150 1565 280 1568 480 C1572 640 1560 800 1500 920 C1440 1030 1360 1078 1270 1078 C1180 1078 1100 1030 1040 920 C980 800 968 640 972 480 C975 280 1100 150 1270 150 Z"/>
+    </clipPath>
+    <clipPath id="mouthClip">
+      <path d="M1270 808 C1334 808 1366 848 1366 890 C1366 938 1324 968 1270 968 C1216 968 1174 938 1174 890 C1174 848 1206 808 1270 808 Z"/>
+    </clipPath>
+    <clipPath id="beakClip">
+      <path d="M34 -146 C50 -142 66 -132 72 -122 C62 -112 48 -106 34 -104 C38 -118 38 -132 34 -146 Z"/>
+    </clipPath>
+
+    <!-- a small puffy cloud -->
+    <g id="cloud">
+      <path d="M-62 18 C-80 16 -82 -8 -62 -12 C-62 -34 -36 -44 -20 -30 C-12 -50 22 -52 32 -32 C50 -42 74 -28 66 -8 C84 -4 84 18 64 20 C30 26 -30 26 -62 18 Z" fill="#ffffff" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M-46 10 C-18 15 28 15 50 9" fill="none" stroke="#d6ecfa" stroke-width="6" stroke-linecap="round"/>
+    </g>
+    <!-- a splash droplet; the fill comes from each use -->
+    <path id="drop" d="M0 -18 C7 -8 12 -1 12 6 C12 14 6 18 0 18 C-6 18 -12 14 -12 6 C-12 -1 -7 -8 0 -18 Z" stroke="#26232e" stroke-width="3.5" stroke-linejoin="round"/>
+    <!-- three foam bubbles -->
+    <g id="bubbles" fill="#d4f0fd" stroke="#26232e" stroke-width="3">
+      <circle cx="0" cy="0" r="9"/>
+      <circle cx="17" cy="-10" r="6"/>
+      <circle cx="15" cy="11" r="5"/>
+    </g>
+    <!-- a cushion of moss -->
+    <g id="moss">
+      <path d="M-60 0 C-62 -22 -40 -34 -22 -26 C-14 -46 18 -48 28 -30 C48 -38 68 -20 62 2 C76 14 64 36 42 32 C30 48 2 46 -6 32 C-26 44 -54 32 -50 16 C-66 12 -68 4 -60 0 Z" fill="#6cb33f" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M-38 -8 C-32 -20 -16 -22 -10 -12 C-2 -26 18 -26 22 -12 C8 -6 -20 -2 -38 -8 Z" fill="#8fd14f"/>
+      <circle cx="-30" cy="18" r="4" fill="#4f9330"/>
+      <circle cx="10" cy="24" r="4" fill="#4f9330"/>
+      <circle cx="40" cy="10" r="4" fill="#4f9330"/>
+    </g>
+    <g id="tuft" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 0 L-12 -22 M0 0 L-1 -28 M0 0 L12 -20" stroke="#26232e" stroke-width="10"/>
+      <path d="M0 0 L-12 -22 M0 0 L-1 -28 M0 0 L12 -20" stroke="#8fd14f" stroke-width="4.5"/>
+    </g>
+  </defs>
+
+  <!-- a strip of sky above the falls, a little sun and a cloud -->
+  <rect width="1600" height="220" fill="#8fd3f7"/>
+  <use xlink:href="#cloud" transform="translate(560 42) scale(0.8)"/>
+  <g stroke-linecap="round" fill="none">
+    <path d="M920 46 L934 46 M908 74 L918 84 M851 74 L841 84 M840 46 L826 46 M851 18 L841 8 M880 6 L880 -8 M908 18 L918 8 M880 86 L880 100" stroke="#26232e" stroke-width="12"/>
+    <path d="M920 46 L934 46 M908 74 L918 84 M851 74 L841 84 M840 46 L826 46 M851 18 L841 8 M880 6 L880 -8 M908 18 L918 8 M880 86 L880 100" stroke="#ffd23f" stroke-width="5"/>
+  </g>
+  <circle cx="880" cy="46" r="30" fill="#ffd23f" stroke="#26232e" stroke-width="5"/>
+  <circle cx="870" cy="37" r="11" fill="#ffe680"/>
+
+  <!-- the big falls: white sheets of water with tapering blue streaks -->
+  <rect x="220" y="100" width="1220" height="840" fill="#ffffff"/>
+  <path d="M220 136 C500 144 900 150 1380 128 L1380 172 C900 184 500 180 220 174 Z" fill="#d4f0fd"/>
+  <g fill="#aedff7" stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <path d="M433 148 Q440 132 447 148 C447 210 465 290 444 540 C432 660 435 860 422 940 L377 940 C381 860 400 660 402 540 C415 290 433 210 433 148 Z"/>
+    <path d="M473 258 Q480 242 487 258 C488 320 510 400 489 595 C475 715 481 860 467 940 L413 940 C415 860 437 715 439 595 C450 400 472 320 473 258 Z"/>
+    <path d="M538 168 Q545 152 552 168 C556 230 584 310 561 550 C546 670 555 860 540 940 L470 940 C471 860 497 670 498 550 C507 310 535 230 538 168 Z"/>
+    <path d="M618 288 Q625 272 632 288 C633 350 655 430 634 610 C620 730 626 860 612 940 L558 940 C560 860 582 730 584 610 C595 430 617 350 618 288 Z"/>
+    <path d="M693 198 Q700 182 707 198 C711 260 741 340 718 565 C702 685 713 860 698 940 L623 940 C623 860 650 685 650 565 C659 340 689 260 693 198 Z"/>
+    <path d="M768 338 Q775 322 782 338 C783 400 803 480 782 635 C769 755 773 860 760 940 L710 940 C713 860 734 755 737 635 C748 480 768 400 768 338 Z"/>
+    <path d="M843 183 Q850 167 857 183 C861 245 889 325 866 558 C851 678 860 860 845 940 L775 940 C776 860 802 678 803 558 C812 325 840 245 843 183 Z"/>
+    <path d="M918 298 Q925 282 932 298 C933 360 955 440 934 615 C920 735 926 860 912 940 L858 940 C860 860 882 735 884 615 C895 440 917 360 918 298 Z"/>
+    <path d="M993 198 Q1000 182 1007 198 C1009 260 1033 340 1011 565 C997 685 1004 860 990 940 L930 940 C932 860 955 685 957 565 C967 340 991 260 993 198 Z"/>
+    <path d="M1073 158 Q1080 142 1087 158 C1088 220 1108 300 1087 545 C1074 665 1078 860 1065 940 L1015 940 C1018 860 1039 665 1042 545 C1053 300 1073 220 1073 158 Z"/>
+  </g>
+  <g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round">
+    <path d="M482 420 L480 450 M548 300 L546 335 M532 650 L530 680 M628 470 L626 500 M706 330 L704 365 M688 700 L686 730"/>
+    <path d="M778 520 L776 550 M856 320 L854 355 M840 680 L838 710 M928 470 L926 500 M1004 330 L1002 360"/>
+  </g>
+  <g fill="none" stroke="#d4f0fd" stroke-width="5" stroke-linecap="round">
+    <path d="M512 190 C514 230 510 270 506 300 M592 190 C594 230 590 260 586 290 M665 330 C667 370 663 410 660 440 M738 200 C740 240 736 280 732 310"/>
+    <path d="M818 230 C820 270 816 310 812 340 M880 360 C882 400 878 440 874 470 M965 200 C966 240 962 280 958 310 M818 700 C816 740 812 780 808 810"/>
+  </g>
+  <!-- grassy top edge where the water pours over -->
+  <path d="M220 92 C300 70 380 96 460 80 C560 62 640 92 740 78 C840 64 920 90 1020 76 C1120 62 1220 84 1380 66 L1380 128 C1250 140 1100 134 980 142 C800 150 600 136 400 144 C320 147 260 142 220 140 Z" fill="#6cb33f" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M236 104 C310 86 380 108 460 94 C560 78 640 106 740 92 C840 80 920 104 1020 90 C1120 78 1220 98 1370 82 L1370 98 C1220 114 1120 94 1020 106 C920 120 840 96 740 108 C640 122 560 94 460 110 C380 124 310 102 236 120 Z" fill="#8fd14f"/>
+  <use xlink:href="#tuft" transform="translate(330 86)"/>
+  <use xlink:href="#tuft" transform="translate(450 82)"/>
+  <use xlink:href="#tuft" transform="translate(600 80)"/>
+  <use xlink:href="#tuft" transform="translate(700 83)"/>
+  <use xlink:href="#tuft" transform="translate(1010 78)"/>
+  <use xlink:href="#tuft" transform="translate(1180 75)"/>
+
+  <!-- dark basalt rock in the top right corner -->
+  <g clip-path="url(#rockClip)">
+    <rect x="1300" y="-10" width="320" height="920" fill="#5d5662"/>
+    <path d="M1330 -10 L1405 -10 L1445 910 L1370 910 Z M1485 -10 L1560 -10 L1600 910 L1525 910 Z" fill="#6b6470"/>
+    <path d="M1389 -10 L1405 -10 L1445 910 L1429 910 Z M1469 -10 L1485 -10 L1525 910 L1509 910 Z M1544 -10 L1560 -10 L1600 910 L1584 910 Z" fill="#4e4753"/>
+    <path d="M1405 -10 L1445 910 M1485 -10 L1525 910 M1560 -10 L1600 910 M1340 60 L1392 68 M1420 150 L1470 158 M1500 90 L1548 98 M1575 220 L1620 228 M1510 300 L1555 308 M1430 30 L1470 38" fill="none" stroke="#3d3742" stroke-width="5" stroke-linecap="round"/>
+    <use xlink:href="#moss" transform="translate(1470 40) scale(0.85 0.7)"/>
+    <use xlink:href="#moss" transform="translate(1585 150) rotate(15) scale(0.9 0.75)"/>
+    <use xlink:href="#moss" transform="translate(1565 300) scale(0.8 0.65)"/>
+  </g>
+  <path d="M1335 -10 L1610 -10 L1610 900 L1440 900 C1400 600 1372 300 1352 120 C1347 70 1340 30 1335 -10 Z" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- the mossy cliff of stepped basalt columns on the left -->
+  <g clip-path="url(#cliffClip)">
+    <rect x="-20" y="-20" width="800" height="760" fill="#5d5662"/>
+    <path d="M-30 -10 L50 -10 L160 720 L80 720 Z M130 -10 L210 -10 L320 720 L240 720 Z M285 -10 L325 -10 L441 720 L400 720 Z M357 -10 L381 -10 L558 720 L493 720 Z M426 -10 L495 -10 L678 720 L625 720 Z" fill="#6b6470"/>
+    <g transform="translate(-10 0)">
+      <path d="M50 -10 L160 720 M130 -10 L240 720 M210 -10 L320 720 M285 -10 L400 720 M338 72 L441 720 M392 176 L493 720 M452 282 L558 720 M530 372 L625 720 M612 456 L678 720" fill="none" stroke="#4e4753" stroke-width="18"/>
+    </g>
+    <path d="M50 -10 L160 720 M130 -10 L240 720 M210 -10 L320 720 M285 -10 L400 720 M338 72 L441 720 M392 176 L493 720 M452 282 L558 720 M530 372 L625 720 M612 456 L678 720" fill="none" stroke="#3d3742" stroke-width="5"/>
+    <path d="M296 60 L338 72 L340 88 L299 77 Z M352 160 L392 176 L394 192 L355 176 Z M408 262 L452 282 L455 298 L411 278 Z M470 356 L530 372 L533 388 L473 372 Z M548 438 L612 456 L615 472 L551 454 Z M628 520 L690 540 L693 556 L631 536 Z" fill="#7d7583"/>
+    <path d="M-4 160 L40 168 M95 300 L140 308 M70 90 L115 98 M172 220 L215 228 M200 480 L245 488 M232 120 L275 128 M262 360 L306 368 M345 250 L370 256 M372 460 L410 466 M425 380 L455 386 M455 560 L500 566 M520 480 L548 486 M560 600 L600 606 M610 560 L640 566" fill="none" stroke="#3d3742" stroke-width="4" stroke-linecap="round"/>
+    <use xlink:href="#moss" transform="translate(40 80) rotate(-8) scale(0.9 0.72)"/>
+    <use xlink:href="#moss" transform="translate(200 40) scale(0.75 0.6)"/>
+    <use xlink:href="#moss" transform="translate(120 235) rotate(6) scale(1 0.8)"/>
+    <use xlink:href="#moss" transform="translate(255 335) scale(0.95 0.76)"/>
+    <use xlink:href="#moss" transform="translate(40 365) scale(1 0.8)"/>
+    <use xlink:href="#moss" transform="translate(155 475) scale(1.1 0.88)"/>
+    <use xlink:href="#moss" transform="translate(335 478) scale(0.9 0.72)"/>
+    <use xlink:href="#moss" transform="translate(478 530) scale(0.8 0.64)"/>
+  </g>
+  <path d="M-10 -10 L285 -10 L296 60 L338 72 L352 160 L392 176 L408 262 L452 282 L470 356 L530 372 L548 438 L612 456 L628 520 L690 540 L706 610 L660 690" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- little moss cushions on the ledges -->
+  <use xlink:href="#moss" transform="translate(372 150) scale(0.45 0.4)"/>
+  <use xlink:href="#moss" transform="translate(498 350) scale(0.5 0.42)"/>
+  <use xlink:href="#moss" transform="translate(668 516) scale(0.42 0.38)"/>
+
+  <!-- the near cascade, lower left: white water with blue streaks -->
+  <g clip-path="url(#lowClip)">
+    <rect x="-20" y="480" width="1040" height="740" fill="#e3f5fe"/>
+    <g fill="none" stroke-linecap="round">
+      <path d="M20 560 C35 600 55 650 78 700 M130 578 C145 618 165 668 188 718 M240 600 C255 640 275 690 298 740 M350 632 C365 672 385 722 408 772 M460 666 C475 706 495 756 518 806 M570 700 C585 740 605 790 628 840 M680 738 C695 778 715 828 738 878 M790 772 C805 812 822 852 840 890 M-20 760 C-5 800 15 850 38 900 M85 790 C100 830 120 880 143 930 M195 810 C210 850 230 900 253 950 M305 840 C320 880 340 930 363 980 M415 870 C430 910 450 960 473 1010 M525 880 C540 920 556 960 572 1000 M640 850 C652 880 664 910 676 940" stroke="#26232e" stroke-width="31"/>
+      <path d="M20 560 C35 600 55 650 78 700 M130 578 C145 618 165 668 188 718 M240 600 C255 640 275 690 298 740 M350 632 C365 672 385 722 408 772 M460 666 C475 706 495 756 518 806 M570 700 C585 740 605 790 628 840 M680 738 C695 778 715 828 738 878 M790 772 C805 812 822 852 840 890 M-20 760 C-5 800 15 850 38 900 M85 790 C100 830 120 880 143 930 M195 810 C210 850 230 900 253 950 M305 840 C320 880 340 930 363 980 M415 870 C430 910 450 960 473 1010 M525 880 C540 920 556 960 572 1000 M640 850 C652 880 664 910 676 940" stroke="#aedff7" stroke-width="22"/>
+      <path d="M30 590 C38 612 46 632 54 650 M140 608 C148 630 156 650 164 668 M250 630 C258 652 266 672 274 690 M360 662 C368 684 376 704 384 722 M470 696 C478 718 486 738 494 756 M580 730 C588 752 596 772 604 790 M95 820 C103 842 111 862 119 880 M205 840 C213 862 221 882 229 900" stroke="#e6f6ff" stroke-width="5"/>
+    </g>
+  </g>
+  <!-- a band of foam where the falls land -->
+  <path d="M-10 491 Q38 427 85 503 Q131 441 178 520 Q224 461 269 542 Q315 484 360 567 Q405 511 450 596 Q491 539 531 622 Q570 565 609 648 Q647 591 685 674 Q722 616 760 698 Q805 642 850 726 Q890 668 930 751 Q970 693 1010 776 L1010 822 C930 797 850 772 760 744 C660 712 560 677 450 642 C300 592 150 552 -10 537 Z" fill="#ffffff"/>
+  <path d="M-10 491 Q38 427 85 503 Q131 441 178 520 Q224 461 269 542 Q315 484 360 567 Q405 511 450 596 Q491 539 531 622 Q570 565 609 648 Q647 591 685 674 Q722 616 760 698 Q805 642 850 726 Q890 668 930 751 Q970 693 1010 776" fill="none" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M20 486 C28 474 46 474 54 486 M114 500 C122 488 140 488 148 500 M208 518 C216 506 234 506 242 518 M298 540 C306 528 324 528 332 540 M388 566 C396 554 414 554 422 566 M474 594 C482 582 500 582 508 594 M554 620 C562 608 580 608 588 620 M632 646 C640 634 658 634 666 646 M706 670 C714 658 732 658 740 670 M790 696 C798 684 816 684 824 696" fill="none" stroke="#bfe6fa" stroke-width="5" stroke-linecap="round"/>
+  <path d="M60 536 C80 546 100 546 118 540 M240 572 C260 582 280 582 298 576 M420 624 C440 634 460 634 478 628 M590 676 C610 686 630 686 648 680 M760 728 C780 738 800 738 818 732" fill="none" stroke="#bfe6fa" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- spray droplets -->
+  <g fill="#ffffff">
+    <use xlink:href="#drop" transform="translate(70 418) scale(0.9)"/>
+    <use xlink:href="#drop" transform="translate(180 436) scale(1.1)"/>
+    <use xlink:href="#drop" transform="translate(292 460) scale(0.8)"/>
+    <use xlink:href="#drop" transform="translate(402 488)"/>
+    <use xlink:href="#drop" transform="translate(600 556) scale(0.8)"/>
+  </g>
+  <g fill="#d4f0fd">
+    <use xlink:href="#drop" transform="translate(905 360)"/>
+    <use xlink:href="#drop" transform="translate(880 520) scale(0.85)"/>
+    <use xlink:href="#drop" transform="translate(895 640) scale(0.9)"/>
+    <use xlink:href="#drop" transform="translate(762 596) scale(0.8)"/>
+  </g>
+
+  <!-- a rainbow in the spray -->
+  <g fill="none">
+    <path d="M-42 1010 A372 372 0 0 1 702 1010" stroke="#ef4d4d" stroke-width="17"/>
+    <path d="M-26 1010 A356 356 0 0 1 686 1010" stroke="#ff9b2e" stroke-width="17"/>
+    <path d="M-10 1010 A340 340 0 0 1 670 1010" stroke="#ffd93d" stroke-width="17"/>
+    <path d="M6 1010 A324 324 0 0 1 654 1010" stroke="#5cc24a" stroke-width="17"/>
+    <path d="M22 1010 A308 308 0 0 1 638 1010" stroke="#4a9be8" stroke-width="16"/>
+    <path d="M-50 1010 A380 380 0 0 1 710 1010 M30 1010 A300 300 0 0 1 630 1010" stroke="#26232e" stroke-width="5"/>
+  </g>
+  <use xlink:href="#bubbles" transform="translate(140 630)"/>
+  <use xlink:href="#bubbles" transform="translate(690 780)"/>
+  <use xlink:href="#bubbles" transform="translate(190 890)"/>
+  <use xlink:href="#bubbles" transform="translate(520 865) scale(0.9)"/>
+  <!-- a mound of foam in the bottom corner -->
+  <g clip-path="url(#moundClip)">
+    <rect x="-20" y="900" width="360" height="320" fill="#ffffff"/>
+    <path d="M-10 1000 Q20 980 50 996 Q80 976 112 994 Q140 982 168 1004 M-10 1070 Q24 1050 56 1068 Q90 1048 124 1066 Q160 1052 196 1076 M20 1140 Q54 1120 88 1138 Q124 1120 160 1140" fill="none" stroke="#bfe6fa" stroke-width="6" stroke-linecap="round"/>
+    <use xlink:href="#bubbles" transform="translate(150 1100) scale(0.8)"/>
+  </g>
+  <path d="M-10 960 Q15 930 45 952 Q75 922 108 950 Q140 930 165 962 Q200 952 210 990 Q245 992 240 1035 Q275 1045 262 1090 L330 1210" fill="none" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- a mossy stone with a puffin looking at Todd -->
+  <path d="M250 1210 C244 1100 268 1000 330 964 C382 938 452 940 512 958 C562 974 602 1002 622 1042 L622 1210 Z" fill="#5d5662" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g clip-path="url(#stoneClip)">
+    <path d="M262 1060 C276 1010 300 980 340 966 C318 1000 300 1040 290 1090 Z" fill="#6b6470"/>
+    <path d="M282 1022 C300 986 340 963 380 956 C410 951 440 953 470 959 C460 975 440 972 425 980 C405 972 385 984 365 980 C345 990 330 984 312 998 C300 1004 290 1014 282 1022 Z" fill="#6cb33f" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M480 990 L520 1010 M300 1110 L330 1130" fill="none" stroke="#3d3742" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(390 948)" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-26 2 L-6 2 L-14 -12 Z M6 2 L26 2 L16 -12 Z" fill="#ff8a1f" stroke-width="3.5"/>
+    <path d="M6 -162 C30 -162 44 -144 42 -120 C50 -100 50 -70 46 -46 C42 -16 26 -4 0 -4 C-26 -4 -42 -16 -44 -46 C-48 -80 -40 -104 -28 -118 C-30 -144 -16 -162 6 -162 Z" fill="#2f2b38" stroke-width="5"/>
+    <path d="M16 -92 C36 -84 42 -56 36 -32 C30 -12 16 -8 2 -8 C-14 -8 -22 -18 -20 -36 C-18 -62 -4 -90 16 -92 Z" fill="#ffffff" stroke-width="4"/>
+    <path d="M-42 -84 C-30 -84 -20 -66 -20 -46 C-20 -30 -30 -20 -40 -24 C-46 -44 -48 -66 -42 -84 Z" fill="#3e3a4a" stroke-width="4"/>
+    <path d="M-12 -132 C-10 -148 10 -154 28 -148 C40 -142 42 -124 36 -112 C22 -104 -2 -106 -12 -118 Z" fill="#f4f2ef" stroke-width="4"/>
+    <g clip-path="url(#beakClip)" stroke="none">
+      <rect x="30" y="-150" width="50" height="50" fill="#f2552c"/>
+      <rect x="30" y="-150" width="13" height="50" fill="#6b7a99"/>
+      <rect x="43" y="-150" width="7" height="50" fill="#ffd23f"/>
+    </g>
+    <path d="M34 -146 C50 -142 66 -132 72 -122 C62 -112 48 -106 34 -104 C38 -118 38 -132 34 -146 Z" fill="none" stroke-width="4"/>
+    <path d="M37 -124 C50 -123 60 -122 70 -122" fill="none" stroke-width="3"/>
+    <circle cx="14" cy="-132" r="6.5" fill="#26232e" stroke="none"/>
+    <circle cx="16" cy="-134" r="2.2" fill="#ffffff" stroke="none"/>
+    <ellipse cx="22" cy="-116" rx="7" ry="4" fill="#f7a493" stroke="none"/>
+  </g>
+  <g fill="#d4f0fd">
+    <use xlink:href="#drop" transform="translate(250 800) scale(0.8)"/>
+    <use xlink:href="#drop" transform="translate(480 800) scale(0.75)"/>
+  </g>
+
+  <!-- TODD: sage hoodie with the hood bunched round his neck -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M840 1210 C842 1080 856 960 900 870 C960 840 1100 830 1250 830 C1420 830 1550 850 1610 880 L1610 1210 Z" fill="#9cb8a8"/>
+    <path d="M845 1210 C842 1060 852 905 900 805 C930 742 978 708 1032 702 C1062 760 1070 880 1060 990 L1040 1210 Z" fill="#9cb8a8"/>
+    <path d="M900 805 C930 742 978 708 1032 702 C1000 740 975 790 962 860 C940 840 915 822 900 805 Z" fill="#82a08f" stroke="none"/>
+    <path d="M922 1210 C918 1080 928 950 962 860" fill="none" stroke-width="4"/>
+    <path d="M1610 720 C1556 726 1512 782 1494 862 C1480 940 1478 1080 1490 1210 L1610 1210 Z" fill="#9cb8a8"/>
+    <path d="M1610 720 C1556 726 1512 782 1494 862 C1530 836 1572 808 1610 800 Z" fill="#82a08f" stroke="none"/>
+    <path d="M1560 1210 C1556 1100 1560 980 1585 890" fill="none" stroke-width="4"/>
+    <path d="M1518 1210 C1510 1100 1512 980 1528 900" fill="none" stroke="#7a9686" stroke-width="3" stroke-dasharray="9 8"/>
+    <path d="M1115 950 L1115 1140 C1180 1160 1270 1160 1335 1140 L1335 950 Z" fill="#f9cba6"/>
+    <path d="M1118 1000 L1332 1000 L1332 1075 C1270 1100 1180 1100 1118 1075 Z" fill="#efb38c" stroke="none"/>
+    <path d="M990 985 C1040 1105 1130 1148 1224 1148 C1320 1148 1410 1110 1462 1000 Q1486 992 1494 1018 C1448 1150 1345 1195 1224 1195 C1100 1195 1000 1150 958 1005 Q966 980 990 985 Z" fill="#b2cdbd"/>
+  </g>
+  <g fill="none" stroke-linecap="round">
+    <path d="M1169 1176 C1166 1192 1164 1204 1163 1215 M1279 1176 C1282 1192 1284 1204 1285 1215" stroke="#26232e" stroke-width="12"/>
+    <path d="M1169 1176 C1166 1192 1164 1204 1163 1215 M1279 1176 C1282 1192 1284 1204 1285 1215" stroke="#f2f4f1" stroke-width="5.5"/>
+  </g>
+  <g stroke="#26232e" stroke-width="3.5">
+    <circle cx="1169" cy="1174" r="8" fill="#e3e8e5"/>
+    <circle cx="1279" cy="1174" r="8" fill="#e3e8e5"/>
+  </g>
+
+  <!-- his bright blue zip jacket -->
+  <g clip-path="url(#jacketClip)">
+    <rect x="200" y="820" width="760" height="400" fill="#2e8ff0"/>
+    <path d="M700 905 C690 1000 676 1110 668 1210 L960 1210 L905 840 Z" fill="#2179dc"/>
+    <path d="M200 1190 C320 1085 452 1000 600 935 C700 890 790 850 860 826 L866 868 C790 892 700 930 610 972 C480 1035 360 1110 280 1210 Z" fill="#63b1f7"/>
+    <path d="M760 880 C800 862 840 845 870 834 L900 840 L906 905 C860 912 810 905 760 880 Z" fill="#4aa0f4"/>
+    <g fill="none" stroke-linecap="round">
+      <path d="M766 884 C812 904 862 910 904 902 M700 905 C690 1000 676 1110 668 1210 M430 1036 C486 1080 526 1146 544 1210" stroke="#26232e" stroke-width="4"/>
+      <path d="M714 912 C704 1000 690 1110 682 1210 M446 1030 C502 1074 542 1140 560 1210" stroke="#9fd0fa" stroke-width="3" stroke-dasharray="10 9"/>
+      <path d="M744 1030 L842 1006" stroke="#26232e" stroke-width="9"/>
+      <path d="M744 1030 L842 1006" stroke="#b6c0cc" stroke-width="4" stroke-dasharray="3 6"/>
+    </g>
+    <path d="M838 1000 L856 996 L862 1022 L844 1026 Z" fill="#c9d1d9" stroke="#26232e" stroke-width="3.5" stroke-linejoin="round"/>
+  </g>
+  <path d="M215 1210 C320 1105 450 1018 600 950 C700 905 790 866 852 842 C868 836 884 840 890 856 C900 920 912 1040 930 1210" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M886 866 C895 930 906 1040 921 1210" fill="none" stroke="#26232e" stroke-width="12"/>
+  <path d="M886 866 C895 930 906 1040 921 1210" fill="none" stroke="#b6c0cc" stroke-width="5" stroke-dasharray="4 7"/>
+  <g stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <rect x="878" y="886" width="24" height="30" rx="6" fill="#c9d1d9"/>
+    <path d="M884 914 L880 960 C880 968 898 968 898 960 L896 914 Z" fill="#c9d1d9"/>
+  </g>
+  <path d="M1610 975 C1578 1030 1556 1110 1546 1210 L1610 1210 Z" fill="#2e8ff0" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M1603 992 C1574 1044 1558 1118 1552 1210" fill="none" stroke="#26232e" stroke-width="12"/>
+  <path d="M1603 992 C1574 1044 1558 1118 1552 1210" fill="none" stroke="#b6c0cc" stroke-width="5" stroke-dasharray="4 7"/>
+
+  <!-- TODD's head, tipped a little in surprise -->
+  <g transform="translate(-14 0) rotate(4 1270 620)">
+    <g stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+      <ellipse cx="965" cy="600" rx="34" ry="58" fill="#f9cba6" stroke-width="6"/>
+      <ellipse cx="1575" cy="600" rx="34" ry="58" fill="#f9cba6" stroke-width="6"/>
+      <path d="M972 568 C956 580 955 618 970 634 C978 620 980 585 972 568 Z M1568 568 C1584 580 1585 618 1570 634 C1562 620 1560 585 1568 568 Z" fill="#efb38c" stroke="none"/>
+      <path d="M974 562 C950 574 948 620 970 640 M1566 562 C1590 574 1592 620 1570 640" fill="none" stroke-width="4"/>
+    </g>
+    <path d="M1270 150 C1440 150 1565 280 1568 480 C1572 640 1560 800 1500 920 C1440 1030 1360 1078 1270 1078 C1180 1078 1100 1030 1040 920 C980 800 968 640 972 480 C975 280 1100 150 1270 150 Z" fill="#f9cba6"/>
+    <g clip-path="url(#headClip)">
+      <path d="M940 360 C1000 450 1010 660 1060 820 C1100 950 1170 1035 1270 1090 L930 1100 Z" fill="#f1b993"/>
+      <ellipse cx="1225" cy="230" rx="105" ry="42" transform="rotate(-10 1225 230)" fill="#ffe4c9"/>
+      <ellipse cx="1372" cy="215" rx="24" ry="11" transform="rotate(28 1372 215)" fill="#fff2e4"/>
+    </g>
+    <path d="M1270 150 C1440 150 1565 280 1568 480 C1572 640 1560 800 1500 920 C1440 1030 1360 1078 1270 1078 C1180 1078 1100 1030 1040 920 C980 800 968 640 972 480 C975 280 1100 150 1270 150 Z" fill="none" stroke="#26232e" stroke-width="6"/>
+
+    <!-- wispy gray-white hair, fluffed up in surprise -->
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M1214 178 C1202 158 1208 138 1224 128" stroke="#26232e" stroke-width="11"/>
+      <path d="M1214 178 C1202 158 1208 138 1224 128" stroke="#eceae4" stroke-width="5"/>
+    </g>
+    <g stroke="#26232e" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M1232 168 C1226 146 1236 130 1252 122 C1252 136 1258 144 1266 146 C1264 124 1276 104 1296 94 C1294 112 1300 128 1310 134 C1314 116 1328 102 1348 98 C1342 114 1344 128 1354 136 C1366 124 1384 118 1402 120 C1390 134 1388 152 1394 166 C1392 176 1388 182 1384 186 C1340 176 1290 168 1232 168 Z" fill="#eceae4"/>
+      <path d="M1282 160 C1284 146 1290 134 1298 126 M1330 162 C1334 150 1340 140 1348 134" fill="none" stroke="#c4beb3" stroke-width="3.5"/>
+      <path d="M1008 338 C986 332 962 342 946 362 C960 366 965 374 962 382 C944 390 934 406 931 426 C946 426 954 434 953 444 C939 456 935 476 937 496 C951 491 961 497 965 506 C961 521 964 536 974 549 C986 540 996 520 1001 500 C1005 450 1009 382 1013 346 Z" fill="#eceae4"/>
+      <path d="M1532 338 C1554 332 1578 342 1594 362 C1580 366 1575 374 1578 382 C1596 390 1606 406 1609 426 C1594 426 1586 434 1587 444 C1601 456 1605 476 1603 496 C1589 491 1579 497 1575 506 C1579 521 1576 536 1566 549 C1554 540 1544 520 1539 500 C1535 450 1531 382 1527 346 Z" fill="#eceae4"/>
+      <path d="M985 380 C975 400 970 420 968 440 M990 450 C982 470 978 490 976 510 M1555 380 C1565 400 1570 420 1572 440 M1550 450 C1558 470 1562 490 1564 510" fill="none" stroke="#c4beb3" stroke-width="3.5"/>
+    </g>
+
+    <!-- forehead wrinkles and raised eyebrows -->
+    <path d="M1175 296 C1210 284 1245 292 1272 287 C1300 282 1335 286 1368 296 M1195 330 C1225 320 1255 327 1275 323 C1298 318 1322 321 1348 330" fill="none" stroke="#db9470" stroke-width="5" stroke-linecap="round"/>
+    <g fill="#c9c3b8" stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+      <path d="M1062 428 C1078 385 1140 366 1196 398 C1192 410 1184 414 1176 410 C1136 390 1096 400 1076 432 C1070 436 1064 434 1062 428 Z"/>
+      <path d="M1478 428 C1462 385 1400 366 1344 398 C1348 410 1356 414 1364 410 C1404 390 1444 400 1464 432 C1470 436 1476 434 1478 428 Z"/>
+    </g>
+
+    <!-- big round whoa eyes -->
+    <g stroke="#26232e">
+      <ellipse cx="1130" cy="532" rx="50" ry="58" fill="#ffffff" stroke-width="5"/>
+      <ellipse cx="1410" cy="532" rx="50" ry="58" fill="#ffffff" stroke-width="5"/>
+      <circle cx="1130" cy="536" r="25" fill="#4b93dc" stroke-width="3"/>
+      <circle cx="1410" cy="536" r="25" fill="#4b93dc" stroke-width="3"/>
+    </g>
+    <circle cx="1130" cy="536" r="12" fill="#26232e"/>
+    <circle cx="1410" cy="536" r="12" fill="#26232e"/>
+    <circle cx="1139" cy="527" r="6" fill="#ffffff"/>
+    <circle cx="1419" cy="527" r="6" fill="#ffffff"/>
+    <circle cx="1122" cy="546" r="3" fill="#ffffff"/>
+    <circle cx="1402" cy="546" r="3" fill="#ffffff"/>
+
+    <!-- rimless glasses -->
+    <g fill="none" stroke-linecap="round">
+      <path d="M1222 478 C1245 462 1295 462 1318 478 M1036 480 L966 546 M1504 480 L1574 546" stroke="#26232e" stroke-width="10"/>
+      <path d="M1222 478 C1245 462 1295 462 1318 478 M1036 480 L966 546 M1504 480 L1574 546" stroke="#b9c3cc" stroke-width="4"/>
+    </g>
+    <g fill="#d8f0ff" fill-opacity="0.3" stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+      <path d="M1046 462 C1094 450 1176 450 1218 460 C1236 496 1236 568 1214 598 C1170 614 1084 614 1050 600 C1028 568 1026 496 1046 462 Z"/>
+      <path d="M1494 462 C1446 450 1364 450 1322 460 C1304 496 1304 568 1326 598 C1370 614 1456 614 1490 600 C1512 568 1514 496 1494 462 Z"/>
+    </g>
+    <path d="M1056 492 C1060 478 1070 471 1084 469 M1336 492 C1340 478 1350 471 1364 469" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="1052" cy="512" r="4" fill="#ffffff"/>
+    <circle cx="1332" cy="512" r="4" fill="#ffffff"/>
+
+    <!-- nose -->
+    <path d="M1250 595 C1244 630 1216 666 1212 702 C1208 736 1238 750 1270 750 C1302 750 1332 736 1328 702 C1324 666 1296 630 1290 595 Z" fill="#f6b992"/>
+    <ellipse cx="1290" cy="690" rx="13" ry="9" fill="#ffdcc0"/>
+    <path d="M1240 632 C1222 660 1210 684 1212 708 C1216 738 1242 750 1270 750 C1298 750 1324 738 1328 708 C1330 684 1318 660 1300 632" fill="none" stroke="#26232e" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="1251" cy="730" rx="9" ry="6" fill="#7b3a32"/>
+    <ellipse cx="1289" cy="730" rx="9" ry="6" fill="#7b3a32"/>
+
+    <!-- cheeks and freckles -->
+    <ellipse cx="1075" cy="690" rx="42" ry="24" fill="#f7a493"/>
+    <ellipse cx="1465" cy="690" rx="42" ry="24" fill="#f7a493"/>
+    <g fill="#e0956d">
+      <circle cx="1050" cy="655" r="3.5"/><circle cx="1072" cy="646" r="3.5"/><circle cx="1094" cy="658" r="3.5"/>
+      <circle cx="1490" cy="655" r="3.5"/><circle cx="1468" cy="646" r="3.5"/><circle cx="1446" cy="658" r="3.5"/>
+    </g>
+    <path d="M1172 760 C1155 790 1150 830 1156 862 M1368 760 C1385 790 1390 830 1384 862 M1238 1012 C1255 1022 1285 1022 1302 1012" fill="none" stroke="#db9470" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- the big O of a mouth -->
+    <path d="M1270 808 C1334 808 1366 848 1366 890 C1366 938 1324 968 1270 968 C1216 968 1174 938 1174 890 C1174 848 1206 808 1270 808 Z" fill="#7d2432"/>
+    <g clip-path="url(#mouthClip)">
+      <path d="M1160 790 L1380 790 L1380 836 C1330 848 1210 848 1160 836 Z" fill="#ffffff"/>
+      <path d="M1160 836 C1210 848 1330 848 1380 836" fill="none" stroke="#26232e" stroke-width="3"/>
+      <ellipse cx="1270" cy="962" rx="68" ry="38" fill="#f07474"/>
+      <path d="M1270 938 L1270 955" stroke="#d24f57" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <path d="M1270 808 C1334 808 1366 848 1366 890 C1366 938 1324 968 1270 968 C1216 968 1174 938 1174 890 C1174 848 1206 808 1270 808 Z" fill="none" stroke="#26232e" stroke-width="6"/>
+  </g>
+</svg>

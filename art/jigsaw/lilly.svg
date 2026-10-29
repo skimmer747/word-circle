@@ -1,0 +1,484 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <!-- a puffy cloud -->
+    <g id="cloud">
+      <path d="M10 70 C-10 70 -12 40 12 36 C14 10 50 0 70 18 C84 -6 130 -4 140 24 C168 20 184 48 170 66 C168 74 160 78 150 78 L20 78 C14 78 10 74 10 70 Z" fill="#ffffff" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M22 66 L156 66 C150 72 146 72 140 72 L28 72 Z" fill="#dcecf8"/>
+    </g>
+    <!-- grass tufts in two greens -->
+    <path id="tuftD" d="M-18 0 C-17 -12 -14 -21 -8 -28 C-8 -18 -7 -8 -5 0 Z M-6 0 C-4 -16 0 -30 5 -38 C7 -26 7 -12 6 0 Z M5 0 C9 -12 14 -21 21 -26 C17 -16 15 -8 15 0 Z" fill="#3e9a27" stroke="#26232e" stroke-width="3" stroke-linejoin="round"/>
+    <path id="tuftL" d="M-18 0 C-17 -12 -14 -21 -8 -28 C-8 -18 -7 -8 -5 0 Z M-6 0 C-4 -16 0 -30 5 -38 C7 -26 7 -12 6 0 Z M5 0 C9 -12 14 -21 21 -26 C17 -16 15 -8 15 0 Z" fill="#9be35f" stroke="#26232e" stroke-width="3" stroke-linejoin="round"/>
+    <!-- a white daisy -->
+    <g id="daisy" stroke="#26232e" stroke-width="3" stroke-linejoin="round">
+      <ellipse cx="0" cy="-13" rx="6.5" ry="11" fill="#ffffff"/>
+      <ellipse cx="0" cy="-13" rx="6.5" ry="11" fill="#ffffff" transform="rotate(45)"/>
+      <ellipse cx="0" cy="-13" rx="6.5" ry="11" fill="#ffffff" transform="rotate(90)"/>
+      <ellipse cx="0" cy="-13" rx="6.5" ry="11" fill="#ffffff" transform="rotate(135)"/>
+      <ellipse cx="0" cy="-13" rx="6.5" ry="11" fill="#ffffff" transform="rotate(180)"/>
+      <ellipse cx="0" cy="-13" rx="6.5" ry="11" fill="#ffffff" transform="rotate(225)"/>
+      <ellipse cx="0" cy="-13" rx="6.5" ry="11" fill="#ffffff" transform="rotate(270)"/>
+      <ellipse cx="0" cy="-13" rx="6.5" ry="11" fill="#ffffff" transform="rotate(315)"/>
+      <circle r="8" fill="#ffd23f"/>
+    </g>
+    <!-- a yellow buttercup -->
+    <g id="buttercup" stroke="#26232e" stroke-width="3" stroke-linejoin="round">
+      <circle cx="0" cy="-9" r="8" fill="#ffe14a"/>
+      <circle cx="8.6" cy="-2.8" r="8" fill="#ffe14a"/>
+      <circle cx="5.3" cy="7.3" r="8" fill="#ffe14a"/>
+      <circle cx="-5.3" cy="7.3" r="8" fill="#ffe14a"/>
+      <circle cx="-8.6" cy="-2.8" r="8" fill="#ffe14a"/>
+      <circle r="4.5" fill="#f29b1f"/>
+    </g>
+    <!-- a little pink flower -->
+    <g id="pinkflower" stroke="#26232e" stroke-width="3" stroke-linejoin="round">
+      <circle cx="0" cy="-9" r="8" fill="#ff7eb6"/>
+      <circle cx="8.6" cy="-2.8" r="8" fill="#ff7eb6"/>
+      <circle cx="5.3" cy="7.3" r="8" fill="#ff7eb6"/>
+      <circle cx="-5.3" cy="7.3" r="8" fill="#ff7eb6"/>
+      <circle cx="-8.6" cy="-2.8" r="8" fill="#ff7eb6"/>
+      <circle r="4.5" fill="#ffffff"/>
+    </g>
+    <!-- a three-leaf clover -->
+    <g id="clover" stroke="#26232e" stroke-width="3" stroke-linejoin="round">
+      <path d="M0 0 C-2 10 -2 18 2 26" fill="none" stroke-linecap="round"/>
+      <path d="M0 0 C-6 -8 -4 -20 6 -18 C14 -16 12 -6 0 0 Z" fill="#3f9b3a" transform="rotate(-10)"/>
+      <path d="M0 0 C-6 -8 -4 -20 6 -18 C14 -16 12 -6 0 0 Z" fill="#3f9b3a" transform="rotate(110)"/>
+      <path d="M0 0 C-6 -8 -4 -20 6 -18 C14 -16 12 -6 0 0 Z" fill="#3f9b3a" transform="rotate(230)"/>
+    </g>
+    <!-- a white sparkle -->
+    <path id="sparkle" d="M0 -16 C2 -5 5 -2 16 0 C5 2 2 5 0 16 C-2 5 -5 2 -16 0 C-5 -2 -2 -5 0 -16 Z" fill="#ffffff"/>
+    <!-- butterflies -->
+    <g id="butterflyO" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-3 -4 C-20 -36 -54 -38 -56 -14 C-58 4 -30 8 -3 2 Z" fill="#ff8a2a" stroke-width="4"/>
+      <path d="M3 -4 C20 -36 54 -38 56 -14 C58 4 30 8 3 2 Z" fill="#ff8a2a" stroke-width="4"/>
+      <path d="M-3 2 C-26 6 -44 22 -36 36 C-26 46 -8 30 -3 10 Z" fill="#ffb347" stroke-width="4"/>
+      <path d="M3 2 C26 6 44 22 36 36 C26 46 8 30 3 10 Z" fill="#ffb347" stroke-width="4"/>
+      <g fill="#ffe14a" stroke="none"><circle cx="-34" cy="-18" r="6"/><circle cx="34" cy="-18" r="6"/><circle cx="-24" cy="24" r="4.5"/><circle cx="24" cy="24" r="4.5"/></g>
+      <ellipse cx="0" cy="2" rx="5" ry="20" fill="#26232e" stroke="none"/>
+      <path d="M-2 -16 C-6 -28 -12 -34 -18 -36 M2 -16 C6 -28 12 -34 18 -36" fill="none" stroke-width="3"/>
+      <circle cx="-18" cy="-36" r="3" fill="#26232e" stroke="none"/><circle cx="18" cy="-36" r="3" fill="#26232e" stroke="none"/>
+    </g>
+    <g id="butterflyB" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-3 -4 C-20 -36 -54 -38 -56 -14 C-58 4 -30 8 -3 2 Z" fill="#5fb4ff" stroke-width="4"/>
+      <path d="M3 -4 C20 -36 54 -38 56 -14 C58 4 30 8 3 2 Z" fill="#5fb4ff" stroke-width="4"/>
+      <path d="M-3 2 C-26 6 -44 22 -36 36 C-26 46 -8 30 -3 10 Z" fill="#9fd2ff" stroke-width="4"/>
+      <path d="M3 2 C26 6 44 22 36 36 C26 46 8 30 3 10 Z" fill="#9fd2ff" stroke-width="4"/>
+      <g fill="#ffffff" stroke="none"><circle cx="-34" cy="-18" r="6"/><circle cx="34" cy="-18" r="6"/><circle cx="-24" cy="24" r="4.5"/><circle cx="24" cy="24" r="4.5"/></g>
+      <ellipse cx="0" cy="2" rx="5" ry="20" fill="#26232e" stroke="none"/>
+      <path d="M-2 -16 C-6 -28 -12 -34 -18 -36 M2 -16 C6 -28 12 -34 18 -36" fill="none" stroke-width="3"/>
+      <circle cx="-18" cy="-36" r="3" fill="#26232e" stroke="none"/><circle cx="18" cy="-36" r="3" fill="#26232e" stroke="none"/>
+    </g>
+
+    <clipPath id="waterClip"><path d="M-10 410 L380 398 L1040 416 L980 448 L-10 584 Z"/></clipPath>
+    <clipPath id="bandClip"><path d="M-10 410 L380 398 L1040 416 L1016 429 L380 414 L-10 426 Z"/></clipPath>
+    <clipPath id="tailClip"><path d="M404 948 C340 926 270 926 220 948 C184 964 160 988 154 1010 C150 1026 160 1036 176 1032 Q186 1054 208 1050 Q224 1074 248 1062 Q268 1084 292 1068 Q314 1088 338 1072 Q362 1088 384 1068 C410 1044 420 990 404 948 Z"/></clipPath>
+    <clipPath id="bodyClip"><path d="M790 740 C690 744 560 776 480 820 C404 862 360 920 362 984 C364 1044 410 1084 480 1092 L1050 1094 C1096 1060 1110 990 1098 930 C1086 866 1056 820 1010 796 Z"/></clipPath>
+    <clipPath id="haunchClip"><path d="M470 1092 C446 1010 474 920 560 896 C650 872 736 924 744 1008 C748 1046 738 1074 720 1092 Z"/></clipPath>
+    <clipPath id="headClip"><path d="M900 566 C994 566 1062 626 1066 706 C1070 784 1032 846 972 874 C940 888 860 888 828 874 C768 846 730 784 734 706 C738 626 806 566 900 566 Z"/></clipPath>
+  </defs>
+
+  <!-- sky, sun and clouds -->
+  <rect width="1600" height="160" fill="#8fd3f7"/>
+  <g stroke-linecap="round">
+    <path d="M70 6 V-12 M70 94 V112 M26 50 H8 M114 50 H132 M39 19 L26 6 M101 81 L114 94 M101 19 L114 6 M39 81 L26 94" stroke="#26232e" stroke-width="14"/>
+    <path d="M70 6 V-12 M70 94 V112 M26 50 H8 M114 50 H132 M39 19 L26 6 M101 81 L114 94 M101 19 L114 6 M39 81 L26 94" stroke="#ffd84a" stroke-width="7"/>
+  </g>
+  <circle cx="70" cy="50" r="34" fill="#ffd84a" stroke="#26232e" stroke-width="6"/>
+  <circle cx="62" cy="42" r="16" fill="#ffe98a"/>
+  <use xlink:href="#cloud" transform="translate(150 18) scale(0.62)"/>
+  <use xlink:href="#cloud" transform="translate(806 2) scale(0.56)"/>
+  <use xlink:href="#cloud" transform="translate(1462 14) scale(0.6)"/>
+
+  <!-- far shore lined with trees -->
+  <path d="M-10 110 C0.5 92 49.5 92 60 108 C73.5 96 136.5 96 150 110 C159 90 201 90 210 112 C226.5 98 303.5 98 320 108 C332 94 388 94 400 110 C410.5 92 459.5 92 470 112 C485 96 555 96 570 108 C579 90 621 90 630 110 C643.5 98 706.5 98 720 112 C732 94 788 94 800 108 C816.5 92 893.5 92 910 110 C920.5 96 969.5 96 980 112 C993.5 90 1056.5 90 1070 108 C1079 98 1121 98 1130 110 C1145 94 1215 94 1230 112 C1242 92 1298 92 1310 108 C1320.5 96 1369.5 96 1380 110 C1393.5 90 1456.5 90 1470 112 C1486.5 98 1563.5 98 1580 108 C1589 94 1631 94 1640 110 L1610 142 L-10 142 Z" fill="#2f7a3d" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <g fill="#3f9a4a">
+    <ellipse cx="30" cy="104" rx="20" ry="6"/><ellipse cx="180" cy="104" rx="18" ry="6"/><ellipse cx="350" cy="104" rx="18" ry="6"/>
+    <ellipse cx="600" cy="104" rx="18" ry="6"/><ellipse cx="860" cy="104" rx="24" ry="6"/><ellipse cx="1025" cy="104" rx="20" ry="6"/>
+    <ellipse cx="1270" cy="104" rx="20" ry="6"/><ellipse cx="1425" cy="104" rx="20" ry="6"/><ellipse cx="1540" cy="108" rx="22" ry="6"/>
+  </g>
+
+  <!-- the wide blue lake -->
+  <rect x="-10" y="139" width="1620" height="200" fill="#2f8ad6"/>
+  <path d="M-10 139 H1610" stroke="#26232e" stroke-width="5"/>
+  <g stroke="#b9e6ff" stroke-width="6" stroke-linecap="round">
+    <path d="M20 160 h70 M200 172 h90 M740 160 h60 M1010 168 h80 M1180 158 h60 M1330 176 h90 M60 230 h90 M300 220 h70 M1080 222 h90 M1300 236 h80 M1460 226 h90 M160 316 h60 M1140 300 h70 M1400 312 h90 M560 312 h60"/>
+  </g>
+
+  <!-- a little sailboat far out on the lake -->
+  <g stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M1540 184 V100" stroke-width="5"/>
+    <path d="M1544 106 L1544 176 L1592 176 Z" fill="#ffffff" stroke-width="5"/>
+    <path d="M1536 118 L1536 176 L1498 176 Z" fill="#ffd84a" stroke-width="5"/>
+    <path d="M1540 100 L1558 94 L1540 88 Z" fill="#e8343a" stroke-width="3"/>
+    <path d="M1490 182 L1590 182 L1576 198 L1504 198 Z" fill="#e8343a" stroke-width="5"/>
+  </g>
+  <path d="M1486 205 h28 M1562 205 h30" stroke="#b9e6ff" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- the roofed boathouse -->
+  <g stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <g fill="#a46c3e" stroke-width="5">
+      <rect x="704" y="128" width="16" height="136"/>
+      <rect x="788" y="128" width="16" height="136"/>
+      <rect x="876" y="128" width="16" height="136"/>
+      <rect x="960" y="128" width="16" height="136"/>
+    </g>
+    <!-- a bench under the roof -->
+    <rect x="812" y="214" width="56" height="12" rx="3" fill="#c98d55" stroke-width="4"/>
+    <rect x="806" y="234" width="68" height="10" rx="3" fill="#c98d55" stroke-width="4"/>
+    <path d="M816 244 V262 M864 244 V262 M820 226 V234 M860 226 V234" stroke-width="4"/>
+    <path d="M690 122 L772 72 L908 72 L990 122 Z" fill="#6b7487" stroke-width="6"/>
+    <path d="M744 92 H936 M720 108 H960" stroke="#8a93a6" stroke-width="5"/>
+    <rect x="680" y="118" width="320" height="14" rx="3" fill="#ffffff" stroke-width="5"/>
+  </g>
+  <!-- life ring on the corner post -->
+  <circle cx="968" cy="194" r="13" fill="none" stroke="#ff6a3d" stroke-width="12"/>
+  <circle cx="968" cy="194" r="13" fill="none" stroke="#ffffff" stroke-width="12" stroke-dasharray="10.2 10.2"/>
+  <circle cx="968" cy="194" r="19" fill="none" stroke="#26232e" stroke-width="4"/>
+  <circle cx="968" cy="194" r="7" fill="none" stroke="#26232e" stroke-width="4"/>
+
+  <!-- the long wooden dock -->
+  <g stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <g stroke="#7a4f2e" stroke-width="7">
+      <path d="M49 298 L169 332 M169 298 L49 332 M289 298 L409 332 M409 298 L289 332 M769 298 L889 332 M889 298 L769 332"/>
+    </g>
+    <g fill="#8a5c38" stroke-width="5">
+      <rect x="40" y="288" width="18" height="50"/>
+      <rect x="160" y="288" width="18" height="50"/>
+      <rect x="280" y="288" width="18" height="50"/>
+      <rect x="400" y="288" width="18" height="50"/>
+      <rect x="520" y="288" width="18" height="50"/>
+      <rect x="640" y="288" width="18" height="50"/>
+      <rect x="760" y="288" width="18" height="50"/>
+      <rect x="880" y="288" width="18" height="50"/>
+      <rect x="1000" y="288" width="18" height="50"/>
+    </g>
+    <rect x="-10" y="262" width="1046" height="28" fill="#b77c48" stroke-width="6"/>
+    <rect x="-10" y="262" width="1046" height="9" fill="#e0aa72" stroke-width="4"/>
+    <path d="M60 271 V290 M140 271 V290 M220 271 V290 M300 271 V290 M380 271 V290 M460 271 V290 M540 271 V290 M620 271 V290 M700 271 V290 M780 271 V290 M860 271 V290 M940 271 V290" stroke="#8f5c34" stroke-width="4"/>
+  </g>
+
+  <!-- grassy shore behind the fence, with tall reeds -->
+  <path d="M-10 330 C200 322 400 334 600 326 C800 320 1000 332 1200 326 C1400 322 1500 330 1610 326 L1610 400 L-10 400 Z" fill="#4fa52b" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="#3e9a27" stroke="#26232e" stroke-width="3" stroke-linejoin="round">
+    <path d="M10 334 L18 296 L24 334 Z M22 334 L34 284 L38 334 Z M36 334 L50 300 L50 334 Z"/>
+    <path d="M220 330 L228 292 L234 330 Z M232 330 L244 280 L248 330 Z M246 330 L260 298 L260 330 Z"/>
+    <path d="M574 330 L582 294 L588 330 Z M586 330 L598 284 L602 330 Z M600 330 L614 300 L614 330 Z"/>
+    <path d="M940 330 L948 294 L954 330 Z M952 330 L964 282 L968 330 Z M966 330 L980 300 L980 330 Z"/>
+    <path d="M1100 330 L1108 292 L1114 330 Z M1112 330 L1124 282 L1128 330 Z M1126 330 L1140 298 L1140 330 Z"/>
+    <path d="M1362 328 L1370 292 L1376 328 Z M1374 328 L1386 280 L1390 328 Z M1388 328 L1402 298 L1402 328 Z"/>
+    <path d="M1530 330 L1538 294 L1544 330 Z M1542 330 L1554 284 L1558 330 Z M1556 330 L1570 300 L1570 330 Z"/>
+  </g>
+
+  <!-- tall cypress trees: trunks -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <path d="M404 140 C402 240 398 300 390 336 C384 356 370 370 350 380 L486 380 C466 370 454 354 450 336 C444 300 442 240 444 140 Z" fill="#7d5c44"/>
+    <path d="M624 140 C624 240 622 300 616 336 C612 356 600 368 584 376 L702 376 C686 368 674 356 670 336 C664 300 662 240 662 140 Z" fill="#7d5c44"/>
+    <path d="M1226 140 C1226 250 1222 310 1214 346 C1208 366 1196 380 1176 390 L1314 390 C1294 380 1282 366 1276 346 C1268 310 1266 250 1266 140 Z" fill="#7d5c44"/>
+  </g>
+  <g fill="none" stroke="#5e4330" stroke-width="4" stroke-linecap="round">
+    <path d="M418 200 C416 250 416 300 410 340 M432 230 C432 280 434 320 440 352 M638 210 C638 260 636 310 630 348 M1240 200 C1240 260 1238 320 1230 360 M1254 240 C1254 290 1256 330 1262 366"/>
+  </g>
+  <!-- branches of the right-hand tree -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M1246 230 C1200 200 1150 184 1104 172 M1250 210 C1300 186 1350 176 1396 170" stroke="#26232e" stroke-width="22"/>
+    <path d="M1246 230 C1200 200 1150 184 1104 172 M1250 210 C1300 186 1350 176 1396 170" stroke="#7d5c44" stroke-width="11"/>
+  </g>
+  <!-- feathery green tops -->
+  <g fill="#2e8a3e" stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <path d="M250 120 C220 80 250 30 300 30 C300 -10 360 -30 400 -10 C440 -40 520 -30 540 0 C580 -20 660 -10 680 30 C730 30 760 70 740 110 C770 140 740 180 700 170 C680 200 620 200 600 175 C570 200 510 195 490 170 C460 195 400 195 380 170 C340 190 280 180 270 150 C240 150 236 130 250 120 Z"/>
+    <path d="M1040 110 C1010 70 1050 30 1090 40 C1100 0 1170 -20 1210 0 C1250 -30 1330 -20 1350 20 C1400 10 1450 50 1440 90 C1470 120 1450 160 1410 160 C1390 190 1330 190 1310 165 C1280 190 1220 190 1200 165 C1170 185 1110 180 1100 155 C1060 160 1030 140 1040 110 Z"/>
+  </g>
+  <g fill="#3fa451">
+    <ellipse cx="350" cy="70" rx="56" ry="24"/><ellipse cx="520" cy="40" rx="64" ry="24"/><ellipse cx="650" cy="100" rx="50" ry="22"/>
+    <ellipse cx="440" cy="130" rx="50" ry="18"/><ellipse cx="1160" cy="60" rx="56" ry="22"/><ellipse cx="1330" cy="70" rx="60" ry="22"/><ellipse cx="1250" cy="130" rx="48" ry="16"/>
+  </g>
+  <g fill="none" stroke="#1f6e30" stroke-width="4" stroke-linecap="round">
+    <path d="M300 110 l14 -10 l14 10 M560 120 l14 -10 l14 10 M480 80 l14 -10 l14 10 M620 50 l14 -10 l14 10 M1100 110 l14 -10 l14 10 M1380 120 l14 -10 l14 10 M1220 30 l14 -10 l14 10 M1400 40 l14 -10 l14 10"/>
+  </g>
+  <!-- Spanish moss hanging from the branches -->
+  <g fill="none" stroke-width="11" stroke-linecap="round">
+    <g stroke="#b4c2a8">
+      <path d="M290 160 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M372 175 c-8 18 8 36 0 54 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M494 176 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M598 182 c-8 18 8 36 0 54 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M716 168 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M1100 162 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M1196 172 c-8 18 8 36 0 54 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M1316 172 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M1420 164 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+    </g>
+    <g stroke="#97a98c">
+      <path d="M330 172 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M538 182 c-8 18 8 36 0 54"/>
+      <path d="M680 180 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M1146 172 c-8 18 8 36 0 54"/>
+      <path d="M1364 176 c-8 18 8 36 0 54 c-8 18 8 36 0 54"/>
+      <path d="M460 182 c-8 18 8 36 0 54"/>
+    </g>
+  </g>
+
+  <!-- the dark iron fence -->
+  <path d="M-10 362 L1610 394 L1610 1210 L-10 1210 Z" fill="#6cc83f"/>
+  <g stroke="#26232e" stroke-linecap="round">
+    <path d="M18 208 V360 M54 208 V361 M90 208 V362 M126 208 V363 M162 208 V363 M198 208 V364 M234 208 V365 M270 208 V365 M306 208 V366 M342 208 V367 M378 208 V368 M414 208 V368 M450 208 V369 M486 208 V370 M522 208 V370 M558 208 V371 M594 208 V372 M630 208 V373 M666 208 V373 M702 208 V374 M738 208 V375 M774 208 V375 M810 208 V376 M846 208 V377 M882 208 V378 M918 208 V378 M954 208 V379 M990 208 V380 M1026 208 V381 M1062 208 V381 M1098 208 V382 M1134 208 V383 M1170 208 V383 M1206 208 V384 M1242 208 V385 M1278 208 V386 M1314 208 V386 M1350 208 V387 M1386 208 V388 M1422 208 V388 M1458 208 V389 M1494 208 V390 M1530 208 V391 M1566 208 V391" stroke-width="5"/>
+    <path d="M-10 208 H1610 M-10 228 H1610" stroke-width="8"/>
+    <path d="M-10 360 L1610 392" stroke-width="8"/>
+  </g>
+  <g fill="#3b3842" stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <rect x="155" y="200" width="14" height="166" rx="3"/>
+    <rect x="443" y="200" width="14" height="172" rx="3"/>
+    <rect x="731" y="200" width="14" height="178" rx="3"/>
+    <rect x="1019" y="200" width="14" height="184" rx="3"/>
+    <rect x="1307" y="200" width="14" height="190" rx="3"/>
+    <rect x="1583" y="200" width="14" height="196" rx="3"/>
+    <circle cx="162" cy="194" r="9"/><circle cx="450" cy="194" r="9"/><circle cx="738" cy="194" r="9"/>
+    <circle cx="1026" cy="194" r="9"/><circle cx="1314" cy="194" r="9"/><circle cx="1590" cy="194" r="9"/>
+  </g>
+
+  <!-- the lawn: lighter and darker patches, and the tree shade on the right -->
+  <g fill="#5fbb35">
+    <path d="M-10 700 C150 680 300 700 420 690 C380 730 200 740 -10 760 Z"/>
+    <path d="M1100 640 C1250 610 1450 620 1610 600 L1610 680 C1450 690 1250 690 1100 640 Z"/>
+    <path d="M1280 900 C1400 880 1500 890 1610 870 L1610 940 C1500 950 1380 940 1280 900 Z"/>
+    <path d="M-10 900 C60 890 120 900 170 920 C110 950 50 950 -10 960 Z"/>
+  </g>
+  <path d="M1090 474 C1250 446 1450 424 1610 412 L1610 530 C1500 540 1380 512 1260 520 C1180 526 1120 506 1090 474 Z" fill="#55ad2c"/>
+
+  <!-- the pool: stone border, tiles and turquoise water -->
+  <path d="M-10 380 L372 370 L1476 402 Q1490 408 1478 416 L-10 628 Z" fill="#f6e7c6" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g stroke="#d9c49a" stroke-width="4" stroke-linecap="round">
+    <path d="M60 378 V408 M160 376 V405 M260 373 V402 M360 370 V399 M460 373 V400 M560 375 V403 M660 378 V406 M760 381 V408 M860 384 V411 M960 387 V414"/>
+    <path d="M1120 392 V467 M1200 394 V455 M1280 396 V444 M1360 399 V432 M1430 401 V422"/>
+    <path d="M40 577 V621 M140 563 V607 M240 550 V592 M340 536 V578 M440 522 V564 M540 508 V550 M640 495 V535 M740 481 V521 M840 467 V507 M940 454 V493"/>
+  </g>
+  <path d="M-10 410 L380 398 L1040 416 L980 448 L-10 584 Z" fill="#3cc8dc"/>
+  <g clip-path="url(#waterClip)">
+    <path d="M-10 540 C200 520 500 480 1000 440 L1000 470 L-10 600 Z" fill="#2fb2cc"/>
+    <path d="M40 470 C90 450 160 458 200 470 C160 486 90 488 40 470 Z M300 450 C360 434 430 440 470 452 C420 466 350 466 300 450 Z M640 440 C690 428 760 432 800 442 C760 454 690 454 640 440 Z M520 500 C570 488 640 490 680 498 C640 510 570 512 520 500 Z M120 540 C170 528 230 530 270 538 C230 550 170 552 120 540 Z" fill="#6fdcea"/>
+    <path d="M-10 410 L380 398 L1040 416 L1016 429 L380 414 L-10 426 Z" fill="#1a8fb8"/>
+    <g clip-path="url(#bandClip)" stroke="#7fe0ef" stroke-width="3">
+      <path d="M10 411 V423 M36 411 V423 M62 410 V422 M88 409 V421 M114 408 V420 M140 407 V419 M166 407 V419 M192 406 V418 M218 405 V417 M244 404 V416 M270 403 V415 M296 403 V415 M322 402 V414 M348 401 V413 M374 400 V412 M400 401 V413 M426 401 V413 M452 402 V414 M478 403 V415 M504 403 V415 M530 404 V416 M556 405 V417 M582 406 V418 M608 406 V418 M634 407 V419 M660 408 V420 M686 408 V420 M712 409 V421 M738 410 V422 M764 410 V422 M790 411 V423 M816 412 V424 M842 413 V425 M868 413 V425 M894 414 V426 M920 415 V427 M946 415 V427 M972 416 V428 M998 417 V429"/>
+    </g>
+    <g fill="none" stroke="#c4f6fa" stroke-width="5" stroke-linecap="round">
+      <path d="M300 500 q15 -8 30 0 t30 0 t30 0"/>
+      <path d="M700 460 q15 -8 30 0 t30 0 t30 0"/>
+      <path d="M40 520 q15 -8 30 0 t30 0"/>
+      <path d="M820 432 q15 -8 30 0 t30 0"/>
+      <path d="M420 540 q15 -8 30 0 t30 0"/>
+      <path d="M500 448 q12 -6 24 0 t24 0 M566 448 q12 -6 24 0"/>
+    </g>
+  </g>
+  <path d="M-10 410 L380 398 L1040 416 L980 448 L-10 584" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <use xlink:href="#sparkle" transform="translate(250 482)"/>
+  <use xlink:href="#sparkle" transform="translate(640 472) scale(0.8)"/>
+  <use xlink:href="#sparkle" transform="translate(880 440) scale(0.7)"/>
+  <use xlink:href="#sparkle" transform="translate(400 520) scale(0.7)"/>
+  <use xlink:href="#sparkle" transform="translate(90 548) scale(0.8)"/>
+
+  <!-- a striped swim ring floating in the pool -->
+  <g stroke="#26232e" stroke-linejoin="round">
+    <ellipse cx="160" cy="494" rx="62" ry="26" fill="#ff6fa5" stroke-width="6"/>
+    <path d="M118 474 L130 500 L110 514 L98 488 Z M200 474 L190 500 L210 514 L222 488 Z" fill="#ffffff" stroke="none"/>
+    <path d="M150 468 L170 468 L172 520 L148 520 Z" fill="#ffffff" stroke="none"/>
+    <ellipse cx="160" cy="494" rx="62" ry="26" fill="none" stroke-width="6"/>
+    <ellipse cx="160" cy="492" rx="24" ry="9" fill="#2fb2cc" stroke-width="5"/>
+  </g>
+
+  <!-- the little fountain jet -->
+  <g stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="545" cy="430" rx="40" ry="11" fill="#e8fcff" stroke-width="4"/>
+    <path d="M534 432 C537 400 539 362 540 330 L550 330 C551 362 553 400 556 432 Z" fill="#e8fcff" stroke-width="5"/>
+    <path d="M544 344 V424" stroke="#bdeefa" stroke-width="4"/>
+    <path d="M528 336 C516 332 516 314 530 312 C528 298 542 290 548 298 C556 290 572 298 566 312 C580 314 578 332 564 336 Z" fill="#ffffff" stroke-width="5"/>
+    <g fill="#e8fcff" stroke-width="3">
+      <path d="M514 318 C520 328 522 334 516 338 C510 336 508 328 514 318 Z"/>
+      <path d="M578 318 C584 328 586 334 580 338 C574 336 572 328 578 318 Z"/>
+      <path d="M504 350 C510 360 512 366 506 370 C500 368 498 360 504 350 Z"/>
+      <path d="M588 350 C594 360 596 366 590 370 C584 368 582 360 588 350 Z"/>
+      <path d="M498 384 C504 394 506 400 500 404 C494 402 492 394 498 384 Z"/>
+      <path d="M594 384 C600 394 602 400 596 404 C590 402 588 394 594 384 Z"/>
+    </g>
+  </g>
+
+  <!-- a great blue heron strolling on the lawn -->
+  <g transform="translate(-26 0)" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M1514 572 L1506 650 M1536 572 L1546 650" stroke-width="12" fill="none"/>
+    <path d="M1514 572 L1506 650 M1536 572 L1546 650" stroke="#d7a743" stroke-width="5" fill="none"/>
+    <path d="M1506 650 L1482 656 M1506 650 L1524 658 M1546 650 L1524 656 M1546 650 L1570 656" stroke-width="5" fill="none"/>
+    <path d="M1494 548 C1464 528 1500 500 1484 474 C1480 468 1476 464 1472 462" fill="none" stroke-width="24"/>
+    <path d="M1494 548 C1464 528 1500 500 1484 474 C1480 468 1476 464 1472 462" fill="none" stroke="#b8c7da" stroke-width="13"/>
+    <path d="M1474 552 C1484 524 1536 508 1576 524 C1592 532 1598 546 1592 556 L1606 580 L1572 574 C1540 584 1494 582 1482 570 C1472 564 1470 558 1474 552 Z" fill="#8fa5c0" stroke-width="6"/>
+    <path d="M1500 548 C1526 532 1566 530 1590 546 C1574 564 1534 572 1504 562 Z" fill="#6f87a6" stroke-width="4"/>
+    <path d="M1454 462 L1404 472 L1454 474 Z" fill="#f2b632" stroke-width="4"/>
+    <ellipse cx="1472" cy="460" rx="19" ry="15" fill="#f4f6f8" stroke-width="5"/>
+    <path d="M1460 450 C1470 442 1486 443 1492 452 L1518 446 L1490 462 C1482 456 1470 452 1460 450 Z" fill="#26232e" stroke-width="3"/>
+    <circle cx="1466" cy="460" r="4.5" fill="#26232e" stroke="none"/>
+    <circle cx="1467.5" cy="458.5" r="1.5" fill="#ffffff" stroke="none"/>
+  </g>
+
+  <!-- grass tufts and flowers on the lawn -->
+  <use xlink:href="#tuftD" transform="translate(60 680)"/>
+  <use xlink:href="#tuftL" transform="translate(210 650)"/>
+  <use xlink:href="#tuftD" transform="translate(340 700)"/>
+  <use xlink:href="#tuftL" transform="translate(440 640)"/>
+  <use xlink:href="#tuftD" transform="translate(600 600)"/>
+  <use xlink:href="#tuftL" transform="translate(760 580)"/>
+  <use xlink:href="#tuftD" transform="translate(940 540)"/>
+  <use xlink:href="#tuftL" transform="translate(1100 580)"/>
+  <use xlink:href="#tuftD" transform="translate(1250 560)"/>
+  <use xlink:href="#tuftL" transform="translate(1370 640)"/>
+  <use xlink:href="#tuftD" transform="translate(1530 700)"/>
+  <use xlink:href="#tuftL" transform="translate(1210 780)"/>
+  <use xlink:href="#tuftD" transform="translate(1340 820)"/>
+  <use xlink:href="#tuftL" transform="translate(1460 900)"/>
+  <use xlink:href="#tuftD" transform="translate(1560 990)"/>
+  <use xlink:href="#tuftL" transform="translate(1310 990)"/>
+  <use xlink:href="#tuftD" transform="translate(1420 1080)"/>
+  <use xlink:href="#tuftL" transform="translate(1560 1190)"/>
+  <use xlink:href="#tuftD" transform="translate(1340 1180)"/>
+  <use xlink:href="#tuftL" transform="translate(1180 1190)"/>
+  <use xlink:href="#tuftD" transform="translate(900 1190)"/>
+  <use xlink:href="#tuftL" transform="translate(720 1180)"/>
+  <use xlink:href="#tuftD" transform="translate(520 1190)"/>
+  <use xlink:href="#tuftL" transform="translate(330 1180)"/>
+  <use xlink:href="#tuftD" transform="translate(40 1190)"/>
+  <use xlink:href="#tuftL" transform="translate(50 1010)"/>
+  <use xlink:href="#tuftD" transform="translate(140 900)"/>
+  <use xlink:href="#tuftL" transform="translate(40 820)"/>
+  <use xlink:href="#tuftD" transform="translate(260 860)"/>
+  <use xlink:href="#tuftL" transform="translate(1320 500)"/>
+  <use xlink:href="#tuftD" transform="translate(1180 470)"/>
+
+  <use xlink:href="#daisy" transform="translate(120 760)"/>
+  <use xlink:href="#daisy" transform="translate(630 670)"/>
+  <use xlink:href="#daisy" transform="translate(1380 720)"/>
+  <use xlink:href="#daisy" transform="translate(1520 860)"/>
+  <use xlink:href="#daisy" transform="translate(440 1170)"/>
+  <use xlink:href="#daisy" transform="translate(1250 1150)"/>
+  <use xlink:href="#daisy" transform="translate(70 1110)"/>
+  <use xlink:href="#buttercup" transform="translate(270 720)"/>
+  <use xlink:href="#buttercup" transform="translate(1280 880)"/>
+  <use xlink:href="#buttercup" transform="translate(1560 1080)"/>
+  <use xlink:href="#buttercup" transform="translate(640 1170)"/>
+  <use xlink:href="#buttercup" transform="translate(110 980)"/>
+  <use xlink:href="#buttercup" transform="translate(1020 560)"/>
+  <use xlink:href="#pinkflower" transform="translate(1330 590)"/>
+  <use xlink:href="#pinkflower" transform="translate(60 900)"/>
+  <use xlink:href="#pinkflower" transform="translate(1360 1100)"/>
+  <use xlink:href="#pinkflower" transform="translate(520 640)"/>
+  <use xlink:href="#clover" transform="translate(380 620)"/>
+  <use xlink:href="#clover" transform="translate(1450 990)"/>
+  <use xlink:href="#clover" transform="translate(820 1160)"/>
+  <use xlink:href="#clover" transform="translate(1568 790)"/>
+  <use xlink:href="#clover" transform="translate(1290 730)"/>
+
+  <!-- LILLY: her shadow, tail, body and legs, then her head -->
+  <path d="M140 1066 C300 1040 1100 1046 1290 1072 C1324 1086 1306 1118 1254 1124 C900 1140 400 1138 190 1120 C136 1112 120 1080 140 1066 Z" fill="#4fa52b"/>
+
+  <path d="M404 948 C340 926 270 926 220 948 C184 964 160 988 154 1010 C150 1026 160 1036 176 1032 Q186 1054 208 1050 Q224 1074 248 1062 Q268 1084 292 1068 Q314 1088 338 1072 Q362 1088 384 1068 C410 1044 420 990 404 948 Z" fill="#f0b14a"/>
+  <g clip-path="url(#tailClip)">
+    <path d="M150 1010 C220 1000 320 1010 420 1030 L420 1100 L150 1100 Z" fill="#f9d48a"/>
+  </g>
+  <path d="M404 948 C340 926 270 926 220 948 C184 964 160 988 154 1010 C150 1026 160 1036 176 1032 Q186 1054 208 1050 Q224 1074 248 1062 Q268 1084 292 1068 Q314 1088 338 1072 Q362 1088 384 1068 C410 1044 420 990 404 948 Z" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="none" stroke="#d48a2c" stroke-width="5" stroke-linecap="round">
+    <path d="M220 972 c14 -8 30 -10 44 -6 M290 960 c14 -6 30 -6 44 0 M240 1010 c14 -6 30 -6 44 0"/>
+  </g>
+
+  <path d="M790 740 C690 744 560 776 480 820 C404 862 360 920 362 984 C364 1044 410 1084 480 1092 L1050 1094 C1096 1060 1110 990 1098 930 C1086 866 1056 820 1010 796 Z" fill="#f0b14a"/>
+  <g clip-path="url(#bodyClip)">
+    <path d="M500 830 C580 790 690 762 790 760 L790 784 C700 790 600 814 520 858 Z" fill="#f9d48a"/>
+    <path d="M340 1046 C520 1062 820 1066 1110 1052 L1110 1110 L340 1110 Z" fill="#dc9636"/>
+  </g>
+  <path d="M790 740 C690 744 560 776 480 820 C404 862 360 920 362 984 C364 1044 410 1084 480 1092 L1050 1094 C1096 1060 1110 990 1098 930 C1086 866 1056 820 1010 796" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <g fill="none" stroke="#d48a2c" stroke-width="5" stroke-linecap="round">
+    <path d="M440 880 c10 12 22 16 34 12 M540 838 c10 12 22 16 34 12 M640 812 c10 12 22 16 34 12 M410 930 c10 12 22 16 34 12 M760 900 c8 12 18 18 30 16 M1050 880 c8 10 18 14 28 12"/>
+  </g>
+
+  <!-- her back leg, folded, with the hind paw tucked forward -->
+  <path d="M470 1092 C446 1010 474 920 560 896 C650 872 736 924 744 1008 C748 1046 738 1074 720 1092 Z" fill="#f0b14a"/>
+  <g clip-path="url(#haunchClip)">
+    <path d="M500 940 C540 904 620 892 680 916 C630 914 570 924 520 960 Z" fill="#f9d48a"/>
+    <path d="M440 1050 C560 1066 680 1066 760 1050 L760 1100 L440 1100 Z" fill="#dc9636"/>
+  </g>
+  <path d="M470 1092 C446 1010 474 920 560 896 C650 872 736 924 744 1008 C748 1046 738 1074 720 1092" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <g fill="none" stroke="#d48a2c" stroke-width="5" stroke-linecap="round">
+    <path d="M540 980 c10 12 22 16 34 12 M620 950 c10 12 22 16 34 12"/>
+  </g>
+  <path d="M606 1054 C666 1040 756 1044 796 1060 C820 1072 816 1100 788 1104 L622 1104 C590 1102 580 1064 606 1054 Z" fill="#f9d48a" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M766 1066 C771 1078 771 1092 766 1103 M784 1070 C789 1080 789 1092 785 1102" fill="none" stroke="#26232e" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- front legs: one stretched out to the right, one under her chest -->
+  <path d="M930 976 C1000 980 1080 996 1170 1032 L1176 1096 L930 1096 Z" fill="#f0b14a"/>
+  <path d="M980 980 C1050 988 1110 1006 1170 1032" fill="none" stroke="#26232e" stroke-width="6" stroke-linecap="round"/>
+  <path d="M930 1062 C1000 1070 1110 1074 1170 1070 L1170 1096 L930 1096 Z" fill="#dc9636"/>
+  <path d="M940 1096 L1176 1096" stroke="#26232e" stroke-width="6" stroke-linecap="round"/>
+  <path d="M1144 1048 C1160 1026 1226 1024 1254 1046 C1274 1062 1268 1096 1238 1100 L1164 1100 C1138 1098 1130 1064 1144 1048 Z" fill="#f9d48a" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M1224 1038 C1219 1052 1219 1068 1224 1080 M1244 1046 C1239 1058 1239 1070 1244 1082" fill="none" stroke="#26232e" stroke-width="4" stroke-linecap="round"/>
+
+  <path d="M850 940 L950 940 L958 1060 L842 1060 Z" fill="#f0b14a" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M834 1066 C834 1044 858 1034 900 1034 C942 1034 966 1044 966 1066 L966 1090 C966 1110 942 1116 900 1116 C858 1116 834 1110 834 1090 Z" fill="#f9d48a" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M868 1116 C866 1104 866 1094 868 1086 M900 1116 V1086 M932 1116 C934 1104 934 1094 932 1086" fill="none" stroke="#26232e" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- the fluffy ruff on her chest -->
+  <path d="M784 800 C776 880 792 950 826 996 Q846 1020 864 998 Q882 1024 900 1000 Q918 1024 936 998 Q954 1020 974 996 C1008 950 1024 880 1016 800 Z" fill="#f9d48a" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="none" stroke="#e4ae5c" stroke-width="5" stroke-linecap="round">
+    <path d="M830 930 c8 12 18 16 28 14 M940 930 c8 12 18 16 28 14 M884 960 c8 12 18 16 28 14"/>
+  </g>
+
+  <!-- her big head: pale old face with a golden cap -->
+  <path d="M900 566 C994 566 1062 626 1066 706 C1070 784 1032 846 972 874 C940 888 860 888 828 874 C768 846 730 784 734 706 C738 626 806 566 900 566 Z" fill="#fcebc6"/>
+  <g clip-path="url(#headClip)">
+    <path d="M730 740 C734 640 806 562 900 562 C994 562 1066 640 1070 740 C1040 702 1000 682 962 676 C932 670 922 612 900 608 C878 612 868 670 838 676 C800 682 760 702 730 740 Z" fill="#f2bf62"/>
+  </g>
+  <path d="M900 566 C994 566 1062 626 1066 706 C1070 784 1032 846 972 874 C940 888 860 888 828 874 C768 846 730 784 734 706 C738 626 806 566 900 566 Z" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- floppy golden ears -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <path d="M800 606 C752 594 712 620 696 668 C680 716 680 774 692 814 Q702 840 722 830 Q738 852 756 832 Q774 844 782 818 C790 782 786 732 794 694 C800 664 822 624 800 606 Z" fill="#e59a38"/>
+    <path d="M1000 606 C1048 594 1088 620 1104 668 C1120 716 1120 774 1108 814 Q1098 840 1078 830 Q1062 852 1044 832 Q1026 844 1018 818 C1010 782 1014 732 1006 694 C1000 664 978 624 1000 606 Z" fill="#e59a38"/>
+  </g>
+  <g fill="none" stroke="#c87b22" stroke-width="4" stroke-linecap="round">
+    <path d="M732 650 C718 696 716 750 726 796 M760 640 C752 690 752 750 758 800"/>
+    <path d="M1068 650 C1082 696 1084 750 1074 796 M1040 640 C1048 690 1048 750 1042 800"/>
+  </g>
+
+  <!-- white muzzle, rosy cheeks, nose and a big happy grin -->
+  <path d="M900 742 C954 740 994 770 996 808 C998 846 964 868 926 866 C914 864 906 860 900 856 C894 860 886 864 874 866 C836 868 802 846 804 808 C806 770 846 740 900 742 Z" fill="#fffaf0"/>
+  <ellipse cx="812" cy="800" rx="20" ry="12" fill="#f9ad9f"/>
+  <ellipse cx="988" cy="800" rx="20" ry="12" fill="#f9ad9f"/>
+  <path d="M840 812 C862 826 886 826 900 818 C914 826 938 826 960 812 C958 846 934 868 900 870 C866 868 842 846 840 812 Z" fill="#8a2a3c" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M868 842 C880 832 920 832 932 842 C940 868 926 898 900 900 C874 898 860 868 868 842 Z" fill="#f47c93" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M900 848 L900 876" stroke="#d9536c" stroke-width="4" stroke-linecap="round"/>
+  <path d="M864 764 C876 748 924 748 936 764 C946 778 928 802 900 806 C872 802 854 778 864 764 Z" fill="#26232e" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="888" cy="762" rx="11" ry="5" fill="#77707f"/>
+  <path d="M900 806 L900 818" stroke="#26232e" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- eyes squeezed shut in the sunshine -->
+  <g fill="none" stroke="#26232e" stroke-width="8" stroke-linecap="round">
+    <path d="M816 726 Q846 694 876 726"/>
+    <path d="M924 726 Q954 694 984 726"/>
+  </g>
+  <g fill="none" stroke="#26232e" stroke-width="4" stroke-linecap="round">
+    <path d="M812 716 L800 710 M814 728 L801 731"/>
+    <path d="M988 716 L1000 710 M986 728 L999 731"/>
+  </g>
+
+  <!-- toys and visitors -->
+  <g stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <circle cx="1056" cy="1146" r="30" fill="#d4ee3a" stroke-width="6"/>
+    <path d="M1034 1124 C1050 1136 1050 1156 1034 1168 M1078 1124 C1062 1136 1062 1156 1078 1168" fill="none" stroke="#ffffff" stroke-width="5"/>
+  </g>
+  <g transform="translate(170 1150) rotate(-12) scale(0.8)" stroke="#26232e" stroke-linejoin="round">
+    <path d="M-50 -10 L50 -10 C56 -26 80 -26 80 -10 C92 -8 92 8 80 10 C80 26 56 26 50 10 L-50 10 C-56 26 -80 26 -80 10 C-92 8 -92 -8 -80 -10 C-80 -26 -56 -26 -50 -10 Z" fill="#fff7e6" stroke-width="7"/>
+    <path d="M-44 -2 L44 -2" stroke="#ead9b8" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(1480 1150)" stroke="#26232e" stroke-linejoin="round">
+    <circle cx="0" cy="-16" r="9" fill="#26232e" stroke-width="3"/>
+    <circle cx="0" cy="0" r="18" fill="#e8343a" stroke-width="4"/>
+    <path d="M0 -18 V18" stroke-width="3"/>
+    <g fill="#26232e" stroke="none"><circle cx="-8" cy="-4" r="4"/><circle cx="8" cy="-4" r="4"/><circle cx="-7" cy="9" r="3.5"/><circle cx="7" cy="9" r="3.5"/></g>
+  </g>
+  <use xlink:href="#butterflyO" transform="translate(1196 650) rotate(18) scale(0.95)"/>
+  <use xlink:href="#butterflyB" transform="translate(250 790) rotate(-14) scale(0.85)"/>
+</svg>
