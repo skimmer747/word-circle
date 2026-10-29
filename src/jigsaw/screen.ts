@@ -156,7 +156,7 @@ export class JigsawScreen implements GameScreen {
     else if (id.startsWith('pic:')) this.openPicture(Number(id.slice('pic:'.length)));
     else if (id === 'pics-back' || id === 'pics-more') this.turnPage(id === 'pics-more' ? 1 : -1);
     else if (id === 'pics-close') this.closePictures();
-    else if (id === 'cartoons') this.cartoons();
+    else if (id === 'cartoon') this.cartoon();
     else if (id === 'pictures') this.showPictures();
     else if (id === 'hint') void this.hint();
     else if (id === 'move-picture') this.movePicture();
@@ -302,14 +302,12 @@ export class JigsawScreen implements GameScreen {
         hasMore: page.hasMore,
         canClose: this.picture !== null,
         canAdd: this.canAdd(),
-        cartoons: this.hasCartoons() ? this.saved.cartoons : null,
       },
       animateIn,
     );
     const offset = this.canAdd() ? 1 : 0;
     const buttons: ButtonGeometry[] = page.pictures.map((_, i) => ({ id: `pic:${i}`, ...layout.tiles[i + offset] }));
     if (offset) buttons.unshift({ id: 'pic:add', ...layout.tiles[0] });
-    if (this.hasCartoons()) buttons.push({ id: 'cartoons', ...layout.cartoons });
     if (page.hasBack) buttons.push({ id: 'pics-back', ...layout.back });
     if (this.picture) buttons.push({ id: 'pics-close', ...layout.close });
     if (page.hasMore) buttons.push({ id: 'pics-more', ...layout.more });
@@ -483,6 +481,7 @@ export class JigsawScreen implements GameScreen {
       // Table has no faint picture: its small picture is always in the corner.
       guide: this.saved.style === 'table' ? 'corner' : this.saved.guide,
       hideEdges: this.saved.hideEdges,
+      cartoon: this.picture?.cartoon ? this.saved.cartoons : null,
       disguises: image && game && this.saved.hideEdges ? this.disguises : [],
     };
   }
@@ -498,6 +497,7 @@ export class JigsawScreen implements GameScreen {
     ];
     if (this.saved.style !== 'table') buttons.push({ id: 'move-picture', ...layout.pictureButton });
     buttons.push({ id: 'hide-edges', ...layout.edgesButton });
+    if (this.picture?.cartoon) buttons.push({ id: 'cartoon', ...layout.cartoonButton });
     const draggables: ButtonGeometry[] = [];
     if (game && this.ready()) {
       // Topmost first: the touch tracker takes the first piece under her finger (where she sees it, shrunk or not).
@@ -635,25 +635,36 @@ export class JigsawScreen implements GameScreen {
     return pictureShown(picture, this.saved.cartoons);
   }
 
-  /** Cartoons is offered once the pictures are in and one of them has a drawing. */
-  private hasCartoons(): boolean {
-    return this.pictures?.some((picture) => picture.cartoon) ?? false;
-  }
-
   /**
-   * Cartoons on or off: the pictures on the page change straight away, and so does a puzzle she's in the middle of
-   * (her place is kept, as the pieces are the same shapes). Remembered.
+   * Cartoon on or off: the puzzle she's doing changes look, her place kept (the pieces are the same shapes), and so do
+   * the pictures on Pick a picture. The new look is loaded before it's shown, so the pieces never blink out. Remembered.
    */
-  private cartoons(): void {
-    if (this.mode !== 'pictures' || !this.hasCartoons()) return;
+  private cartoon(): void {
+    const picture = this.picture;
+    const listed = picture?.cartoon && this.pictures?.find((p) => p.id === picture.id);
+    if (this.mode !== 'puzzle' || !listed) return;
     this.saved = { ...this.saved, cartoons: !this.saved.cartoons };
     saveSavedJigsaw(this.store, this.saved);
-    const current = this.picture && this.pictures?.find((picture) => picture.id === this.picture?.id);
-    if (current) {
-      this.picture = this.asShown(current);
-      this.keepDecodedOnly(this.picture.src);
-    }
+    const next = this.asShown(listed);
     this.host.redraw(false);
+    const image = this.imageFor(next);
+    void image
+      .decode()
+      .catch(() => undefined)
+      .then(() => {
+        // Unless she has switched again, or moved on to another picture, meanwhile.
+        if (this.picture?.id !== next.id || this.asShown(listed).src !== next.src) return;
+        if (image.naturalWidth > 0) {
+          this.picture = next;
+          this.keepDecodedOnly(next.src);
+        } else {
+          // It couldn't be had (offline before the app ever saved it): she stays as she was.
+          this.images.delete(next.src);
+          this.saved = { ...this.saved, cartoons: !this.saved.cartoons };
+          saveSavedJigsaw(this.store, this.saved);
+        }
+        this.redrawWhenFree();
+      });
   }
 
   /** Add a photo shows once the pictures are in (a photo added before would be lost when they arrive). */

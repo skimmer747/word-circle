@@ -18,7 +18,7 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
   /** Tray style (the only one with a tray); Board and Table share the same layout otherwise. */
   const layout = computeJigsawLayout(frame, 'tray');
   const spread = computeJigsawLayout(frame, 'board');
-  const buttons = [layout.hintButton, layout.picturesButton, ...layout.styleButtons, ...layout.countButtons, layout.pictureButton, layout.edgesButton];
+  const buttons = [layout.hintButton, layout.picturesButton, ...layout.styleButtons, ...layout.countButtons, layout.pictureButton, layout.edgesButton, layout.cartoonButton];
 
   it('puts Hint and the piece counts where every game has Hint and its levels', () => {
     expect(layout.hintButton).toEqual(frame.hintButton);
@@ -66,12 +66,25 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
       expect(button.w).toBeCloseTo(frame.corner.w);
     }
     const small = layout.smallPicture;
+    const rows = play.y + play.h - layout.styleButtons[0].y;
     expect(small.w / small.h).toBeCloseTo(4 / 3);
-    expect(small.h).toBeCloseTo(play.y + play.h - layout.styleButtons[0].y);
+    expect(small.h).toBeLessThanOrEqual(rows + 0.001);
     expect(small.x + small.w).toBeCloseTo(layout.pictureButton.x - 16);
-    expect(small.y + small.h).toBeCloseTo(play.y + play.h);
-    const lastRow = layout.countButtons[layout.countButtons.length - 1];
-    expect(small.x).toBeGreaterThanOrEqual(lastRow.x + lastRow.w + 16);
+    // Centered on the two rows when it has to be smaller than them.
+    expect(small.y + small.h / 2).toBeCloseTo(layout.styleButtons[0].y + rows / 2);
+    expect(small.x).toBeGreaterThanOrEqual(layout.cartoonButton.x + layout.cartoonButton.w + 16 - 0.001);
+    // On the smallest iPads with a thumb side it's about half size, still big enough to make out.
+    expect(small.w).toBeGreaterThanOrEqual(95);
+    if (width >= 1180) expect(small.h).toBeCloseTo(rows);
+  });
+
+  it('puts Cartoon after Tray, Board and Table, as tall as both rows', () => {
+    const cartoon = layout.cartoonButton;
+    const last = layout.styleButtons[layout.styleButtons.length - 1];
+    expect(cartoon.x).toBeCloseTo(last.x + last.w + 16);
+    expect(cartoon.y).toBe(layout.styleButtons[0].y);
+    expect(cartoon.y + cartoon.h).toBeCloseTo(frame.play.y + frame.play.h);
+    expect(cartoon.w).toBeGreaterThanOrEqual(100);
   });
 
   it('makes the board and the finished picture 4:3, with big pieces', () => {

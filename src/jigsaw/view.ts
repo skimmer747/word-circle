@@ -46,6 +46,8 @@ export interface JigsawViewState {
   /** Where the guide picture is: faint on the board, or small in the bottom-right corner (always there in Table). */
   guide: Guide;
   hideEdges: boolean;
+  /** Cartoon on or off, or null for a picture without a drawing (no Cartoon button). */
+  cartoon: boolean | null;
   /** The pieces' shapes with their straight sides hidden (Hide edges), or none when it's off. */
   disguises: readonly PieceShape[];
 }
@@ -92,6 +94,7 @@ export class JigsawView {
       this.button(board, 'button move-picture', `${icon}<span>Move picture</span>`, layout.pictureButton);
     }
     this.choice(board, 'Hide edges', state.hideEdges, layout.edgesButton);
+    if (state.cartoon !== null) this.choice(board, 'Cartoon', state.cartoon, layout.cartoonButton);
     if (state.guide === 'corner' && state.picture) {
       const small = el('img', 'jigsaw-small', board);
       small.alt = '';

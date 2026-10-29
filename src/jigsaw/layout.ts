@@ -16,6 +16,8 @@ const TABLE_GAP = 6;
 const TABLE_MIN = 40;
 /** The finished picture's caption: up to two lines across the bottom. */
 const CAPTION_HEIGHT = 96;
+/** Cartoon, after Tray, Board and Table. */
+const CARTOON_WIDTH = 110;
 /** "Pick a picture". */
 const TITLE_HEIGHT = 72;
 const TILE_GAP = 24;
@@ -39,7 +41,9 @@ export interface JigsawLayout {
   pictureButton: Rect;
   /** Hide edges, under Move picture. */
   edgesButton: Rect;
-  /** The whole picture, small, just left of Move picture and Hide edges. */
+  /** Cartoon, as tall as both rows, just after Tray, Board and Table (for pictures with a drawing). */
+  cartoonButton: Rect;
+  /** The whole picture, small, just left of Move picture and Hide edges (smaller on small iPads, to leave Cartoon room). */
   smallPicture: Rect;
   /** Tray, Board, Table: just above the piece counts. */
   styleButtons: Rect[];
@@ -69,7 +73,8 @@ function fit(area: Rect, aspect: number): Rect {
 export function computeJigsawLayout(frame: FrameLayout, style: JigsawStyle): JigsawLayout {
   // Hint top left and the piece counts in the level row, as in every game; Pictures beside Hint (where Word Circle
   // has Shuffle); the tray between Pictures and the top-right buttons; Tray, Board and Table above the counts;
-  // Move picture and Hide edges in the bottom-right corner, with the small picture beside them.
+  // Cartoon after Tray, Board and Table; Move picture and Hide edges in the bottom-right corner, with the small
+  // picture beside them.
   const { play, hintButton, levelButtons: countButtons, corner } = frame;
   const picturesButton = { ...hintButton, x: hintButton.x + hintButton.w + GAP };
   const trayLeft = picturesButton.x + picturesButton.w + GAP;
@@ -87,9 +92,13 @@ export function computeJigsawLayout(frame: FrameLayout, style: JigsawStyle): Jig
   const columnX = play.x + play.w - corner.w;
   const pictureButton = { x: columnX, y: styleButtons[0].y, w: corner.w, h: styleButtons[0].h };
   const edgesButton = { x: columnX, y: countButtons[0].y, w: corner.w, h: countButtons[0].h };
-  const smallHeight = bottom - rowsTop;
-  const smallWidth = smallHeight * PICTURE_ASPECT;
-  const smallPicture = { x: pictureButton.x - GAP - smallWidth, y: rowsTop, w: smallWidth, h: smallHeight };
+  const rowsHeight = bottom - rowsTop;
+  const lastStyle = styleButtons[styleButtons.length - 1];
+  const cartoonButton = { x: lastStyle.x + lastStyle.w + GAP, y: rowsTop, w: CARTOON_WIDTH, h: rowsHeight };
+  const smallLeft = Math.max(pictureButton.x - GAP - rowsHeight * PICTURE_ASPECT, cartoonButton.x + cartoonButton.w + GAP);
+  const smallWidth = pictureButton.x - GAP - smallLeft;
+  const smallHeight = smallWidth / PICTURE_ASPECT;
+  const smallPicture = { x: smallLeft, y: rowsTop + (rowsHeight - smallHeight) / 2, w: smallWidth, h: smallHeight };
   const caption = { x: play.x, y: play.y + play.h - CAPTION_HEIGHT, w: play.w, h: CAPTION_HEIGHT };
   return {
     frame,
@@ -99,6 +108,7 @@ export function computeJigsawLayout(frame: FrameLayout, style: JigsawStyle): Jig
     slots,
     pictureButton,
     edgesButton,
+    cartoonButton,
     smallPicture,
     styleButtons,
     countButtons,
