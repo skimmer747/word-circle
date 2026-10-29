@@ -11,7 +11,9 @@
     "id": "my-three-sons",
     "file": "my-three-sons.jpg",
     "thumb": "my-three-sons.thumb.jpg",
-    "caption": "My three sons"
+    "caption": "My three sons",
+    "cartoon": "my-three-sons.cartoon.png",
+    "cartoonThumb": "my-three-sons.cartoon.thumb.png"
   },
   {
     "id": "lake-minnehaha",
