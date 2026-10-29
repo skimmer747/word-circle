@@ -25,6 +25,8 @@ const PAGE_BUTTON_HEIGHT = 96;
 const BACK_WIDTH = 200;
 const CLOSE_WIDTH = 180;
 const MORE_WIDTH = 260;
+/** Cartoons, at the end of the title row. */
+const CARTOONS_WIDTH = 200;
 
 export interface JigsawLayout {
   frame: FrameLayout;
@@ -185,6 +187,8 @@ export function clampToFree(free: readonly Rect[], body: Rect, overhang = 0): Re
 
 export interface PicturePageLayout {
   title: Rect;
+  /** Cartoons, at the end of the title row, just left of the corner buttons. */
+  cartoons: Rect;
   /** Six 4:3 places, three across and two down, with up to two lines of caption under each. */
   tiles: Rect[];
   captions: Rect[];
@@ -195,7 +199,8 @@ export interface PicturePageLayout {
 
 export function computePicturePageLayout(frame: FrameLayout): PicturePageLayout {
   const { play, corner } = frame;
-  const title = { x: play.x, y: play.y, w: corner.x - GAP - play.x, h: TITLE_HEIGHT };
+  const cartoons = { x: corner.x - GAP - CARTOONS_WIDTH, y: play.y, w: CARTOONS_WIDTH, h: TITLE_HEIGHT };
+  const title = { x: play.x, y: play.y, w: cartoons.x - GAP - play.x, h: TITLE_HEIGHT };
   const buttonsY = play.y + play.h - PAGE_BUTTON_HEIGHT;
   const top = title.y + title.h;
   const room = buttonsY - GAP - top;
@@ -211,6 +216,7 @@ export function computePicturePageLayout(frame: FrameLayout): PicturePageLayout 
   }));
   return {
     title,
+    cartoons,
     tiles,
     captions: tiles.map((tile) => ({ x: tile.x, y: tile.y + tile.h, w: tile.w, h: TILE_CAPTION })),
     back: { x: play.x, y: buttonsY, w: BACK_WIDTH, h: PAGE_BUTTON_HEIGHT },
