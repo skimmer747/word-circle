@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <!-- long streaky clouds, four lengths -->
+    <g id="cA">
+      <path d="M0 44 C18 30 50 22 84 26 C104 8 150 4 178 18 C204 4 252 2 276 18 C306 8 352 12 368 28 C400 28 430 36 440 46 C420 56 380 60 340 60 L70 60 C40 60 14 56 0 44 Z" fill="#ffffff" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M54 50 C140 42 300 42 396 48 C370 54 330 55 300 55 L90 55 C74 55 62 53 54 50 Z" fill="#d6ecfa"/>
+    </g>
+    <g id="cB">
+      <path d="M0 40 C14 28 40 20 66 24 C84 6 130 2 154 18 C178 6 222 8 236 24 C270 22 306 30 320 42 C300 52 270 56 240 56 L60 56 C30 56 10 52 0 40 Z" fill="#ffffff" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M40 46 C110 39 220 39 290 44 C266 50 236 51 210 51 L70 51 C56 51 46 49 40 46 Z" fill="#d6ecfa"/>
+    </g>
+    <g id="cC">
+      <path d="M0 36 C10 24 30 18 52 22 C70 4 112 2 128 18 C150 12 190 18 220 38 C200 48 170 50 140 50 L50 50 C26 50 8 46 0 36 Z" fill="#ffffff" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M30 41 C80 35 150 35 194 40 C172 45 146 45 126 45 L54 45 C42 45 34 43 30 41 Z" fill="#d6ecfa"/>
+    </g>
+    <g id="cD">
+      <path d="M0 26 C30 14 80 8 130 12 C180 0 260 0 310 10 C370 6 450 10 520 24 C470 34 400 38 320 38 L120 38 C70 38 25 34 0 26 Z" fill="#ffffff" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M56 30 C180 25 360 25 466 28 C420 33 360 33 300 33 L110 33 C88 33 70 32 56 30 Z" fill="#d6ecfa"/>
+    </g>
+
+    <!-- fir trees in three sizes; the fill comes from each use -->
+    <path id="f1" d="M0 -64 L13 -43 L7 -43 L19 -22 L11 -22 L24 0 L-24 0 L-11 -22 L-19 -22 L-7 -43 L-13 -43 Z" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+    <path id="f2" d="M0 -80 L16 -54 L8 -54 L24 -28 L14 -28 L30 0 L-30 0 L-14 -28 L-24 -28 L-8 -54 L-16 -54 Z" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+    <g id="f3">
+      <rect x="-7" y="-4" width="14" height="18" fill="#6b4a32" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M0 -96 L19 -64 L10 -64 L29 -33 L17 -33 L36 0 L-36 0 L-17 -33 L-29 -33 L-10 -64 L-19 -64 Z" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+    </g>
+
+    <!-- the mountain's outline, used to keep the snow on the mountain -->
+    <path id="mtnShape" d="M-10 702 C140 694 290 668 410 622 C520 580 620 470 700 372 L728 342 L748 334 L768 350 C820 395 880 470 950 530 C1040 600 1170 650 1320 676 C1440 696 1530 706 1610 712 L1610 1210 L-10 1210 Z"/>
+    <clipPath id="mtnClip"><use xlink:href="#mtnShape"/></clipPath>
+    <path id="snowShape" d="M-10 250 L1610 250 L1610 772 Q1597 807 1568 832 Q1534 804 1518 762 Q1501 811 1462 846 Q1419 805 1402 748 Q1382 793 1342 822 Q1300 785 1282 732 Q1260 791 1212 832 Q1166 782 1150 716 Q1132 788 1082 842 Q1029 783 1012 706 Q996 767 952 812 Q907 764 892 700 Q882 784 832 852 Q783 787 772 706 Q767 791 722 862 Q672 790 664 702 Q651 774 604 830 Q560 776 548 708 Q529 787 474 846 Q422 790 404 716 Q383 780 334 826 Q290 785 272 728 Q251 789 202 832 Q160 795 142 742 Q122 789 82 820 Q43 794 22 752 Q9 766 -10 772 Z"/>
+    <clipPath id="snowClip"><use xlink:href="#snowShape"/></clipPath>
+  </defs>
+
+  <!-- sky, with a paler haze low down -->
+  <rect width="1600" height="760" fill="#8fd3f7"/>
+  <path d="M-10 540 C200 525 400 545 600 532 C800 520 1000 540 1200 528 C1400 518 1500 535 1610 528 L1610 760 L-10 760 Z" fill="#b5e2f8"/>
+
+  <!-- streaky clouds -->
+  <use xlink:href="#cA" transform="translate(40 40)"/>
+  <use xlink:href="#cC" transform="translate(600 150)"/>
+  <use xlink:href="#cB" transform="translate(880 50)"/>
+  <use xlink:href="#cD" transform="translate(1110 170)"/>
+  <use xlink:href="#cC" transform="translate(1360 40)"/>
+  <use xlink:href="#cB" transform="translate(-40 300)"/>
+  <use xlink:href="#cC" transform="translate(330 280)"/>
+  <use xlink:href="#cC" transform="translate(1100 270) scale(-1 1)"/>
+  <use xlink:href="#cA" transform="translate(1150 320)"/>
+  <use xlink:href="#cA" transform="translate(40 450)"/>
+  <use xlink:href="#cB" transform="translate(1230 450)"/>
+
+  <!-- far hills and the little snowy peak far away -->
+  <path d="M-10 598 C60 584 130 590 200 580 C270 570 340 590 420 584 C500 578 600 592 700 586 C800 580 900 596 1000 590 C1100 584 1200 598 1300 590 C1400 582 1500 596 1610 588 L1610 800 L-10 800 Z" fill="#a3bddc" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <g stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <path d="M1010 600 L1100 536 C1112 526 1128 526 1140 536 L1230 600 Z" fill="#8aa6c8"/>
+    <path d="M1068 559 L1100 536 C1112 526 1128 526 1140 536 L1172 559 C1160 571 1150 565 1140 573 C1130 565 1118 575 1108 567 C1096 574 1080 567 1068 559 Z" fill="#ffffff"/>
+  </g>
+  <path d="M-10 652 C50 634 110 642 170 630 C240 618 300 642 380 634 C460 626 540 642 620 636 C700 630 900 640 1000 646 C1080 650 1150 636 1230 640 C1310 644 1380 628 1450 634 C1520 640 1570 630 1610 634 L1610 800 L-10 800 Z" fill="#5f8fa8" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Mount Hood: blue-gray rock, the snow cap, its shadow side, rock ribs and snow streaks -->
+  <use xlink:href="#mtnShape" fill="#7c8fae"/>
+  <g clip-path="url(#mtnClip)">
+    <path d="M664 690 C664 760 662 830 660 920 L-20 920 L-20 600 Z" fill="#6b7e9c"/>
+    <use xlink:href="#snowShape" fill="#ffffff"/>
+    <g clip-path="url(#snowClip)">
+      <path d="M752 320 C738 420 690 560 664 702 L664 950 L-20 950 L-20 300 Z" fill="#c8daee"/>
+    </g>
+    <g fill="#7c8fae" stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+      <path d="M726 382 C735 446 673 502 664 566 C655 502 717 446 726 382 Z"/><path d="M790 424 C799 487 855 541 846 604 C837 541 781 487 790 424 Z"/><path d="M886 520 C894 570 962 614 954 664 C946 614 878 570 886 520 Z"/><path d="M612 516 C620 561 568 599 560 644 C552 599 604 561 612 516 Z"/><path d="M1060 622 C1068 644 1124 662 1116 684 C1108 662 1052 644 1060 622 Z"/><path d="M514 584 C522 637 464 682 456 735 C448 682 506 637 514 584 Z"/>
+    </g>
+    <use xlink:href="#snowShape" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+    <g fill="#ffffff" stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+      <path d="M1518 804 C1528 833 1566 857 1556 886 C1546 857 1508 833 1518 804 Z"/><path d="M1282 774 C1292 813 1319 847 1309 886 C1299 847 1272 813 1282 774 Z"/><path d="M1012 748 C1022 796 1035 838 1025 886 C1015 838 1002 796 1012 748 Z"/><path d="M772 748 C782 796 783 838 773 886 C763 838 762 796 772 748 Z"/><path d="M548 750 C558 798 548 838 538 886 C528 838 538 798 548 750 Z"/><path d="M272 770 C282 811 258 845 248 886 C238 845 262 811 272 770 Z"/><path d="M22 794 C32 826 -4 854 -14 886 C-24 854 12 826 22 794 Z"/>
+    </g>
+  </g>
+  <use xlink:href="#mtnShape" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- back row of forest -->
+  <path d="M-10 896 L10 898 L30 899 L50 899 L70 898 L90 897 L110 896 L130 895 L150 895 L170 896 L190 897 L210 899 L230 901 L250 902 L270 904 L290 905 L310 904 L330 903 L350 901 L370 898 L390 894 L410 891 L430 888 L450 886 L470 885 L490 885 L510 886 L530 887 L550 888 L570 889 L590 889 L610 889 L630 887 L650 886 L670 884 L690 882 L710 880 L730 880 L750 880 L770 881 L790 883 L810 886 L830 889 L850 893 L870 895 L890 898 L910 899 L930 899 L950 899 L970 898 L990 897 L1010 896 L1030 895 L1050 895 L1070 896 L1090 898 L1110 900 L1130 902 L1150 903 L1170 904 L1190 904 L1210 903 L1230 901 L1250 898 L1270 895 L1290 892 L1310 889 L1330 886 L1350 885 L1370 885 L1390 885 L1410 886 L1430 887 L1450 888 L1470 889 L1490 889 L1510 888 L1530 886 L1550 884 L1570 882 L1590 881 L1610 880 L1610 1210 L-10 1210 Z" fill="#2b7a5e" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <use xlink:href="#f1" x="3" y="906" fill="#1d6847"/><use xlink:href="#f1" x="55" y="910" fill="#28804f"/><use xlink:href="#f1" x="96" y="906" fill="#22744b"/><use xlink:href="#f1" x="135" y="909" fill="#1d6847"/><use xlink:href="#f1" x="186" y="912" fill="#28804f"/><use xlink:href="#f1" x="227" y="912" fill="#22744b"/><use xlink:href="#f1" x="275" y="912" fill="#1d6847"/><use xlink:href="#f1" x="312" y="916" fill="#28804f"/><use xlink:href="#f1" x="362" y="907" fill="#22744b"/><use xlink:href="#f1" x="403" y="901" fill="#1d6847"/><use xlink:href="#f1" x="447" y="900" fill="#28804f"/><use xlink:href="#f1" x="493" y="901" fill="#22744b"/><use xlink:href="#f1" x="539" y="899" fill="#1d6847"/><use xlink:href="#f1" x="576" y="902" fill="#28804f"/><use xlink:href="#f1" x="623" y="901" fill="#22744b"/><use xlink:href="#f1" x="672" y="898" fill="#1d6847"/><use xlink:href="#f1" x="710" y="889" fill="#28804f"/><use xlink:href="#f1" x="758" y="891" fill="#22744b"/><use xlink:href="#f1" x="801" y="899" fill="#1d6847"/><use xlink:href="#f1" x="849" y="903" fill="#28804f"/><use xlink:href="#f1" x="885" y="913" fill="#22744b"/><use xlink:href="#f1" x="934" y="913" fill="#1d6847"/><use xlink:href="#f1" x="978" y="906" fill="#28804f"/><use xlink:href="#f1" x="1021" y="910" fill="#22744b"/><use xlink:href="#f1" x="1062" y="907" fill="#1d6847"/><use xlink:href="#f1" x="1111" y="912" fill="#28804f"/><use xlink:href="#f1" x="1149" y="914" fill="#22744b"/><use xlink:href="#f1" x="1195" y="913" fill="#1d6847"/><use xlink:href="#f1" x="1240" y="915" fill="#28804f"/><use xlink:href="#f1" x="1288" y="900" fill="#22744b"/><use xlink:href="#f1" x="1332" y="898" fill="#1d6847"/><use xlink:href="#f1" x="1372" y="895" fill="#28804f"/><use xlink:href="#f1" x="1421" y="899" fill="#22744b"/><use xlink:href="#f1" x="1458" y="897" fill="#1d6847"/><use xlink:href="#f1" x="1508" y="896" fill="#28804f"/><use xlink:href="#f1" x="1548" y="896" fill="#22744b"/><use xlink:href="#f1" x="1590" y="896" fill="#1d6847"/>
+
+  <!-- middle row of forest -->
+  <path d="M-10 994 L10 995 L30 996 L50 996 L70 996 L90 996 L110 995 L130 993 L150 991 L170 988 L190 985 L210 983 L230 980 L250 978 L270 976 L290 975 L310 974 L330 974 L350 974 L370 975 L390 976 L410 978 L430 979 L450 979 L470 980 L490 980 L510 980 L530 979 L550 978 L570 977 L590 977 L610 976 L630 976 L650 976 L670 977 L690 978 L710 980 L730 982 L750 985 L770 988 L790 990 L810 993 L830 995 L850 996 L870 997 L890 998 L910 997 L930 997 L950 995 L970 994 L990 993 L1010 991 L1030 990 L1050 989 L1070 989 L1090 989 L1110 990 L1130 990 L1150 991 L1170 992 L1190 992 L1210 992 L1230 992 L1250 991 L1270 989 L1290 987 L1310 985 L1330 982 L1350 979 L1370 977 L1390 975 L1410 973 L1430 972 L1450 971 L1470 971 L1490 972 L1510 973 L1530 975 L1550 976 L1570 978 L1590 980 L1610 981 L1610 1210 L-10 1210 Z" fill="#3a9466" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <use xlink:href="#f2" x="10" y="1006" fill="#22764c"/><use xlink:href="#f2" x="68" y="1005" fill="#2e8c58"/><use xlink:href="#f2" x="121" y="1008" fill="#1f6e47"/><use xlink:href="#f2" x="175" y="996" fill="#22764c"/><use xlink:href="#f2" x="221" y="995" fill="#2e8c58"/><use xlink:href="#f2" x="284" y="988" fill="#1f6e47"/><use xlink:href="#f2" x="336" y="988" fill="#22764c"/><use xlink:href="#f2" x="393" y="992" fill="#2e8c58"/><use xlink:href="#f2" x="439" y="989" fill="#1f6e47"/><use xlink:href="#f2" x="495" y="992" fill="#22764c"/><use xlink:href="#f2" x="551" y="993" fill="#2e8c58"/><use xlink:href="#f2" x="603" y="991" fill="#1f6e47"/><use xlink:href="#f2" x="656" y="987" fill="#22764c"/><use xlink:href="#f2" x="712" y="992" fill="#2e8c58"/><use xlink:href="#f2" x="764" y="996" fill="#1f6e47"/><use xlink:href="#f2" x="817" y="1006" fill="#22764c"/><use xlink:href="#f2" x="877" y="1006" fill="#2e8c58"/><use xlink:href="#f2" x="928" y="1009" fill="#1f6e47"/><use xlink:href="#f2" x="987" y="1007" fill="#22764c"/><use xlink:href="#f2" x="1037" y="1005" fill="#2e8c58"/><use xlink:href="#f2" x="1091" y="1004" fill="#1f6e47"/><use xlink:href="#f2" x="1141" y="1001" fill="#22764c"/><use xlink:href="#f2" x="1200" y="1001" fill="#2e8c58"/><use xlink:href="#f2" x="1248" y="1001" fill="#1f6e47"/><use xlink:href="#f2" x="1301" y="997" fill="#22764c"/><use xlink:href="#f2" x="1355" y="992" fill="#2e8c58"/><use xlink:href="#f2" x="1418" y="982" fill="#1f6e47"/><use xlink:href="#f2" x="1465" y="982" fill="#22764c"/><use xlink:href="#f2" x="1526" y="988" fill="#2e8c58"/><use xlink:href="#f2" x="1573" y="992" fill="#1f6e47"/>
+
+  <!-- small lake -->
+  <path d="M490 1124 C490 1088 600 1074 720 1076 C850 1078 962 1094 962 1128 C962 1166 850 1182 720 1182 C590 1182 490 1162 490 1124 Z" fill="#2f8ad6" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M560 1112 h90 M720 1100 h110 M860 1124 h50 M620 1150 h120 M790 1158 h70" stroke="#b9e6ff" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- log cabin by the lake -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <rect x="1092" y="1036" width="18" height="36" fill="#8a8f99"/>
+    <rect x="1012" y="1090" width="110" height="62" fill="#a86b42"/>
+    <path d="M1015 1110 H1119 M1015 1128 H1119" stroke="#7a4a2c" stroke-width="4"/>
+    <path d="M996 1096 L1067 1040 L1138 1096 Z" fill="#d8443a"/>
+    <rect x="1054" y="1114" width="26" height="38" fill="#5a3a26" stroke-width="4"/>
+    <rect x="1023" y="1104" width="22" height="20" fill="#ffd84a" stroke-width="4"/>
+    <rect x="1090" y="1104" width="22" height="20" fill="#ffd84a" stroke-width="4"/>
+  </g>
+
+  <!-- front hill with big firs and patches of snow -->
+  <path d="M1140 1210 C1150 1150 1170 1110 1190 1103 L1210 1103 L1230 1103 L1250 1101 L1270 1097 L1290 1094 L1310 1090 L1330 1088 L1350 1086 L1370 1086 L1390 1086 L1410 1087 L1430 1088 L1450 1088 L1470 1088 L1490 1086 L1510 1085 L1530 1084 L1550 1084 L1570 1085 L1590 1087 L1610 1091 L1610 1210 Z" fill="#4aa96c" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="#ffffff" stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <path d="M1262 1164 C1270 1148 1300 1150 1312 1156 C1326 1146 1352 1152 1358 1166 C1340 1180 1290 1180 1262 1164 Z"/>
+    <path d="M1430 1154 C1440 1140 1474 1140 1488 1146 C1504 1136 1532 1144 1538 1156 C1520 1172 1460 1172 1430 1154 Z"/>
+  </g>
+  <use xlink:href="#f3" x="1224" y="1112" fill="#2a8a52"/><use xlink:href="#f3" x="1289" y="1101" fill="#36a062"/><use xlink:href="#f3" x="1354" y="1099" fill="#2a8a52"/><use xlink:href="#f3" x="1418" y="1101" fill="#36a062"/><use xlink:href="#f3" x="1482" y="1094" fill="#2a8a52"/><use xlink:href="#f3" x="1550" y="1093" fill="#36a062"/><use xlink:href="#f3" x="1612" y="1098" fill="#2a8a52"/>
+
+  <!-- the tip of the plane's wing, seen from the window -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <path d="M-20 1035 L330 1112 C342 1115 346 1122 344 1132 L338 1152 L-20 1236 Z" fill="#eef1f4"/>
+    <path d="M-20 1190 L300 1142 L338 1152 L-20 1236 Z" fill="#c9d0d8" stroke-width="4"/>
+    <path d="M306 1112 C326 1076 342 1032 348 990 C350 978 380 976 384 990 C384 1050 368 1112 344 1152 Z" fill="#e8343a"/>
+    <path d="M40 1060 L28 1205 M150 1084 L140 1188" fill="none" stroke="#c9d0d8" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

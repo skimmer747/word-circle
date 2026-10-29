@@ -1,0 +1,323 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <!-- the oak: trunk, the big right limb, the twisting limb and the arm that loops over to make a hole -->
+    <clipPath id="treeClip">
+      <path clip-rule="evenodd" d="M-10 -10 L485 -10 C600 160 820 430 935 620 Q955 645 978 620 C995 600 1015 580 1035 560 C990 470 965 360 985 250 C1000 160 985 80 955 -10 L1330 -10 C1450 10 1550 50 1610 95 L1610 400 C1450 460 1280 560 1190 690 C1120 790 1095 900 1100 1210 L690 1210 L700 1000 C690 800 620 640 520 520 C420 400 300 280 230 190 C180 150 100 140 -10 140 Z M1165 105 C1250 72 1370 78 1430 190 C1350 250 1255 330 1182 445 C1145 340 1140 200 1165 105 Z"/>
+    </clipPath>
+    <clipPath id="sailClip">
+      <path d="M610 -10 L868 -10 L1030 640 L700 880 Z"/>
+    </clipPath>
+
+    <!-- a drape of Spanish moss -->
+    <g id="moss">
+      <path d="M-22 0 C-14 40 -30 75 -18 115 C-10 140 -22 170 -10 205 L-3 185 L4 220 L10 190 L18 205 C14 160 26 130 16 95 C10 60 26 30 20 0 Z"
+        fill="#b9c8ab" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M-8 20 C-4 55 -14 90 -6 135 M6 25 C12 65 2 100 8 150" fill="none" stroke="#93a586" stroke-width="3" stroke-linecap="round"/>
+    </g>
+
+    <!-- a bromeliad rosette: fill = front leaves, color = back leaves and heart -->
+    <g id="brom" stroke="#26232e" stroke-width="3.5" stroke-linejoin="round">
+      <g fill="currentColor">
+        <path d="M0 0 C-11 -16 -9 -36 0 -50 C9 -36 11 -16 0 0 Z" transform="rotate(30)"/>
+        <path d="M0 0 C-11 -16 -9 -36 0 -50 C9 -36 11 -16 0 0 Z" transform="rotate(90)"/>
+        <path d="M0 0 C-11 -16 -9 -36 0 -50 C9 -36 11 -16 0 0 Z" transform="rotate(150)"/>
+        <path d="M0 0 C-11 -16 -9 -36 0 -50 C9 -36 11 -16 0 0 Z" transform="rotate(210)"/>
+        <path d="M0 0 C-11 -16 -9 -36 0 -50 C9 -36 11 -16 0 0 Z" transform="rotate(270)"/>
+        <path d="M0 0 C-11 -16 -9 -36 0 -50 C9 -36 11 -16 0 0 Z" transform="rotate(330)"/>
+      </g>
+      <path d="M0 0 C-13 -20 -10 -44 0 -60 C10 -44 13 -20 0 0 Z"/>
+      <path d="M0 0 C-13 -20 -10 -44 0 -60 C10 -44 13 -20 0 0 Z" transform="rotate(60)"/>
+      <path d="M0 0 C-13 -20 -10 -44 0 -60 C10 -44 13 -20 0 0 Z" transform="rotate(120)"/>
+      <path d="M0 0 C-13 -20 -10 -44 0 -60 C10 -44 13 -20 0 0 Z" transform="rotate(180)"/>
+      <path d="M0 0 C-13 -20 -10 -44 0 -60 C10 -44 13 -20 0 0 Z" transform="rotate(240)"/>
+      <path d="M0 0 C-13 -20 -10 -44 0 -60 C10 -44 13 -20 0 0 Z" transform="rotate(300)"/>
+      <circle r="9" fill="currentColor"/>
+    </g>
+
+    <!-- a fern frond hanging down from its base; stroke width comes from the parent -->
+    <g id="frond" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-13 0 C-22 70 -10 140 -24 196 L-36 232 L-15 212 L-3 242 L6 208 C15 150 17 70 13 0 Z"/>
+      <path d="M0 12 C-2 80 -3 140 -10 200" fill="none" stroke="currentColor"/>
+    </g>
+
+    <!-- a fern frond that arches out to the right and droops -->
+    <g id="droop" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M0 -12 C70 -48 160 -40 206 40 L226 84 L204 66 L196 98 L186 62 C150 -6 80 -20 0 12 Z"/>
+      <path d="M8 0 C80 -30 150 -20 194 58" fill="none" stroke="currentColor"/>
+    </g>
+
+    <!-- a big pointed leaf standing up from its base -->
+    <g id="bigleaf" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M0 0 C-36 -30 -38 -95 0 -135 C38 -95 36 -30 0 0 Z"/>
+      <path d="M0 -10 C-2 -50 -2 -90 0 -120" fill="none" stroke="currentColor"/>
+    </g>
+
+    <!-- a little tuft of fern growing on the bark -->
+    <g id="tuft" fill="#57b045" stroke="#26232e" stroke-width="3" stroke-linejoin="round">
+      <path d="M0 0 C-20 -6 -34 -20 -38 -36 C-20 -32 -6 -18 0 0 Z"/>
+      <path d="M0 0 C-6 -20 -2 -40 8 -54 C14 -36 10 -16 0 0 Z"/>
+      <path d="M0 0 C16 -10 32 -12 44 -6 C34 4 16 6 0 0 Z"/>
+    </g>
+  </defs>
+
+  <!-- sky -->
+  <rect width="1600" height="1200" fill="#9ad7f5"/>
+
+  <!-- trees behind the oak: on the left, and behind the hole and the sail on the right -->
+  <g fill="#4a9a48" stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <path d="M-10 120 L300 120 C320 170 300 220 270 240 C300 280 290 340 250 350 C270 400 240 450 190 445 C190 490 140 520 100 505 C80 540 30 550 -10 530 Z"/>
+    <path d="M840 -10 L1610 -10 L1610 300 L1450 470 L1100 640 L840 640 Z"/>
+  </g>
+  <g fill="#5fb35a">
+    <ellipse cx="80" cy="280" rx="60" ry="28"/>
+    <ellipse cx="190" cy="215" rx="48" ry="22"/>
+    <ellipse cx="110" cy="420" rx="48" ry="22"/>
+    <ellipse cx="1260" cy="150" rx="48" ry="24"/>
+    <ellipse cx="1230" cy="290" rx="30" ry="46"/>
+    <ellipse cx="1330" cy="200" rx="34" ry="20"/>
+    <ellipse cx="925" cy="110" rx="26" ry="50"/>
+    <ellipse cx="960" cy="360" rx="16" ry="40"/>
+    <ellipse cx="1500" cy="22" rx="60" ry="22"/>
+  </g>
+
+  <!-- far shore and the lake -->
+  <path d="M-10 815 L-10 700 Q35 673 81 702 Q119 676 158 701 Q188 669 219 700 Q254 651 290 701 Q334 658 379 697 Q420 680 461 701 Q502 672 543 702 Q582 671 620 699 Q655 670 689 700 Q734 675 778 703 Q823 662 868 703 Q897 675 926 698 Q964 676 1001 700 Q1043 676 1084 702 Q1116 676 1148 698 Q1181 652 1213 699 Q1247 679 1281 700 Q1316 667 1351 701 Q1380 678 1408 704 Q1454 676 1500 699 Q1535 659 1569 696 Q1607 658 1645 701 L1610 815 Z"
+    fill="#2f7a3d" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <g fill="#3f9150">
+    <ellipse cx="510" cy="745" rx="40" ry="20"/><ellipse cx="610" cy="770" rx="34" ry="18"/>
+    <ellipse cx="660" cy="735" rx="28" ry="16"/><ellipse cx="1150" cy="745" rx="40" ry="20"/>
+    <ellipse cx="1250" cy="770" rx="34" ry="18"/><ellipse cx="1330" cy="738" rx="30" ry="16"/>
+    <ellipse cx="1450" cy="755" rx="40" ry="20"/><ellipse cx="1560" cy="740" rx="30" ry="16"/>
+  </g>
+  <rect x="-10" y="813" width="1620" height="400" fill="#2f8ad6" stroke="#26232e" stroke-width="5"/>
+  <path d="M575 905 h50 M600 1060 h45 M1140 860 h60 M1180 905 h70 M1140 1050 h60 M1215 1080 h40 M1400 880 h60 M1500 905 h50"
+    stroke="#b9e6ff" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- a little sailboat far out on the lake -->
+  <g stroke="#26232e" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M627 800 V862" fill="none"/>
+    <path d="M630 806 L630 856 L662 856 Z" fill="#ffffff"/>
+    <path d="M623 816 L623 856 L598 856 Z" fill="#ffffff"/>
+    <path d="M590 862 L668 862 L656 880 L602 880 Z" fill="#e8343a"/>
+  </g>
+
+  <!-- white dock posts and rope behind the railing -->
+  <g stroke="#26232e" stroke-width="5" stroke-linejoin="round" fill="#ffffff">
+    <rect x="576" y="985" width="22" height="230"/>
+    <rect x="1252" y="985" width="22" height="230"/>
+  </g>
+  <path d="M470 1004 Q530 1050 587 996 Q645 1050 700 1006 M1130 1006 Q1190 1050 1263 996 Q1330 1050 1400 1006" fill="none" stroke="#26232e" stroke-width="12" stroke-linecap="round"/>
+  <path d="M470 1004 Q530 1050 587 996 Q645 1050 700 1006 M1130 1006 Q1190 1050 1263 996 Q1330 1050 1400 1006" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- black railing -->
+  <g stroke="#26232e" stroke-linecap="round">
+    <path d="M380 958 H1610" stroke-width="11"/>
+    <path d="M380 1100 H1610" stroke-width="8"/>
+    <path d="M420 958 V1210 M466 958 V1210 M512 958 V1210 M558 958 V1210 M604 958 V1210 M650 958 V1210 M696 958 V1210 M742 958 V1210 M788 958 V1210 M834 958 V1210 M880 958 V1210 M926 958 V1210 M972 958 V1210 M1018 958 V1210 M1064 958 V1210 M1110 958 V1210 M1156 958 V1210 M1202 958 V1210 M1248 958 V1210 M1294 958 V1210 M1340 958 V1210 M1386 958 V1210 M1432 958 V1210 M1478 958 V1210 M1524 958 V1210 M1570 958 V1210" stroke-width="6"/>
+  </g>
+
+  <!-- a cardinal on the railing -->
+  <g transform="translate(1200 953) scale(1.15)" stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-6 -12 L-8 0 M6 -12 L6 0" fill="none" stroke-width="4"/>
+    <path d="M18 -26 C32 -22 46 -12 54 2 C40 4 26 -4 12 -14 Z" fill="#b51d24" stroke-width="4"/>
+    <path d="M-30 -60 C-32 -74 -22 -82 -14 -82 L-8 -100 L-2 -80 C6 -76 8 -64 6 -56 C20 -54 30 -40 28 -26 C26 -14 12 -10 0 -10 C-16 -10 -24 -22 -24 -36 C-24 -46 -28 -52 -30 -60 Z" fill="#e0262c" stroke-width="5"/>
+    <path d="M-6 -42 C6 -50 22 -42 24 -28 C14 -22 0 -28 -6 -42 Z" fill="#b51d24" stroke-width="3.5"/>
+    <path d="M-31 -66 C-26 -60 -18 -60 -14 -66 C-14 -56 -22 -50 -29 -54 Z" fill="#26232e" stroke-width="2"/>
+    <path d="M-30 -66 L-44 -59 L-29 -53 Z" fill="#f6a13a" stroke-width="3"/>
+    <circle cx="-17" cy="-69" r="4" fill="#26232e" stroke="none"/>
+    <circle cx="-16" cy="-70" r="1.5" fill="#ffffff" stroke="none"/>
+  </g>
+
+  <!-- the big sail behind the tree -->
+  <path d="M610 -10 L868 -10 L1030 640 L700 880 Z" fill="#ffffff"/>
+  <g clip-path="url(#sailClip)">
+    <path d="M600 -20 L735 -20 L800 570 L600 570 Z" fill="#1fa6e0" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M770 -20 L900 -20 L1060 700 L905 731 Z" fill="#c6e83a" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M600 140 L940 168 M600 310 L980 342 M600 470 L1020 504" stroke="#26232e" stroke-width="3"/>
+  </g>
+  <path d="M610 -10 L868 -10 L1030 640 L700 880 Z" fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M868 -10 L1030 640" stroke="#26232e" stroke-width="18" stroke-linecap="round"/>
+  <path d="M868 -10 L1030 640" stroke="#55555f" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Spanish moss hanging from the branches (tops tuck behind the bark) -->
+  <use xlink:href="#moss" transform="translate(30 120) rotate(3) scale(1.1)"/>
+  <use xlink:href="#moss" transform="translate(150 135) rotate(-4) scale(1.2)"/>
+  <use xlink:href="#moss" transform="translate(205 150) rotate(5) scale(0.7)"/>
+  <use xlink:href="#moss" transform="translate(268 205) rotate(-3) scale(1.0)"/>
+  <use xlink:href="#moss" transform="translate(458 400) rotate(4) scale(0.8)"/>
+  <use xlink:href="#moss" transform="translate(522 -30) scale(0.85)"/>
+  <use xlink:href="#moss" transform="translate(577 -40) rotate(-3) scale(0.95)"/>
+  <use xlink:href="#moss" transform="translate(915 -30) scale(0.9)"/>
+  <use xlink:href="#moss" transform="translate(1235 70) rotate(4) scale(1.0)"/>
+  <use xlink:href="#moss" transform="translate(1350 75) rotate(-5) scale(0.7)"/>
+  <use xlink:href="#moss" transform="translate(1450 -40) scale(0.8)"/>
+  <use xlink:href="#moss" transform="translate(1545 -20) scale(0.75)"/>
+  <use xlink:href="#moss" transform="translate(1232 620) rotate(3) scale(0.8)"/>
+  <use xlink:href="#moss" transform="translate(1290 565) rotate(-3) scale(0.95)"/>
+
+  <!-- the hanging fern under the big limb on the right -->
+  <g stroke-width="3.5">
+    <use xlink:href="#frond" fill="#4ea53a" color="#2f7f2c" transform="translate(1385 495) rotate(8) scale(0.95 1.3)"/>
+    <use xlink:href="#frond" fill="#4ea53a" color="#2f7f2c" transform="translate(1470 448) rotate(-4) scale(1.0 1.55)"/>
+    <use xlink:href="#frond" fill="#4ea53a" color="#2f7f2c" transform="translate(1570 408) rotate(5) scale(1.0 1.45)"/>
+    <use xlink:href="#frond" fill="#6cbf45" color="#3f8f2f" transform="translate(1345 528) rotate(-6) scale(0.95 1.15)"/>
+    <use xlink:href="#frond" fill="#6cbf45" color="#3f8f2f" transform="translate(1428 472) rotate(3) scale(1.0 1.4)"/>
+    <use xlink:href="#frond" fill="#6cbf45" color="#3f8f2f" transform="translate(1520 428) rotate(-6) scale(1.0 1.6)"/>
+    <use xlink:href="#frond" fill="#6cbf45" color="#3f8f2f" transform="translate(1610 400) rotate(7) scale(1.0 1.35)"/>
+  </g>
+
+  <!-- a flying gull -->
+  <g transform="translate(350 478) scale(1.2)" stroke="#26232e" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-64 0 C-50 -24 -24 -26 -6 -2 L6 -2 C24 -26 50 -24 64 0 C44 -8 24 -4 8 8 L-8 8 C-24 -4 -44 -8 -64 0 Z" fill="#ffffff"/>
+    <ellipse cx="0" cy="4" rx="11" ry="9" fill="#ffffff"/>
+    <path d="M-3 9 L0 16 L3 9 Z" fill="#f6a13a" stroke-width="2.5"/>
+  </g>
+
+  <!-- the live oak -->
+  <path d="M-10 -10 L485 -10 C600 160 820 430 935 620 Q955 645 978 620 C995 600 1015 580 1035 560 C990 470 965 360 985 250 C1000 160 985 80 955 -10 L1330 -10 C1450 10 1550 50 1610 95 L1610 400 C1450 460 1280 560 1190 690 C1120 790 1095 900 1100 1210 L690 1210 L700 1000 C690 800 620 640 520 520 C420 400 300 280 230 190 C180 150 100 140 -10 140 Z M1165 105 C1250 72 1370 78 1430 190 C1350 250 1255 330 1182 445 C1145 340 1140 200 1165 105 Z"
+    fill="#a0968a" fill-rule="evenodd"/>
+  <g clip-path="url(#treeClip)">
+    <g fill="#857c71">
+      <path d="M-10 100 C100 100 200 118 262 152 C360 262 480 390 590 520 C680 650 735 820 755 1210 L-10 1210 Z"/>
+      <path d="M1610 335 C1450 395 1260 500 1160 630 C1090 730 1050 900 1045 1210 L1700 1210 L1700 335 Z"/>
+      <path d="M1040 600 C1010 470 1005 360 1025 250 C1040 160 1030 80 1005 -10 L900 -10 L900 600 Z"/>
+    </g>
+    <g fill="#b4ab9e">
+      <path d="M420 -10 C530 150 740 420 870 640 L960 600 L700 -10 Z"/>
+      <path d="M1180 -10 L1330 -10 C1450 10 1550 50 1610 95 L1610 140 C1540 100 1450 60 1330 40 C1260 30 1210 15 1180 -10 Z"/>
+      <path d="M1182 445 C1255 330 1350 250 1430 190 L1610 95 L1610 165 L1460 250 C1370 310 1290 390 1230 490 Z"/>
+      <path d="M1182 445 C1145 340 1140 200 1165 105 C1095 200 1080 340 1182 445 Z"/>
+    </g>
+    <path fill="none" stroke="#6e665b" stroke-width="5" stroke-linecap="round" d="M18 63Q30 59 42 64 M3 108Q22 114 41 109 M64 34Q83 39 101 35 M63 82Q77 73 91 83 M127 22Q147 28 166 23 M137 65Q150 71 164 66 M137 115Q157 106 176 116 M199 47Q212 55 225 48 M188 85Q208 78 227 86 M264 23Q279 29 295 24 M255 70Q271 63 287 71 M260 109Q280 102 299 111 M448 -56Q461 -45 466 -28 M408 -25Q412 -11 423 -2 M369 6Q385 14 386 31 M333 23Q334 43 352 52 M294 54Q309 66 313 84 M258 81Q272 91 276 108 M507 -3Q521 4 521 19 M463 9Q466 26 480 35 M418 37Q435 47 437 67 M387 75Q400 87 406 105 M350 104Q362 113 366 128 M309 111Q324 122 329 141 M551 33Q564 45 570 62 M513 63Q531 74 534 95 M478 83Q479 99 493 107 M435 112Q437 131 454 141 M406 136Q408 155 425 165 M363 160Q378 174 384 192 M322 178Q340 188 342 208 M572 106Q584 113 586 127 M533 120Q536 135 548 143 M490 146Q505 159 511 178 M462 178Q480 190 483 211 M414 206Q417 223 431 232 M380 224Q385 242 399 253 M584 172Q601 184 605 204 M550 188Q567 200 571 220 M507 210Q511 230 528 242 M474 252Q477 266 488 274 M438 272Q437 288 452 293 M395 289Q413 298 414 318 M643 217Q656 225 657 240 M596 234Q611 247 617 266 M566 253Q568 272 584 281 M530 285Q544 295 547 311 M478 301Q493 315 499 333 M447 328Q465 339 467 359 M681 240Q696 252 699 271 M645 270Q658 282 662 299 M617 292Q628 300 630 313 M564 307Q579 316 579 334 M534 341Q549 350 549 368 M490 353Q495 370 507 381 M459 385Q463 401 475 413 M704 314Q715 322 717 335 M661 337Q663 356 679 368 M626 356Q637 365 639 378 M581 381Q596 396 601 416 M544 404Q550 423 564 437 M503 432Q507 447 519 458 M706 370Q723 382 726 403 M667 397Q666 414 682 422 M634 420Q635 440 653 451 M597 456Q611 464 610 479 M555 462Q556 481 572 490 M766 415Q779 427 783 445 M728 444Q743 455 745 473 M688 465Q704 474 704 492 M643 484Q659 494 660 513 M610 513Q612 534 629 546 M567 528Q580 540 584 558 M777 496Q792 505 793 523 M737 505Q752 515 754 533 M702 531Q701 546 714 552 M659 550Q676 560 676 579 M623 578Q626 592 637 603 M584 610Q586 624 598 633 M823 526Q835 537 838 553 M793 550Q795 567 809 577 M750 582Q765 593 767 612 M718 605Q719 623 735 633 M671 623Q687 637 691 658 M641 650Q643 667 657 677 M898 625Q907 639 906 655 M857 630Q864 641 864 655 M814 649Q825 664 823 682 M769 654Q768 668 776 680 M720 658Q734 673 730 692 M682 672Q681 688 690 701 M638 688Q648 701 646 717 M901 691Q910 706 909 723 M842 693Q838 714 853 731 M807 713Q821 727 816 745 M761 731Q760 748 769 762 M721 743Q731 756 729 773 M669 738Q682 753 678 773 M883 753Q893 764 890 778 M845 758Q843 778 854 794 M803 779Q797 796 811 807 M759 790Q770 806 769 826 M714 801Q708 815 721 824 M666 817Q677 834 676 854 M933 814Q942 830 942 847 M882 814Q880 835 892 851 M836 832Q832 849 844 861 M793 855Q806 868 801 886 M756 861Q769 877 766 898 M709 873Q707 888 716 899 M924 883Q937 893 931 908 M871 880Q869 900 881 915 M836 910Q830 926 843 937 M790 905Q785 925 799 939 M739 919Q737 938 748 952 M700 944Q697 965 711 981 M958 925Q970 940 967 959 M917 935Q927 951 926 970 M876 957Q886 972 886 991 M826 964Q824 985 837 1001 M787 991Q798 1003 795 1020 M740 1002Q740 1019 749 1034 M910 695Q924 687 930 671 M948 719Q953 700 972 691 M985 754Q992 735 1009 724 M1019 779Q1022 764 1037 758 M1050 805Q1053 786 1071 779 M1092 827Q1107 821 1110 806 M969 651Q971 637 984 633 M1003 688Q1017 680 1022 665 M1037 712Q1051 705 1056 689 M1072 749Q1079 729 1098 719 M1112 775Q1115 758 1131 752 M1148 796Q1154 775 1174 766 M1033 611Q1037 597 1049 591 M1068 647Q1083 636 1090 619 M1098 683Q1101 667 1117 661 M1136 700Q1153 693 1157 675 M1175 728Q1189 721 1194 706 M1055 548Q1061 533 1074 525 M1093 585Q1098 565 1116 556 M1121 617Q1135 612 1138 597 M1160 648Q1173 639 1179 625 M1205 670Q1220 666 1221 651 M1231 696Q1232 681 1247 678 M1083 489Q1101 482 1104 463 M1110 524Q1114 509 1128 502 M1152 551Q1161 534 1175 523 M1179 585Q1194 578 1199 562 M1218 616Q1234 606 1242 588 M1258 634Q1274 623 1282 605 M1135 455Q1141 436 1158 428 M1165 493Q1182 485 1187 467 M1204 521Q1213 503 1229 491 M1238 547Q1254 535 1263 517 M1275 578Q1292 571 1296 554 M1209 362Q1224 364 1230 350 M1229 398Q1245 396 1255 383 M1243 444Q1261 446 1268 430 M1268 490Q1283 488 1292 476 M1299 527Q1314 525 1323 513 M1310 565Q1321 553 1337 550 M1270 354Q1281 339 1299 337 M1286 399Q1295 383 1313 383 M1307 434Q1323 431 1334 418 M1336 471Q1343 457 1358 458 M1371 509Q1380 495 1397 494 M1329 340Q1346 335 1359 323 M1354 385Q1363 368 1383 368 M1376 417Q1385 404 1400 403 M1401 459Q1414 446 1432 441 M1428 503Q1447 502 1458 485 M1383 288Q1400 289 1407 274 M1395 328Q1404 314 1420 314 M1418 375Q1433 361 1453 355 M1448 407Q1458 394 1474 392 M1480 445Q1487 429 1505 430 M1430 234Q1441 219 1460 217 M1448 270Q1457 256 1474 255 M1462 316Q1479 313 1491 300 M1489 349Q1505 348 1514 334 M1505 399Q1527 397 1539 379 M1539 427Q1548 411 1567 410 M1486 227Q1496 213 1514 211 M1510 260Q1530 257 1542 241 M1539 298Q1556 295 1567 282 M1552 345Q1572 344 1582 327 M1583 377Q1591 367 1604 364 M1554 207Q1564 193 1582 190 M1579 248Q1591 231 1612 228 M1599 288Q1607 273 1625 273 M1083 478Q1072 463 1076 444 M1126 461Q1130 442 1119 427 M1048 403Q1052 385 1040 370 M1088 401Q1077 383 1080 363 M1135 380Q1125 367 1129 350 M1059 342Q1046 330 1052 314 M1102 322Q1093 309 1095 293 M1042 292Q1036 273 1044 254 M1090 277Q1098 262 1091 246 M1024 218Q1034 199 1025 179 M1074 221Q1078 208 1075 194 M1121 218Q1132 199 1123 179 M1001 134Q1009 120 999 108 M1049 133Q1041 122 1047 109 M1097 119Q1102 106 1095 94 M1020 72Q1028 52 1016 33 M1068 65Q1062 46 1065 26 M1106 64Q1109 50 1103 37 M994 9Q987 -5 991 -19 M1030 3Q1037 -15 1027 -31 M1084 -7Q1075 -20 1082 -35 M1185 39Q1203 34 1221 41 M1260 19Q1276 11 1291 21 M1336 10Q1350 1 1363 11 M1326 47Q1339 39 1352 49 M1397 15Q1418 13 1432 28 M1395 56Q1413 53 1423 67 M1458 64Q1467 76 1481 73 M1517 108Q1532 110 1544 119"/>
+  </g>
+  <path d="M-10 -10 L485 -10 C600 160 820 430 935 620 Q955 645 978 620 C995 600 1015 580 1035 560 C990 470 965 360 985 250 C1000 160 985 80 955 -10 L1330 -10 C1450 10 1550 50 1610 95 L1610 400 C1450 460 1280 560 1190 690 C1120 790 1095 900 1100 1210 L690 1210 L700 1000 C690 800 620 640 520 520 C420 400 300 280 230 190 C180 150 100 140 -10 140 Z M1165 105 C1250 72 1370 78 1430 190 C1350 250 1255 330 1182 445 C1145 340 1140 200 1165 105 Z"
+    fill="none" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- little ferns growing on the bark -->
+  <use xlink:href="#tuft" transform="translate(690 545) rotate(-25) scale(1.2)"/>
+
+  <!-- knot holes in the bark -->
+  <g stroke="#26232e" stroke-linejoin="round">
+    <g transform="translate(425 175) rotate(58)">
+      <ellipse rx="36" ry="22" fill="#857c71" stroke-width="5"/>
+      <ellipse cx="2" rx="19" ry="10" fill="#4a433c" stroke-width="3"/>
+    </g>
+    <g transform="translate(1070 330) rotate(95)">
+      <ellipse rx="28" ry="17" fill="#857c71" stroke-width="5"/>
+      <ellipse cx="2" rx="14" ry="8" fill="#4a433c" stroke-width="3"/>
+    </g>
+    <g transform="translate(1310 470) rotate(-38)">
+      <ellipse rx="30" ry="18" fill="#857c71" stroke-width="5"/>
+      <ellipse cx="2" rx="15" ry="8" fill="#4a433c" stroke-width="3"/>
+    </g>
+  </g>
+
+  <!-- a little green lizard climbing the trunk -->
+  <g transform="translate(560 315) rotate(64) scale(1.45)" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-16 -8 L-24 -22 L-30 -24 M-16 8 L-24 22 L-30 24 M16 -7 L26 -20 L32 -20 M16 7 L26 20 L32 20" fill="none" stroke="#26232e" stroke-width="10"/>
+    <path d="M-16 -8 L-24 -22 L-30 -24 M-16 8 L-24 22 L-30 24 M16 -7 L26 -20 L32 -20 M16 7 L26 20 L32 20" fill="none" stroke="#6cc83f" stroke-width="4"/>
+    <path d="M24 0 C55 0 70 18 94 14" fill="none" stroke="#26232e" stroke-width="13"/>
+    <path d="M24 0 C55 0 70 18 94 14" fill="none" stroke="#6cc83f" stroke-width="6"/>
+    <path d="M-54 0 C-52 -6 -40 -11 -28 -9 C-14 -13 14 -13 30 -6 C36 -3 36 3 30 6 C14 13 -14 13 -28 9 C-40 11 -52 6 -54 0 Z" fill="#6cc83f" stroke="#26232e" stroke-width="4"/>
+    <path d="M-20 0 H18" stroke="#4fa52c" stroke-width="4"/>
+    <circle cx="-40" cy="-5" r="3" fill="#26232e"/>
+    <circle cx="-40" cy="5" r="3" fill="#26232e"/>
+  </g>
+  <use xlink:href="#tuft" transform="translate(1250 40) rotate(10) scale(1.1)"/>
+  <use xlink:href="#tuft" transform="translate(1500 330) rotate(-15) scale(1.2)"/>
+
+  <!-- a second trunk at the left edge -->
+  <path d="M-10 690 C40 678 92 712 108 790 C120 880 110 1040 118 1210 L-10 1210 Z" fill="#a0968a" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M30 760 q6 20 0 40 M70 800 q6 20 0 40 M40 870 q-6 20 0 40 M82 905 q-6 20 0 40 M30 980 q6 20 0 40 M78 1020 q-6 20 0 40 M35 1090 q6 20 0 40 M80 1130 q-6 20 0 40"
+    fill="none" stroke="#6e665b" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- the big dark green fern on the left -->
+  <g stroke-width="3">
+    <use xlink:href="#droop" fill="#2f8a35" color="#1f6b28" transform="translate(365 990) scale(-1 1) rotate(-55) scale(1.35)"/>
+    <use xlink:href="#droop" fill="#2f8a35" color="#1f6b28" transform="translate(365 990) scale(-1 1) rotate(-78) scale(1.6)"/>
+    <use xlink:href="#droop" fill="#3f9b3a" color="#2a7a2c" transform="translate(365 990) scale(-1 1) rotate(-98) scale(1.8)"/>
+    <use xlink:href="#droop" fill="#3f9b3a" color="#2a7a2c" transform="translate(365 990) rotate(-72) scale(1.55)"/>
+    <use xlink:href="#droop" fill="#2f8a35" color="#1f6b28" transform="translate(365 990) rotate(-92) scale(1.85)"/>
+    <use xlink:href="#droop" fill="#4fae3c" color="#2e7f31" transform="translate(372 990) rotate(-84) scale(1.4)"/>
+    <use xlink:href="#droop" fill="#4fae3c" color="#2e7f31" transform="translate(358 990) scale(-1 1) rotate(-86) scale(1.35)"/>
+  </g>
+
+  <!-- red bromeliads on the left -->
+  <path d="M30 680 C80 640 150 660 190 720 C250 790 310 850 340 920 C370 990 375 1100 370 1210 L120 1210 C115 1080 110 920 100 800 C80 740 50 710 30 680 Z" fill="#a8282c"/>
+  <use xlink:href="#brom" fill="#ec4a2f" color="#a8282c" transform="translate(40 660) rotate(10) scale(0.9)"/>
+  <use xlink:href="#brom" fill="#f26b3a" color="#c13c29" transform="translate(125 650) rotate(25) scale(0.8)"/>
+  <use xlink:href="#brom" fill="#d93348" color="#9a2035" transform="translate(175 725) rotate(5) scale(0.9)"/>
+  <use xlink:href="#brom" fill="#ec4a2f" color="#a8282c" transform="translate(110 745) rotate(20) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#f26b3a" color="#c13c29" transform="translate(235 795) rotate(15) scale(0.9)"/>
+  <use xlink:href="#brom" fill="#ec4a2f" color="#a8282c" transform="translate(155 825) rotate(0) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#d93348" color="#9a2035" transform="translate(295 865) rotate(28) scale(0.9)"/>
+  <use xlink:href="#brom" fill="#f26b3a" color="#c13c29" transform="translate(210 895) rotate(8) scale(1.05)"/>
+  <use xlink:href="#brom" fill="#ec4a2f" color="#a8282c" transform="translate(130 930) rotate(22) scale(0.9)"/>
+  <use xlink:href="#brom" fill="#ec4a2f" color="#a8282c" transform="translate(335 945) rotate(12) scale(0.95)"/>
+  <use xlink:href="#brom" fill="#d93348" color="#9a2035" transform="translate(255 975) rotate(0) scale(1.05)"/>
+  <use xlink:href="#brom" fill="#f26b3a" color="#c13c29" transform="translate(165 1015) rotate(18) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#f26b3a" color="#c13c29" transform="translate(355 1045) rotate(5) scale(0.95)"/>
+  <use xlink:href="#brom" fill="#ec4a2f" color="#a8282c" transform="translate(270 1075) rotate(25) scale(1.05)"/>
+  <use xlink:href="#brom" fill="#d93348" color="#9a2035" transform="translate(180 1115) rotate(10) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#ec4a2f" color="#a8282c" transform="translate(345 1145) rotate(0) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#f26b3a" color="#c13c29" transform="translate(255 1175) rotate(15) scale(1.05)"/>
+
+  <!-- dark red bromeliads around the bottom of the trunk -->
+  <path d="M935 660 C975 680 1020 740 1050 810 C1090 890 1100 1000 1095 1210 L640 1210 C645 1070 690 920 780 830 C850 750 895 680 935 660 Z" fill="#8e1f33"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(935 650) rotate(0) scale(0.75)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(893 718) rotate(20) scale(0.85)"/>
+  <use xlink:href="#brom" fill="#e0442f" color="#a8282c" transform="translate(977 722) rotate(8) scale(0.85)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(850 792) rotate(12) scale(0.95)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(937 792) rotate(28) scale(0.95)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(1030 802) rotate(5) scale(0.9)"/>
+  <use xlink:href="#brom" fill="#e0442f" color="#a8282c" transform="translate(792 872) rotate(18) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(887 872) rotate(0) scale(1.05)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(985 877) rotate(22) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#e0442f" color="#a8282c" transform="translate(1075 882) rotate(10) scale(0.9)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(737 952) rotate(5) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(837 952) rotate(25) scale(1.1)"/>
+  <use xlink:href="#brom" fill="#e0442f" color="#a8282c" transform="translate(942 957) rotate(12) scale(1.1)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(1047 962) rotate(0) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#e0442f" color="#a8282c" transform="translate(690 1037) rotate(20) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(790 1037) rotate(8) scale(1.1)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(895 1042) rotate(28) scale(1.1)"/>
+  <use xlink:href="#brom" fill="#e0442f" color="#a8282c" transform="translate(1000 1042) rotate(15) scale(1.05)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(1095 1042) rotate(3) scale(0.95)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(650 1122) rotate(10) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(745 1127) rotate(25) scale(1.1)"/>
+  <use xlink:href="#brom" fill="#e0442f" color="#a8282c" transform="translate(850 1127) rotate(0) scale(1.1)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(960 1127) rotate(18) scale(1.1)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(1060 1122) rotate(8) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#e0442f" color="#a8282c" transform="translate(800 1200) rotate(12) scale(1.0)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(905 1200) rotate(0) scale(1.1)"/>
+  <use xlink:href="#brom" fill="#c42a3e" color="#7e1830" transform="translate(1010 1205) rotate(20) scale(1.0)"/>
+
+  <!-- a yellow butterfly on the red bush -->
+  <g transform="translate(905 985) rotate(-15) scale(1.25)" stroke="#26232e" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M0 0 C-10 -30 -44 -40 -46 -16 C-48 -2 -20 4 0 0 Z" fill="#ffd84a"/>
+    <path d="M0 0 C10 -30 44 -40 46 -16 C48 -2 20 4 0 0 Z" fill="#ffd84a"/>
+    <path d="M0 2 C-14 6 -36 16 -30 32 C-24 42 -6 26 0 2 Z" fill="#ffb21a"/>
+    <path d="M0 2 C14 6 36 16 30 32 C24 42 6 26 0 2 Z" fill="#ffb21a"/>
+    <path d="M0 -14 L0 24" stroke-width="7"/>
+    <path d="M0 -14 C-4 -26 -10 -32 -16 -34 M0 -14 C4 -26 10 -32 16 -34" fill="none" stroke-width="3"/>
+  </g>
+
+  <!-- leafy plants along the bottom -->
+  <g stroke-width="5">
+    <use xlink:href="#bigleaf" fill="#4fae3c" color="#2e7f31" transform="translate(15 1215) rotate(-20) scale(0.9)"/>
+    <use xlink:href="#bigleaf" fill="#4fae3c" color="#2e7f31" transform="translate(85 1218) rotate(18) scale(0.8)"/>
+    <use xlink:href="#bigleaf" fill="#9ad448" color="#5f9e2a" transform="translate(445 1215) rotate(-38) scale(0.95)"/>
+    <use xlink:href="#bigleaf" fill="#9ad448" color="#5f9e2a" transform="translate(520 1215) rotate(-8) scale(1.05)"/>
+    <use xlink:href="#bigleaf" fill="#9ad448" color="#5f9e2a" transform="translate(595 1215) rotate(22) scale(1.0)"/>
+    <use xlink:href="#bigleaf" fill="#9ad448" color="#5f9e2a" transform="translate(665 1218) rotate(48) scale(0.85)"/>
+    <use xlink:href="#bigleaf" fill="#d6e8dc" color="#9bb8a5" transform="translate(1125 1215) rotate(-42) scale(0.9)"/>
+    <use xlink:href="#bigleaf" fill="#d6e8dc" color="#9bb8a5" transform="translate(1185 1215) rotate(-2) scale(1.0)"/>
+    <use xlink:href="#bigleaf" fill="#d6e8dc" color="#9bb8a5" transform="translate(1245 1215) rotate(40) scale(0.9)"/>
+  </g>
+  <g stroke-width="3.5">
+    <use xlink:href="#bigleaf" fill="#3f9b3a" color="#2a6f2c" transform="translate(1320 1215) rotate(-42) scale(1.4)"/>
+    <use xlink:href="#bigleaf" fill="#5cb848" color="#3a8a30" transform="translate(1400 1215) rotate(-14) scale(1.8)"/>
+    <use xlink:href="#bigleaf" fill="#3f9b3a" color="#2a6f2c" transform="translate(1495 1215) rotate(10) scale(1.9)"/>
+    <use xlink:href="#bigleaf" fill="#5cb848" color="#3a8a30" transform="translate(1580 1215) rotate(32) scale(1.6)"/>
+  </g>
+</svg>

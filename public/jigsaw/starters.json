@@ -3,7 +3,9 @@
     "id": "gator-lake-palatlakaha",
     "file": "gator-lake-palatlakaha.jpg",
     "thumb": "gator-lake-palatlakaha.thumb.jpg",
-    "caption": "Gator on Lake Palatlakaha"
+    "caption": "Gator on Lake Palatlakaha",
+    "cartoon": "gator-lake-palatlakaha.cartoon.png",
+    "cartoonThumb": "gator-lake-palatlakaha.cartoon.thumb.png"
   },
   {
     "id": "my-three-sons",
@@ -15,30 +17,40 @@
     "id": "lake-minnehaha",
     "file": "lake-minnehaha.jpg",
     "thumb": "lake-minnehaha.thumb.jpg",
-    "caption": "Lake Minnehaha"
+    "caption": "Lake Minnehaha",
+    "cartoon": "lake-minnehaha.cartoon.png",
+    "cartoonThumb": "lake-minnehaha.cartoon.thumb.png"
   },
   {
     "id": "sand-hill-cranes",
     "file": "sand-hill-cranes.jpg",
     "thumb": "sand-hill-cranes.thumb.jpg",
-    "caption": "Sand Hill Cranes"
+    "caption": "Sand Hill Cranes",
+    "cartoon": "sand-hill-cranes.cartoon.png",
+    "cartoonThumb": "sand-hill-cranes.cartoon.thumb.png"
   },
   {
     "id": "rake-the-beach",
     "file": "rake-the-beach.jpg",
     "thumb": "rake-the-beach.thumb.jpg",
-    "caption": "Rake the beach"
+    "caption": "Rake the beach",
+    "cartoon": "rake-the-beach.cartoon.png",
+    "cartoonThumb": "rake-the-beach.cartoon.thumb.png"
   },
   {
     "id": "storm-is-coming",
     "file": "storm-is-coming.jpg",
     "thumb": "storm-is-coming.thumb.jpg",
-    "caption": "Storm is coming"
+    "caption": "Storm is coming",
+    "cartoon": "storm-is-coming.cartoon.png",
+    "cartoonThumb": "storm-is-coming.cartoon.thumb.png"
   },
   {
     "id": "mount-hood",
     "file": "mount-hood.jpg",
     "thumb": "mount-hood.thumb.jpg",
-    "caption": "Mount Hood"
+    "caption": "Mount Hood",
+    "cartoon": "mount-hood.cartoon.png",
+    "cartoonThumb": "mount-hood.cartoon.thumb.png"
   }
 ]

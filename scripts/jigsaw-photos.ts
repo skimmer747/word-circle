@@ -2,6 +2,7 @@
  * Makes Jigsaw's starter pictures from the originals in photos/starter/ (kept out of git): frames each to 4:3,
  * shrinks it to 1600 × 1200 with a 448 × 336 thumbnail, and writes public/jigsaw/ with starters.json, plus the
  * review page docs/jigsaw-starters.html. Captions and which part to keep go in photos/starter/captions.txt.
+ * A starter with a hand-drawn cartoon in art/jigsaw/<its id>.svg (in git) gets that drawing too, the same sizes.
  * The whole set is rebuilt each time, and the old one is replaced only once every photo has worked.
  *
  *   npm run jigsaw-photos                  after adding photos (and captions.txt lines)
@@ -20,6 +21,8 @@ const OUT = 'public/jigsaw';
 // Built beside OUT and swapped in at the end, so a failed run never leaves a half-made set behind.
 const BUILD = 'public/.jigsaw-new';
 const REVIEW = 'docs/jigsaw-starters.html';
+/** The drawings, 1600 × 1200 SVGs named by starter id. */
+const ART = 'art/jigsaw';
 const PHOTO = { w: 1600, h: 1200 };
 const THUMB = { w: 448, h: 336 };
 const IMAGE = /\.(jpe?g|png|heic|heif|webp)$/i;
@@ -29,6 +32,8 @@ interface Starter {
   file: string;
   thumb: string;
   caption: string;
+  cartoon?: string;
+  cartoonThumb?: string;
 }
 
 /** Six plain pictures with big numbers, for building and testing before the real ones arrive. */
@@ -67,18 +72,39 @@ function reviewPage(starters: readonly Starter[]): string {
   const tiles = starters
     .map(
       (s) =>
-        `<figure><img src="../public/jigsaw/${s.thumb}" alt=""><figcaption><b>${escapeHtml(s.id)}</b><br>${
+        `<figure><img src="../public/jigsaw/${s.thumb}" alt="">${
+          s.cartoonThumb ? `<img src="../public/jigsaw/${s.cartoonThumb}" alt="">` : ''
+        }<figcaption><b>${escapeHtml(s.id)}</b><br>${
           s.caption ? escapeHtml(s.caption) : '<i>no caption</i>'
         }</figcaption></figure>`,
     )
     .join('\n');
   return `<!doctype html>
 <html><head><meta charset="utf-8"><title>Jigsaw starter pictures</title>
-<style>body{font-family:system-ui,sans-serif;margin:24px;background:#d8eaf7}main{display:grid;grid-template-columns:repeat(auto-fill,224px);gap:16px}figure{margin:0}img{display:block;width:224px;height:168px;border-radius:8px}figcaption{margin-top:4px;font-size:14px}</style>
+<style>body{font-family:system-ui,sans-serif;margin:24px;background:#d8eaf7}main{display:grid;grid-template-columns:repeat(auto-fill,224px);gap:16px}figure{margin:0}img{display:block;width:224px;height:168px;border-radius:8px;margin-bottom:4px}figcaption{margin-top:4px;font-size:14px}</style>
 </head><body><h1>Jigsaw starter pictures (${starters.length})</h1><main>
 ${tiles}
 </main></body></html>
 `;
+}
+
+/**
+ * Each drawing as palette PNGs, which keep the flat colors and outlines sharp at a fraction of a JPEG's size. A
+ * drawing whose name matches no starter stops the run: it would otherwise quietly never be seen.
+ */
+async function addDrawings(starters: Starter[]): Promise<void> {
+  const drawings = existsSync(ART) ? readdirSync(ART).filter((file) => file.endsWith('.svg')) : [];
+  for (const file of drawings) {
+    const id = file.slice(0, -'.svg'.length);
+    const starter = starters.find((s) => s.id === id);
+    if (!starter) throw new Error(`${ART}/${file}: no starter photo has the id "${id}".`);
+    const drawing = sharp(join(ART, file));
+    starter.cartoon = `${id}.cartoon.png`;
+    starter.cartoonThumb = `${id}.cartoon.thumb.png`;
+    await drawing.clone().resize(PHOTO.w, PHOTO.h).png({ palette: true, compressionLevel: 9 }).toFile(join(BUILD, starter.cartoon));
+    await drawing.clone().resize(THUMB.w, THUMB.h).png({ palette: true, compressionLevel: 9 }).toFile(join(BUILD, starter.cartoonThumb));
+    console.log(`${file} → ${starter.cartoon}`);
+  }
 }
 
 async function main(): Promise<void> {
@@ -137,6 +163,8 @@ async function main(): Promise<void> {
       }
     }
     if (starters.length === 0) throw new Error(`No usable photos in ${SOURCE}/.`);
+    // Stand-ins have ids of their own, so the drawings only go with the real photos.
+    if (!standIns) await addDrawings(starters);
     writeFileSync(join(BUILD, 'starters.json'), `${JSON.stringify(starters, null, 2)}\n`);
     // Everything worked: only now does the new set replace the old one.
     rmSync(OUT, { recursive: true, force: true });

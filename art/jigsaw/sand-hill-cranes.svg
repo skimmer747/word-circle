@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <g id="cloud">
+      <path d="M0 60 C-10 20 40 0 70 20 C90 -15 160 -10 170 30 C210 20 240 50 225 80 C230 100 210 112 190 110 L20 110 C-10 110 -20 80 0 60 Z"
+        fill="#ffffff" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+    </g>
+    <g id="crane">
+      <!-- shadow on the ground -->
+      <ellipse cx="-40" cy="262" rx="120" ry="16" fill="#26232e" opacity="0.18"/>
+      <!-- legs -->
+      <path d="M-15 70 L-25 255 M15 70 L28 255" stroke="#26232e" stroke-width="14" stroke-linecap="round"/>
+      <path d="M-15 70 L-25 255 M15 70 L28 255" stroke="#4a4a55" stroke-width="7" stroke-linecap="round"/>
+      <path d="M-25 255 L-55 262 M-25 255 L5 262 M28 255 L-2 262 M28 255 L58 262" stroke="#26232e" stroke-width="7" stroke-linecap="round"/>
+      <!-- neck -->
+      <path d="M50 -15 C80 -60 60 -120 85 -165" fill="none" stroke="#26232e" stroke-width="30" stroke-linecap="round"/>
+      <path d="M50 -15 C80 -60 60 -120 85 -165" fill="none" stroke="#b3b9c2" stroke-width="18" stroke-linecap="round"/>
+      <!-- tail bustle -->
+      <path d="M-60 0 C-105 10 -115 60 -80 80 C-60 70 -40 60 -35 40 Z" fill="#7d838d" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+      <!-- body -->
+      <path d="M-70 10 C-70 -40 10 -55 60 -25 C90 -8 88 35 55 58 C15 85 -70 70 -70 10 Z" fill="#b3b9c2" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+      <!-- wing -->
+      <path d="M-50 5 C-30 -20 30 -22 55 0 C30 20 -20 35 -50 5 Z" fill="#959ba5" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+      <!-- head -->
+      <circle cx="90" cy="-172" r="24" fill="#b3b9c2" stroke="#26232e" stroke-width="6"/>
+      <path d="M72 -180 C74 -200 104 -202 110 -184 C100 -178 82 -176 72 -180 Z" fill="#e8343a" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+      <ellipse cx="96" cy="-160" rx="14" ry="9" fill="#ffffff"/>
+      <circle cx="100" cy="-176" r="5" fill="#26232e"/>
+      <circle cx="102" cy="-178" r="1.6" fill="#ffffff"/>
+      <path d="M110 -172 L165 -158 L110 -160 Z" fill="#3b3b44" stroke="#26232e" stroke-width="4" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <!-- sky and clouds -->
+  <rect width="1600" height="420" fill="#8fd3f7"/>
+  <use xlink:href="#cloud" transform="translate(190 290) scale(0.55)"/>
+  <use xlink:href="#cloud" transform="translate(600 175) scale(0.75)"/>
+
+  <!-- far shore and lake -->
+  <path d="M0 392 C120 380 240 386 360 384 C520 378 700 390 900 382 C1100 376 1300 388 1600 380 L1600 405 L0 405 Z" fill="#2f7a3d" stroke="#26232e" stroke-width="5" stroke-linejoin="round"/>
+  <rect x="0" y="403" width="1600" height="80" fill="#2f8ad6" stroke="#26232e" stroke-width="5"/>
+  <path d="M180 428 h120 M520 446 h160 M860 425 h110 M1150 452 h170 M380 466 h90" stroke="#b9e6ff" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- fence -->
+  <g stroke="#26232e">
+    <path d="M0 448 H1600 M0 488 H1600" stroke-width="7"/>
+    <path d="M20 448 V490 M64 448 V490 M108 448 V490 M152 448 V490 M196 448 V490 M240 448 V490 M284 448 V490 M328 448 V490 M372 448 V490 M416 448 V490 M460 448 V490 M504 448 V490 M548 448 V490 M592 448 V490 M636 448 V490 M680 448 V490 M724 448 V490 M768 448 V490 M812 448 V490 M856 448 V490 M900 448 V490 M944 448 V490 M988 448 V490 M1032 448 V490 M1076 448 V490 M1120 448 V490 M1164 448 V490 M1208 448 V490 M1252 448 V490 M1296 448 V490 M1340 448 V490 M1384 448 V490 M1428 448 V490 M1472 448 V490 M1516 448 V490 M1560 448 V490" stroke-width="4"/>
+  </g>
+
+  <!-- lawn -->
+  <rect x="0" y="490" width="1600" height="310" fill="#6cc83f" stroke="#26232e" stroke-width="6"/>
+  <path d="M0 540 C200 520 420 560 620 535 C760 518 900 548 1000 530 L1000 600 C820 610 600 585 380 605 C220 618 90 600 0 610 Z" fill="#55ad2c"/>
+  <path d="M1150 520 C1300 505 1450 530 1600 515 L1600 600 C1450 590 1300 610 1150 590 Z" fill="#55ad2c"/>
+
+  <!-- oak tree: trunk, the long low branch, leaves and Spanish moss -->
+  <path d="M1170 500 C1180 420 1160 330 1200 230 L1280 230 C1260 330 1270 420 1290 500 Z" fill="#6b4a32" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M1200 300 C1080 260 900 250 760 300 C650 340 560 330 470 290 L460 320 C560 370 660 375 770 335 C900 290 1060 300 1200 345 Z" fill="#6b4a32" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M470 290 C440 270 420 250 400 250 M465 318 C440 330 420 345 400 350" stroke="#26232e" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <g fill="#2e8a3e" stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <path d="M880 230 C840 160 900 100 980 120 C1010 60 1120 60 1150 110 C1210 70 1320 90 1330 150 C1400 120 1520 140 1540 210 C1610 220 1620 300 1600 330 L1600 380 C1540 400 1470 380 1440 350 C1400 390 1310 390 1280 350 C1230 380 1150 370 1130 330 C1080 350 1000 340 990 300 C930 310 860 280 880 230 Z"/>
+    <path d="M160 170 C150 120 220 100 260 125 C300 80 400 90 420 135 C470 110 560 120 570 170 C620 175 640 230 600 255 C560 280 500 270 480 250 C440 280 370 275 350 245 C300 270 230 260 220 230 C170 235 140 200 160 170 Z"/>
+  </g>
+  <g fill="#3fa451">
+    <ellipse cx="1060" cy="170" rx="70" ry="38"/>
+    <ellipse cx="1300" cy="200" rx="85" ry="40"/>
+    <ellipse cx="1490" cy="250" rx="60" ry="30"/>
+    <ellipse cx="330" cy="165" rx="70" ry="32"/>
+  </g>
+  <g fill="none" stroke="#a9b8a0" stroke-width="12" stroke-linecap="round">
+    <path d="M940 300 C930 330 950 350 938 380"/>
+    <path d="M1040 330 C1030 360 1050 380 1040 420"/>
+    <path d="M1380 360 C1370 390 1390 410 1380 440"/>
+    <path d="M1500 375 C1490 400 1510 420 1500 450"/>
+    <path d="M260 235 C250 260 270 280 258 310"/>
+    <path d="M430 260 C420 285 440 300 430 330"/>
+    <path d="M540 260 C530 280 550 300 540 320"/>
+  </g>
+
+  <!-- patio and its shadows -->
+  <rect x="0" y="800" width="1600" height="400" fill="#f7e6c4" stroke="#26232e" stroke-width="6"/>
+  <g stroke="#e0c99c" stroke-width="5">
+    <path d="M0 880 H1600 M0 970 H1600 M0 1070 H1600"/>
+    <path d="M200 800 V880 M520 800 V880 M840 800 V880 M1160 800 V880 M1480 800 V880 M60 880 V970 M380 880 V970 M700 880 V970 M1020 880 V970 M1340 880 V970 M220 970 V1070 M560 970 V1070 M900 970 V1070 M1240 970 V1070 M1580 970 V1070 M100 1070 V1200 M460 1070 V1200 M820 1070 V1200 M1180 1070 V1200 M1540 1070 V1200"/>
+  </g>
+
+
+  <!-- a potted plant and a few fallen leaves, so the bottom pieces aren't all plain stone -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <path d="M1330 1000 C1290 930 1250 900 1220 880 C1270 885 1320 930 1350 980 Z" fill="#e8343a"/>
+    <path d="M1360 990 C1350 910 1360 860 1390 830 C1400 880 1395 940 1380 990 Z" fill="#c9262c"/>
+    <path d="M1400 995 C1430 930 1480 890 1520 880 C1500 930 1450 975 1420 1000 Z" fill="#e8343a"/>
+    <path d="M1350 990 C1320 950 1300 940 1270 935 C1300 960 1320 985 1340 1000 Z" fill="#3f9b3a"/>
+    <path d="M1400 990 C1420 950 1450 935 1480 930 C1460 960 1430 985 1410 1000 Z" fill="#3f9b3a"/>
+    <path d="M1280 990 H1500 L1475 1130 H1305 Z" fill="#e07a45"/>
+    <rect x="1268" y="985" width="244" height="36" rx="6" fill="#ee8c57"/>
+  </g>
+  <g fill="#c98a2e" stroke="#26232e" stroke-width="4">
+    <ellipse cx="640" cy="1010" rx="22" ry="10" transform="rotate(-20 640 1010)"/>
+    <ellipse cx="910" cy="1120" rx="22" ry="10" transform="rotate(25 910 1120)"/>
+    <ellipse cx="300" cy="1090" rx="22" ry="10" transform="rotate(10 300 1090)"/>
+  </g>
+  <ellipse cx="1390" cy="1135" rx="130" ry="14" fill="#26232e" opacity="0.18"/>
+
+  <!-- pergola beams -->
+  <g fill="#ffffff" stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <rect x="-10" y="40" width="1620" height="62"/>
+    <rect x="-10" y="0" width="1620" height="40" fill="#e9edf0"/>
+    <rect x="300" y="-6" width="34" height="52" fill="#e9edf0"/>
+    <rect x="640" y="-6" width="34" height="52" fill="#e9edf0"/>
+    <rect x="980" y="-6" width="34" height="52" fill="#e9edf0"/>
+    <rect x="1320" y="-6" width="34" height="52" fill="#e9edf0"/>
+  </g>
+  <!-- string of party lights -->
+  <path d="M0 120 C200 160 400 160 600 125 C800 160 1000 160 1200 125 C1350 150 1480 150 1600 125" fill="none" stroke="#26232e" stroke-width="4"/>
+  <g fill="#ffd84a" stroke="#26232e" stroke-width="3">
+    <circle cx="100" cy="140" r="9"/><circle cx="300" cy="152" r="9"/><circle cx="500" cy="140" r="9"/>
+    <circle cx="700" cy="140" r="9"/><circle cx="900" cy="152" r="9"/><circle cx="1100" cy="140" r="9"/>
+    <circle cx="1300" cy="138" r="9"/><circle cx="1500" cy="140" r="9"/>
+  </g>
+
+  <!-- columns -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round">
+    <rect x="80" y="102" width="80" height="700" fill="#ffffff"/>
+    <rect x="66" y="102" width="108" height="30" fill="#ffffff"/>
+    <rect x="62" y="772" width="116" height="34" fill="#ffffff"/>
+    <rect x="1040" y="102" width="80" height="700" fill="#ffffff"/>
+    <rect x="1026" y="102" width="108" height="30" fill="#ffffff"/>
+    <rect x="1022" y="772" width="116" height="34" fill="#ffffff"/>
+  </g>
+  <path d="M140 140 V765 M1100 140 V765" stroke="#dde3e8" stroke-width="16"/>
+
+  <!-- hanging basket of flowers -->
+  <path d="M800 102 L780 250 M800 102 L820 250 M800 102 V250" stroke="#26232e" stroke-width="4"/>
+  <path d="M760 250 H840 L825 300 H775 Z" fill="#e07a45" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="#ff5fa2" stroke="#26232e" stroke-width="4">
+    <circle cx="772" cy="244" r="15"/><circle cx="800" cy="236" r="17"/><circle cx="828" cy="244" r="15"/>
+  </g>
+  <g fill="#ffe14a"><circle cx="772" cy="244" r="5"/><circle cx="800" cy="236" r="6"/><circle cx="828" cy="244" r="5"/></g>
+
+  <!-- the two cranes -->
+  <use xlink:href="#crane" transform="translate(470 640)"/>
+  <use xlink:href="#crane" transform="translate(820 610) scale(1.05)"/>
+
+  <!-- patio chair with a navy cushion -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M60 920 L80 760 M220 920 L200 760" fill="none" stroke-width="10"/>
+    <path d="M60 920 L80 760 M220 920 L200 760" fill="none" stroke="#ffffff" stroke-width="4"/>
+    <path d="M50 760 L230 760 L250 600 L70 560 Z" fill="#ffffff"/>
+    <path d="M90 600 L82 760 M130 590 L125 760 M170 595 L165 760 M210 600 L205 760 M62 640 L246 650 M58 690 L240 700 M54 730 L235 735" fill="none" stroke-width="4"/>
+    <path d="M30 760 C30 730 250 730 260 760 C260 795 30 795 30 760 Z" fill="#2a4b9b"/>
+  </g>
+</svg>

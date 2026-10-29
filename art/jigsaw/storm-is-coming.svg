@@ -1,0 +1,278 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <!-- Each cloud and treetop is a cluster of circles, drawn three times:
+         a wide dark copy for the outline, a shadow-colour fill, then the lit
+         colour on slightly smaller raised circles, which leaves a shaded rim
+         along the bottom of every puff. -->
+    <g id="cTt"><circle cx="1050" cy="200" r="70"/><circle cx="1110" cy="270" r="70"/><circle cx="1000" cy="260" r="55"/></g>
+    <g id="cT1"><circle cx="1190" cy="360" r="90"/><circle cx="1295" cy="430" r="72"/><circle cx="1090" cy="420" r="100"/><circle cx="1340" cy="510" r="55"/><circle cx="1210" cy="470" r="90"/></g>
+    <g id="cT2"><circle cx="1280" cy="600" r="70"/><circle cx="1170" cy="590" r="105"/><circle cx="1030" cy="600" r="110"/></g>
+    <g id="cT3"><circle cx="1260" cy="720" r="75"/><circle cx="1130" cy="740" r="120"/><circle cx="960" cy="780" r="130"/><circle cx="1330" cy="800" r="70"/></g>
+    <g id="cW1"><circle cx="1385" cy="590" r="28"/><circle cx="1440" cy="572" r="36"/><circle cx="1500" cy="558" r="34"/><circle cx="1555" cy="548" r="26"/><ellipse cx="1470" cy="590" rx="120" ry="22"/></g>
+    <g id="cPR"><circle cx="1520" cy="820" r="50"/><circle cx="1600" cy="800" r="65"/><circle cx="1470" cy="880" r="48"/><circle cx="1560" cy="890" r="60"/></g>
+    <g id="cR"><circle cx="1290" cy="700" r="42"/><circle cx="1370" cy="680" r="52"/><circle cx="1470" cy="685" r="58"/><circle cx="1570" cy="690" r="55"/><ellipse cx="1430" cy="730" rx="200" ry="32"/></g>
+    <g id="cS"><circle cx="40" cy="670" r="45"/><circle cx="115" cy="655" r="42"/><circle cx="185" cy="672" r="35"/><ellipse cx="110" cy="695" rx="150" ry="28"/></g>
+    <g id="cP"><circle cx="300" cy="660" r="50"/><circle cx="375" cy="640" r="58"/><circle cx="450" cy="655" r="50"/><circle cx="520" cy="685" r="40"/><ellipse cx="400" cy="705" rx="180" ry="42"/></g>
+    <g id="cG">
+      <circle cx="680" cy="520" r="80"/><circle cx="810" cy="555" r="100"/><circle cx="940" cy="600" r="85"/>
+      <circle cx="560" cy="680" r="90"/><circle cx="700" cy="650" r="120"/><circle cx="870" cy="680" r="110"/><circle cx="985" cy="700" r="70"/>
+      <circle cx="470" cy="760" r="70"/><circle cx="600" cy="790" r="90"/><circle cx="740" cy="800" r="85"/><circle cx="880" cy="790" r="75"/>
+    </g>
+    <g id="cB1">
+      <circle cx="420" cy="40" r="100"/><circle cx="560" cy="0" r="120"/><circle cx="720" cy="10" r="110"/><circle cx="870" cy="20" r="100"/><circle cx="960" cy="60" r="70"/>
+      <circle cx="470" cy="190" r="85"/><circle cx="600" cy="190" r="110"/><circle cx="760" cy="200" r="105"/><circle cx="870" cy="190" r="80"/>
+    </g>
+    <g id="cB2">
+      <circle cx="540" cy="330" r="70"/><circle cx="650" cy="350" r="95"/><circle cx="790" cy="385" r="100"/><circle cx="920" cy="400" r="90"/>
+      <circle cx="1020" cy="420" r="65"/><circle cx="850" cy="470" r="60"/><circle cx="970" cy="310" r="60"/>
+    </g>
+    <g id="cA"><circle cx="40" cy="40" r="100"/><circle cx="170" cy="20" r="90"/><circle cx="285" cy="55" r="75"/><circle cx="60" cy="150" r="65"/><circle cx="175" cy="135" r="70"/><circle cx="290" cy="140" r="50"/></g>
+    <g id="cC">
+      <circle cx="1120" cy="40" r="80"/><circle cx="1250" cy="30" r="110"/><circle cx="1400" cy="50" r="110"/><circle cx="1540" cy="40" r="100"/>
+      <circle cx="1190" cy="150" r="60"/><circle cx="1310" cy="190" r="75"/><circle cx="1450" cy="180" r="80"/><circle cx="1575" cy="170" r="60"/>
+    </g>
+    <g id="cT4">
+      <circle cx="1060" cy="930" r="140"/><circle cx="760" cy="970" r="110"/><circle cx="640" cy="1010" r="70"/><circle cx="1180" cy="1000" r="80"/>
+      <circle cx="1290" cy="950" r="110"/><circle cx="1380" cy="1010" r="60"/><circle cx="1470" cy="990" r="95"/><circle cx="1600" cy="970" r="95"/>
+    </g>
+    <g id="cL">
+      <circle cx="0" cy="950" r="70"/><circle cx="60" cy="880" r="90"/><circle cx="175" cy="815" r="80"/><circle cx="275" cy="860" r="75"/><circle cx="370" cy="900" r="70"/>
+      <circle cx="455" cy="935" r="62"/><circle cx="540" cy="965" r="55"/><circle cx="200" cy="910" r="60"/><circle cx="120" cy="960" r="80"/><circle cx="300" cy="960" r="80"/><circle cx="430" cy="995" r="70"/>
+    </g>
+    <g id="cLF">
+      <circle cx="10" cy="1010" r="70"/><circle cx="130" cy="1015" r="78"/><circle cx="265" cy="1025" r="82"/><circle cx="400" cy="1040" r="72"/><circle cx="500" cy="1050" r="55"/>
+      <circle cx="700" cy="1020" r="55"/><circle cx="790" cy="1008" r="60"/>
+    </g>
+    <g id="cI"><circle cx="440" cy="1085" r="48"/><circle cx="520" cy="1060" r="58"/><circle cx="605" cy="1075" r="52"/><circle cx="670" cy="1105" r="38"/><circle cx="400" cy="1112" r="36"/><circle cx="530" cy="1105" r="55"/><circle cx="615" cy="1118" r="42"/></g>
+    <g id="cTr1"><circle cx="980" cy="820" r="55"/><circle cx="930" cy="870" r="52"/><circle cx="1035" cy="865" r="50"/><circle cx="885" cy="930" r="42"/><circle cx="980" cy="915" r="58"/><circle cx="1075" cy="930" r="42"/></g>
+    <g id="cTr2"><circle cx="1185" cy="800" r="60"/><circle cx="1130" cy="855" r="50"/><circle cx="1245" cy="850" r="55"/><circle cx="1300" cy="915" r="48"/><circle cx="1090" cy="925" r="44"/><circle cx="1190" cy="905" r="62"/><circle cx="1340" cy="965" r="38"/></g>
+    <g id="cTr3"><circle cx="1540" cy="1060" r="42"/><circle cx="1590" cy="1045" r="45"/><circle cx="1515" cy="1100" r="32"/><circle cx="1600" cy="1105" r="40"/></g>
+
+    <path id="bird" d="M-30 4 C-22 -12 -8 -12 0 2 C8 -12 22 -12 30 4" fill="none" stroke="#26232e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g id="mossL" fill="none" stroke-linecap="round">
+      <path d="M0 0 C-8 15 8 30 0 45 C-8 60 8 75 0 90" stroke="#26232e" stroke-width="16"/>
+      <path d="M0 0 C-8 15 8 30 0 45 C-8 60 8 75 0 90" stroke="#b8c7aa" stroke-width="8"/>
+    </g>
+    <g id="mossS" fill="none" stroke-linecap="round">
+      <path d="M0 0 C-8 18 8 36 0 55" stroke="#26232e" stroke-width="16"/>
+      <path d="M0 0 C-8 18 8 36 0 55" stroke="#b8c7aa" stroke-width="8"/>
+    </g>
+  </defs>
+
+  <!-- blue sky and the sun's rays fanning out to the left -->
+  <rect width="1600" height="1200" fill="#4aa8ea"/>
+  <g fill="#93d4f8">
+    <path d="M430 300 L-10 192 L-10 248 Z"/>
+    <path d="M430 300 L-10 322 L-10 392 Z"/>
+    <path d="M430 300 L-10 462 L-10 542 Z"/>
+    <path d="M430 300 L-10 620 L-10 702 Z"/>
+  </g>
+  <!-- the sun, peeking out from behind the storm cloud -->
+  <circle cx="430" cy="300" r="55" fill="#ffe14a" stroke="#26232e" stroke-width="6"/>
+  <ellipse cx="405" cy="300" rx="16" ry="10" fill="#fff3a0"/>
+
+  <!-- the tall white cloud tower behind everything -->
+  <use xlink:href="#cTt" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cTt" fill="#f6c98f"/>
+  <g fill="#ffe6bf"><circle cx="1050" cy="186" r="56"/><circle cx="1110" cy="256" r="56"/><circle cx="1000" cy="248" r="43"/></g>
+  <ellipse cx="1030" cy="165" rx="25" ry="9" fill="#fff4de"/>
+
+  <use xlink:href="#cT1" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cT1" fill="#dbe2ee"/>
+  <g fill="#ffffff"><circle cx="1190" cy="344" r="74"/><circle cx="1295" cy="416" r="58"/><circle cx="1090" cy="402" r="82"/><circle cx="1340" cy="498" r="43"/><circle cx="1210" cy="454" r="74"/></g>
+
+  <use xlink:href="#cT2" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cT2" fill="#dbe2ee"/>
+  <g fill="#ffffff"><circle cx="1280" cy="586" r="56"/><circle cx="1170" cy="572" r="87"/><circle cx="1030" cy="582" r="92"/></g>
+
+  <use xlink:href="#cT3" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cT3" fill="#dbe2ee"/>
+  <g fill="#ffffff"><circle cx="1260" cy="706" r="61"/><circle cx="1130" cy="722" r="102"/><circle cx="960" cy="762" r="112"/><circle cx="1330" cy="786" r="56"/></g>
+
+  <!-- clouds on the right: a white wisp, a peach glow, a gray streak -->
+  <use xlink:href="#cW1" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cW1" fill="#dbe2ee"/>
+  <g fill="#ffffff"><circle cx="1385" cy="582" r="20"/><circle cx="1440" cy="564" r="28"/><circle cx="1500" cy="550" r="26"/><circle cx="1555" cy="540" r="18"/><ellipse cx="1470" cy="582" rx="112" ry="14"/></g>
+
+  <use xlink:href="#cPR" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cPR" fill="#f0a07c"/>
+  <g fill="#ffc59a"><circle cx="1520" cy="808" r="38"/><circle cx="1600" cy="786" r="53"/><circle cx="1470" cy="868" r="36"/><circle cx="1560" cy="878" r="48"/></g>
+  <g fill="#ffe1c8"><ellipse cx="1505" cy="790" rx="18" ry="7"/><ellipse cx="1585" cy="765" rx="22" ry="8"/><ellipse cx="1545" cy="862" rx="20" ry="7"/></g>
+
+  <use xlink:href="#cR" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cR" fill="#78809a"/>
+  <g fill="#8f97b0"><circle cx="1290" cy="690" r="32"/><circle cx="1370" cy="668" r="40"/><circle cx="1470" cy="673" r="46"/><circle cx="1570" cy="678" r="43"/><ellipse cx="1430" cy="720" rx="190" ry="22"/></g>
+  <g fill="#adb4c9"><ellipse cx="1355" cy="650" rx="20" ry="7"/><ellipse cx="1455" cy="650" rx="24" ry="8"/><ellipse cx="1555" cy="655" rx="20" ry="7"/></g>
+
+  <!-- clouds on the left: a blue-gray streak and a peach one -->
+  <use xlink:href="#cS" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cS" fill="#7684a3"/>
+  <g fill="#8f9cba"><circle cx="40" cy="660" r="35"/><circle cx="115" cy="645" r="32"/><circle cx="185" cy="664" r="27"/><ellipse cx="110" cy="686" rx="141" ry="19"/></g>
+  <g fill="#adb8d0"><ellipse cx="30" cy="640" rx="18" ry="6"/><ellipse cx="105" cy="628" rx="16" ry="6"/></g>
+
+  <use xlink:href="#cP" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cP" fill="#d9a6ae"/>
+  <g fill="#ffc59a"><circle cx="300" cy="650" r="40"/><circle cx="375" cy="628" r="46"/><circle cx="450" cy="645" r="40"/><circle cx="520" cy="677" r="32"/><ellipse cx="400" cy="695" rx="170" ry="32"/></g>
+  <g fill="#ffe1c8"><ellipse cx="290" cy="635" rx="18" ry="7"/><ellipse cx="365" cy="612" rx="22" ry="8"/><ellipse cx="440" cy="630" rx="18" ry="7"/></g>
+
+  <!-- the big glowing gold cloud -->
+  <use xlink:href="#cG" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cG" fill="#ff8c2e"/>
+  <g fill="#ffb43c">
+    <circle cx="680" cy="504" r="64"/><circle cx="810" cy="537" r="82"/><circle cx="940" cy="584" r="69"/>
+    <circle cx="560" cy="662" r="72"/><circle cx="700" cy="630" r="100"/><circle cx="870" cy="662" r="92"/><circle cx="985" cy="686" r="56"/>
+    <circle cx="470" cy="746" r="56"/><circle cx="600" cy="772" r="72"/><circle cx="740" cy="784" r="69"/><circle cx="880" cy="776" r="61"/>
+  </g>
+  <g fill="#ffd84f">
+    <ellipse cx="770" cy="620" rx="110" ry="50"/>
+    <ellipse cx="650" cy="490" rx="35" ry="14"/><ellipse cx="940" cy="560" rx="30" ry="12"/>
+    <ellipse cx="545" cy="650" rx="38" ry="15"/><ellipse cx="470" cy="725" rx="25" ry="10"/><ellipse cx="600" cy="750" rx="40" ry="14"/>
+    <ellipse cx="740" cy="760" rx="35" ry="13"/><ellipse cx="880" cy="750" rx="30" ry="11"/><ellipse cx="980" cy="670" rx="22" ry="9"/>
+  </g>
+  <ellipse cx="760" cy="605" rx="55" ry="24" fill="#fff09a"/>
+
+  <!-- dark storm clouds along the top -->
+  <use xlink:href="#cB1" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cB1" fill="#575e78"/>
+  <g fill="#6c7490">
+    <circle cx="420" cy="22" r="82"/><circle cx="560" cy="-18" r="102"/><circle cx="720" cy="-8" r="92"/><circle cx="870" cy="2" r="82"/><circle cx="960" cy="46" r="56"/>
+    <circle cx="470" cy="174" r="69"/><circle cx="600" cy="172" r="92"/><circle cx="760" cy="182" r="87"/><circle cx="870" cy="174" r="64"/>
+  </g>
+  <g fill="#8a92ab"><ellipse cx="510" cy="70" rx="48" ry="16"/><ellipse cx="690" cy="80" rx="50" ry="16"/><ellipse cx="850" cy="90" rx="40" ry="14"/><ellipse cx="430" cy="150" rx="28" ry="10"/><ellipse cx="600" cy="175" rx="40" ry="14"/></g>
+
+  <use xlink:href="#cB2" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cB2" fill="#60677f"/>
+  <g fill="#767e98">
+    <circle cx="540" cy="316" r="56"/><circle cx="650" cy="332" r="77"/><circle cx="790" cy="367" r="82"/><circle cx="920" cy="384" r="74"/>
+    <circle cx="1020" cy="406" r="51"/><circle cx="850" cy="456" r="46"/><circle cx="970" cy="296" r="46"/>
+  </g>
+  <g fill="#959cb4"><ellipse cx="520" cy="300" rx="22" ry="8"/><ellipse cx="625" cy="300" rx="42" ry="14"/><ellipse cx="770" cy="330" rx="46" ry="15"/><ellipse cx="905" cy="350" rx="36" ry="12"/><ellipse cx="960" cy="272" rx="20" ry="7"/><ellipse cx="1010" cy="385" rx="22" ry="8"/></g>
+
+  <use xlink:href="#cA" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cA" fill="#60677f"/>
+  <g fill="#767e98"><circle cx="40" cy="24" r="84"/><circle cx="170" cy="4" r="74"/><circle cx="285" cy="39" r="59"/><circle cx="60" cy="136" r="51"/><circle cx="175" cy="121" r="56"/><circle cx="290" cy="128" r="38"/></g>
+  <g fill="#959cb4"><ellipse cx="20" cy="95" rx="34" ry="12"/><ellipse cx="150" cy="60" rx="40" ry="14"/><ellipse cx="270" cy="85" rx="30" ry="11"/><ellipse cx="170" cy="110" rx="26" ry="9"/></g>
+
+  <use xlink:href="#cC" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cC" fill="#60677f"/>
+  <g fill="#767e98">
+    <circle cx="1120" cy="26" r="66"/><circle cx="1250" cy="12" r="92"/><circle cx="1400" cy="32" r="92"/><circle cx="1540" cy="22" r="82"/>
+    <circle cx="1190" cy="136" r="46"/><circle cx="1310" cy="174" r="59"/><circle cx="1450" cy="164" r="64"/><circle cx="1575" cy="156" r="46"/>
+  </g>
+  <g fill="#959cb4"><ellipse cx="1100" cy="15" rx="28" ry="10"/><ellipse cx="1230" cy="60" rx="45" ry="15"/><ellipse cx="1385" cy="75" rx="45" ry="15"/><ellipse cx="1525" cy="65" rx="40" ry="14"/><ellipse cx="1180" cy="120" rx="22" ry="8"/><ellipse cx="1295" cy="155" rx="28" ry="10"/><ellipse cx="1430" cy="145" rx="32" ry="11"/><ellipse cx="1565" cy="135" rx="22" ry="8"/></g>
+
+  <!-- low white clouds along the horizon -->
+  <use xlink:href="#cT4" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cT4" fill="#dbe2ee"/>
+  <g fill="#ffffff">
+    <circle cx="1060" cy="912" r="122"/><circle cx="760" cy="952" r="92"/><circle cx="640" cy="996" r="56"/><circle cx="1180" cy="984" r="64"/>
+    <circle cx="1290" cy="932" r="92"/><circle cx="1380" cy="996" r="46"/><circle cx="1470" cy="974" r="79"/><circle cx="1600" cy="954" r="79"/>
+  </g>
+
+  <use xlink:href="#cL" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cL" fill="#d8dfeb"/>
+  <g fill="#ffffff">
+    <circle cx="0" cy="936" r="56"/><circle cx="60" cy="862" r="72"/><circle cx="175" cy="799" r="64"/><circle cx="275" cy="844" r="59"/><circle cx="370" cy="886" r="56"/>
+    <circle cx="455" cy="921" r="48"/><circle cx="540" cy="953" r="43"/><circle cx="200" cy="896" r="46"/><circle cx="120" cy="944" r="64"/><circle cx="300" cy="944" r="64"/><circle cx="430" cy="981" r="56"/>
+  </g>
+  <use xlink:href="#cLF" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cLF" fill="#d8dfeb"/>
+  <g fill="#ffffff">
+    <circle cx="10" cy="996" r="56"/><circle cx="130" cy="999" r="62"/><circle cx="265" cy="1009" r="66"/><circle cx="400" cy="1026" r="58"/><circle cx="500" cy="1038" r="43"/>
+    <circle cx="700" cy="1008" r="43"/><circle cx="790" cy="994" r="46"/>
+  </g>
+
+  <!-- far shore with a little house -->
+  <path d="M-10 1095 L-10 1055 A40 20 0 0 1 65 1050 A40 20 0 0 1 140 1056 A40 20 0 0 1 220 1049 A40 20 0 0 1 295 1054 A40 20 0 0 1 375 1050 A40 20 0 0 1 450 1057 A40 20 0 0 1 530 1051 A40 20 0 0 1 610 1055 A40 20 0 0 1 690 1049 A40 20 0 0 1 765 1056 A40 20 0 0 1 845 1050 A40 20 0 0 1 925 1054 A40 20 0 0 1 1000 1049 A40 20 0 0 1 1080 1056 A40 20 0 0 1 1160 1051 A40 20 0 0 1 1235 1055 A40 20 0 0 1 1315 1049 A40 20 0 0 1 1395 1054 A40 20 0 0 1 1470 1050 A40 20 0 0 1 1550 1056 A40 20 0 0 1 1625 1052 L1625 1095 Z" fill="#2f7a3d" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="#3f9b4a"><ellipse cx="100" cy="1044" rx="16" ry="6"/><ellipse cx="410" cy="1046" rx="16" ry="6"/><ellipse cx="650" cy="1044" rx="16" ry="6"/><ellipse cx="880" cy="1044" rx="16" ry="6"/><ellipse cx="1120" cy="1046" rx="16" ry="6"/><ellipse cx="1430" cy="1044" rx="16" ry="6"/></g>
+  <g stroke="#26232e" stroke-width="4" stroke-linejoin="round">
+    <rect x="300" y="1046" width="38" height="28" fill="#ffffff"/>
+    <path d="M294 1049 L319 1026 L344 1049 Z" fill="#e8343a"/>
+    <rect x="313" y="1058" width="11" height="16" fill="#6b4a32"/>
+  </g>
+
+  <!-- the lake -->
+  <rect x="-10" y="1080" width="1620" height="130" fill="#2f8ad6" stroke="#26232e" stroke-width="6"/>
+  <path d="M30 1100 h70 M300 1102 h50 M20 1150 h60 M60 1186 h110 M230 1172 h90 M360 1194 h80 M600 1195 h120 M1035 1102 h60 M1250 1098 h70 M1270 1130 h50 M1400 1105 h70" stroke="#b9e6ff" stroke-width="7" stroke-linecap="round"/>
+  <!-- the gold cloud reflected in the water -->
+  <path d="M720 1096 h150 M770 1136 h150" stroke="#ffd84f" stroke-width="9" stroke-linecap="round"/>
+  <path d="M745 1116 h120 M790 1180 h60" stroke="#ffb43c" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- little sailboat -->
+  <g stroke="#26232e" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M192 1128 V1040" stroke-width="7"/>
+    <path d="M198 1046 L198 1120 L252 1120 Z" fill="#ffffff" stroke-width="6"/>
+    <path d="M186 1058 L186 1120 L140 1120 Z" fill="#ffd84a" stroke-width="6"/>
+    <path d="M192 1040 L214 1047 L192 1054 Z" fill="#e8343a" stroke-width="4"/>
+    <path d="M112 1128 L268 1128 L246 1156 L134 1156 Z" fill="#e8343a" stroke-width="6"/>
+  </g>
+  <path d="M126 1141 H254" stroke="#ffffff" stroke-width="5"/>
+  <path d="M120 1172 h50 M200 1170 h60" stroke="#b9e6ff" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- tree island in the middle of the lake -->
+  <path d="M330 1178 C360 1148 730 1148 765 1178 Z" fill="#55ad2c" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <use xlink:href="#cI" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cI" fill="#1e5a2b"/>
+  <g fill="#2a7238"><circle cx="440" cy="1073" r="36"/><circle cx="520" cy="1046" r="44"/><circle cx="605" cy="1063" r="40"/><circle cx="670" cy="1095" r="28"/><circle cx="400" cy="1102" r="26"/><circle cx="530" cy="1091" r="41"/><circle cx="615" cy="1106" r="30"/></g>
+  <g fill="#3f9b4a"><ellipse cx="505" cy="1030" rx="24" ry="9"/><ellipse cx="425" cy="1062" rx="18" ry="7"/><ellipse cx="590" cy="1045" rx="20" ry="8"/><ellipse cx="655" cy="1085" rx="12" ry="5"/></g>
+
+  <!-- the two cypress trees draped in Spanish moss, and a small one at the edge -->
+  <g stroke="#26232e" stroke-width="6" stroke-linejoin="round" fill="#6b4a32">
+    <path d="M968 1205 C974 1100 978 960 984 900 L1000 900 C1002 960 1006 1100 1016 1205 Z"/>
+    <path d="M1180 1205 C1188 1100 1186 990 1182 940 L1198 940 C1204 990 1214 1100 1232 1205 Z"/>
+    <path d="M1548 1205 C1552 1160 1554 1120 1556 1090 L1568 1090 C1568 1120 1570 1160 1576 1205 Z"/>
+  </g>
+
+  <use xlink:href="#cTr1" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cTr1" fill="#226b31"/>
+  <g fill="#2e8a3e"><circle cx="980" cy="808" r="43"/><circle cx="930" cy="858" r="40"/><circle cx="1035" cy="853" r="38"/><circle cx="885" cy="920" r="32"/><circle cx="980" cy="903" r="46"/><circle cx="1075" cy="920" r="32"/></g>
+  <g fill="#45ad57"><ellipse cx="965" cy="785" rx="24" ry="9"/><ellipse cx="915" cy="838" rx="18" ry="7"/><ellipse cx="1020" cy="836" rx="18" ry="7"/><ellipse cx="960" cy="880" rx="22" ry="8"/></g>
+
+  <use xlink:href="#cTr2" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cTr2" fill="#226b31"/>
+  <g fill="#2e8a3e"><circle cx="1185" cy="786" r="46"/><circle cx="1130" cy="843" r="38"/><circle cx="1245" cy="838" r="43"/><circle cx="1300" cy="903" r="36"/><circle cx="1090" cy="915" r="34"/><circle cx="1190" cy="891" r="48"/><circle cx="1340" cy="955" r="28"/></g>
+  <g fill="#45ad57"><ellipse cx="1168" cy="765" rx="26" ry="10"/><ellipse cx="1115" cy="822" rx="18" ry="7"/><ellipse cx="1230" cy="815" rx="20" ry="8"/><ellipse cx="1285" cy="880" rx="16" ry="6"/><ellipse cx="1172" cy="862" rx="24" ry="9"/></g>
+
+  <use xlink:href="#cTr3" fill="#26232e" stroke="#26232e" stroke-width="12"/>
+  <use xlink:href="#cTr3" fill="#226b31"/>
+  <g fill="#2e8a3e"><circle cx="1540" cy="1050" r="32"/><circle cx="1590" cy="1034" r="34"/><circle cx="1515" cy="1092" r="24"/><circle cx="1600" cy="1095" r="30"/></g>
+  <g fill="#45ad57"><ellipse cx="1528" cy="1032" rx="16" ry="6"/><ellipse cx="1578" cy="1015" rx="18" ry="7"/></g>
+
+  <use xlink:href="#mossL" x="872" y="958"/>
+  <use xlink:href="#mossS" x="918" y="952"/>
+  <use xlink:href="#mossS" x="955" y="964"/>
+  <use xlink:href="#mossL" x="1025" y="960"/>
+  <use xlink:href="#mossL" x="1085" y="962"/>
+  <use xlink:href="#mossL" x="1160" y="962"/>
+  <use xlink:href="#mossL" x="1240" y="958"/>
+  <use xlink:href="#mossS" x="1280" y="952"/>
+  <use xlink:href="#mossL" x="1320" y="988"/>
+  <use xlink:href="#mossS" x="1358" y="985"/>
+  <use xlink:href="#mossS" x="1530" y="1122"/>
+
+  <!-- grassy bank in front, a little dock and its lamp -->
+  <path d="M870 1210 C880 1186 905 1172 940 1168 L1610 1155 L1610 1210 Z" fill="#6cc83f" stroke="#26232e" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M960 1188 C1100 1180 1300 1186 1610 1178 L1610 1210 L960 1210 Z" fill="#55ad2c"/>
+  <g stroke="#26232e" stroke-linejoin="round">
+    <rect x="806" y="1158" width="12" height="38" fill="#6b4a32" stroke-width="5"/>
+    <rect x="870" y="1158" width="12" height="38" fill="#6b4a32" stroke-width="5"/>
+    <rect x="800" y="1146" width="150" height="16" fill="#c98a4e" stroke-width="5"/>
+    <path d="M830 1146 V1162 M860 1146 V1162 M890 1146 V1162 M920 1146 V1162" stroke-width="3"/>
+  </g>
+  <circle cx="812" cy="1062" r="30" fill="#fff1a0"/>
+  <g stroke="#26232e" stroke-linejoin="round">
+    <rect x="808" y="1074" width="9" height="72" fill="#3b3b44" stroke-width="4"/>
+    <rect x="800" y="1050" width="24" height="26" rx="4" fill="#ffe14a" stroke-width="5"/>
+    <path d="M796 1052 L812 1038 L828 1052 Z" fill="#3b3b44" stroke-width="4"/>
+  </g>
+
+  <!-- birds -->
+  <use xlink:href="#bird" transform="translate(150 330) scale(1.1)"/>
+  <use xlink:href="#bird" transform="translate(250 290) scale(0.9)"/>
+  <use xlink:href="#bird" transform="translate(330 430)"/>
+  <use xlink:href="#bird" transform="translate(120 520) scale(0.85)"/>
+  <use xlink:href="#bird" transform="translate(1450 400)"/>
+  <use xlink:href="#bird" transform="translate(1530 355) scale(0.85)"/>
+  <use xlink:href="#bird" transform="translate(1180 560) scale(0.9)"/>
+  <use xlink:href="#bird" transform="translate(1110 690) scale(0.8)"/>
+</svg>
