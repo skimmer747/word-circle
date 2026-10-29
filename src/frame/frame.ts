@@ -207,6 +207,8 @@ export class Frame implements FrameHost {
       done = true;
       this.covered -= 1;
       this.updateTouchTargets();
+      // Her taps on the page over the game didn't count: a full quiet minute from here.
+      this.restartHelp();
     };
   }
 
@@ -545,6 +547,7 @@ export class Frame implements FrameHost {
         return;
       }
       if (type === 'down' && this.onHelpBubble(event.clientX, event.clientY)) {
+        this.interacted = true;
         this.helpTaps.add(event.pointerId);
         this.restartHelp();
         return;
@@ -607,9 +610,12 @@ export class Frame implements FrameHost {
     this.view.renderCorner(layout, this.games.length > 1 ? 'games' : 'stats');
     this.targets = this.game.render(this.view.gameLayer, layout, animateIn);
     // A redraw keeps the help showing: Hint is drawn afresh, so it pulses again.
+    // Only if the game still has help to give (Word Guess may have just turned into Today's Wordle, which has none).
     if (this.helpShown) {
-      this.game.setHintPulse?.(true);
-      this.view.placeHelp(layout);
+      if (this.game.help?.()) {
+        this.game.setHintPulse?.(true);
+        this.view.placeHelp(layout);
+      } else this.hideHelp();
     }
     this.updateTouchTargets();
   }
