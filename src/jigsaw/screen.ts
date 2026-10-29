@@ -302,12 +302,14 @@ export class JigsawScreen implements GameScreen {
         hasMore: page.hasMore,
         canClose: this.picture !== null,
         canAdd: this.canAdd(),
+        cartoons: this.hasCartoons() ? this.saved.cartoons : null,
       },
       animateIn,
     );
     const offset = this.canAdd() ? 1 : 0;
     const buttons: ButtonGeometry[] = page.pictures.map((_, i) => ({ id: `pic:${i}`, ...layout.tiles[i + offset] }));
     if (offset) buttons.unshift({ id: 'pic:add', ...layout.tiles[0] });
+    if (this.hasCartoons()) buttons.push({ id: 'cartoon', ...layout.cartoons });
     if (page.hasBack) buttons.push({ id: 'pics-back', ...layout.back });
     if (this.picture) buttons.push({ id: 'pics-close', ...layout.close });
     if (page.hasMore) buttons.push({ id: 'pics-more', ...layout.more });
@@ -635,18 +637,25 @@ export class JigsawScreen implements GameScreen {
     return pictureShown(picture, this.saved.cartoons);
   }
 
+  /** Cartoons is offered on Pick a picture once the pictures are in and one of them has a drawing. */
+  private hasCartoons(): boolean {
+    return this.pictures?.some((picture) => picture.cartoon) ?? false;
+  }
+
   /**
-   * Cartoon on or off: the puzzle she's doing changes look, her place kept (the pieces are the same shapes), and so do
-   * the pictures on Pick a picture. The new look is loaded before it's shown, so the pieces never blink out. Remembered.
+   * Cartoon on or off, from the puzzle or from Pick a picture: the pictures on the page change, and so does the puzzle
+   * she's doing, her place kept (the pieces are the same shapes). The new look is loaded before it's shown, so the
+   * pieces never blink out. Remembered.
    */
   private cartoon(): void {
-    const picture = this.picture;
-    const listed = picture?.cartoon && this.pictures?.find((p) => p.id === picture.id);
-    if (this.mode !== 'puzzle' || !listed) return;
+    if (this.mode === 'pictures' ? !this.hasCartoons() : !this.picture?.cartoon) return;
     this.saved = { ...this.saved, cartoons: !this.saved.cartoons };
     saveSavedJigsaw(this.store, this.saved);
-    const next = this.asShown(listed);
     this.host.redraw(false);
+    const picture = this.picture;
+    const listed = picture?.cartoon && this.pictures?.find((p) => p.id === picture.id);
+    if (!listed) return;
+    const next = this.asShown(listed);
     const image = this.imageFor(next);
     void image
       .decode()
