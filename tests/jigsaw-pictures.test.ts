@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
-import { PAGE_WITH_ADD, loadStarters, parseStarters, picturePage } from '../src/jigsaw/pictures';
+import { PAGE_WITH_ADD, loadStarters, parseStarters, picturePage, pictureShown } from '../src/jigsaw/pictures';
 import type { Picture } from '../src/jigsaw/types';
 
 describe('the starter pictures', () => {
@@ -26,6 +26,26 @@ describe('the starter pictures', () => {
     ];
     expect(parseStarters(list, '/')).toEqual([{ id: 'starter:b', src: '/jigsaw/b.jpg', thumb: '/jigsaw/b.thumb.jpg', caption: '' }]);
     expect(parseStarters({ not: 'a list' }, '/')).toEqual([]);
+  });
+
+  it('reads the drawing of a starter that has one', () => {
+    const entry = { id: 'lake', file: 'lake.jpg', thumb: 'lake.thumb.jpg', cartoon: 'lake.cartoon.png', cartoonThumb: 'lake.cartoon.thumb.png', caption: '' };
+    expect(parseStarters([entry], '/word-circle/')[0].cartoon).toEqual({
+      src: '/word-circle/jigsaw/lake.cartoon.png',
+      thumb: '/word-circle/jigsaw/lake.cartoon.thumb.png',
+    });
+  });
+
+  it('keeps the photo when its drawing is damaged', () => {
+    const photo = { file: 'a.jpg', thumb: 'a.thumb.jpg', caption: '' };
+    const list = [
+      { id: 'a1', ...photo, cartoon: '../x.png', cartoonThumb: 'a.cartoon.thumb.png' },
+      { id: 'a2', ...photo, cartoon: 'a.cartoon.png', cartoonThumb: 7 },
+      { id: 'a3', ...photo, cartoon: 'a.cartoon.png' },
+    ];
+    const pictures = parseStarters(list, '/');
+    expect(pictures.map((p) => p.id)).toEqual(['starter:a1', 'starter:a2', 'starter:a3']);
+    expect(pictures.every((p) => !('cartoon' in p))).toBe(true);
   });
 
   it("fetches the list, and has none when it can't", async () => {
@@ -58,6 +78,23 @@ describe('the starter pictures', () => {
   });
 });
 
+describe('a picture as shown, photo or drawing', () => {
+  const photo: Picture = { id: 'family:x', src: 'x.jpg', thumb: 'x.thumb.jpg', caption: 'X' };
+  const drawn: Picture = { id: 'starter:lake', src: 'lake.jpg', thumb: 'lake.thumb.jpg', caption: 'Lake', cartoon: { src: 'lake.cartoon.png', thumb: 'lake.cartoon.thumb.png' } };
+
+  it('is the photo while Cartoons is off', () => {
+    expect(pictureShown(drawn, false)).toBe(drawn);
+  });
+
+  it('is the drawing while Cartoons is on, still the same picture', () => {
+    expect(pictureShown(drawn, true)).toEqual({ ...drawn, src: 'lake.cartoon.png', thumb: 'lake.cartoon.thumb.png' });
+  });
+
+  it('stays the photo when there is no drawing', () => {
+    expect(pictureShown(photo, true)).toBe(photo);
+  });
+});
+
 describe('the published starters.json and the parser agree', () => {
   const publicDir = fileURLToPath(new URL('../public/', import.meta.url));
   const raw = JSON.parse(readFileSync(new URL('../public/jigsaw/starters.json', import.meta.url), 'utf8')) as unknown[];
@@ -67,9 +104,9 @@ describe('the published starters.json and the parser agree', () => {
     expect(parseStarters(raw, '/word-circle/')).toHaveLength(raw.length);
   });
 
-  it('every picture and thumbnail the parser keeps is a file under public/', () => {
+  it('every picture and thumbnail the parser keeps, and every drawing, is a file under public/', () => {
     for (const picture of parseStarters(raw, '/word-circle/')) {
-      for (const address of [picture.src, picture.thumb]) {
+      for (const address of [picture.src, picture.thumb, picture.cartoon?.src, picture.cartoon?.thumb].filter((a) => a !== undefined)) {
         const file = join(publicDir, address.slice('/word-circle/'.length));
         expect(existsSync(file), address).toBe(true);
       }

@@ -36,6 +36,8 @@ export interface Picture {
   thumb: string;
   /** '' for none. */
   caption: string;
+  /** A starter's hand-drawn cartoon of the same scene, the same sizes as the photo and its thumbnail. */
+  cartoon?: { src: string; thumb: string };
 }
 
 /** Her place in one puzzle, as saved. Positions are in pieces (see rules.ts). */

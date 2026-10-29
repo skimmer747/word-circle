@@ -16,18 +16,28 @@ export function parseStarters(value: unknown, base: string): Picture[] {
   const seen = new Set<string>();
   for (const entry of value) {
     if (typeof entry !== 'object' || entry === null) continue;
-    const { id, file, thumb, caption } = entry as Record<string, unknown>;
+    const { id, file, thumb, caption, cartoon, cartoonThumb } = entry as Record<string, unknown>;
     if (typeof id !== 'string' || !ID.test(id) || seen.has(id)) continue;
-    if (typeof file !== 'string' || !NAME.test(file) || typeof thumb !== 'string' || !NAME.test(thumb)) continue;
+    if (!isName(file) || !isName(thumb)) continue;
     seen.add(id);
-    pictures.push({
+    const picture: Picture = {
       id: `starter:${id}`,
       src: `${base}jigsaw/${file}`,
       thumb: `${base}jigsaw/${thumb}`,
       caption: typeof caption === 'string' ? caption.trim() : '',
-    });
+    };
+    // A damaged drawing costs only the drawing.
+    if (isName(cartoon) && isName(cartoonThumb)) picture.cartoon = { src: `${base}jigsaw/${cartoon}`, thumb: `${base}jigsaw/${cartoonThumb}` };
+    pictures.push(picture);
   }
   return pictures;
+}
+
+const isName = (value: unknown): value is string => typeof value === 'string' && NAME.test(value);
+
+/** The picture as it's shown: its drawing while Cartoons is on and it has one, otherwise the photo. Still the same picture (id). */
+export function pictureShown(picture: Picture, cartoons: boolean): Picture {
+  return cartoons && picture.cartoon ? { ...picture, src: picture.cartoon.src, thumb: picture.cartoon.thumb } : picture;
 }
 
 /** The starter pictures; none if the list can't be had (offline before the app ever saved it). */
