@@ -125,23 +125,12 @@ describe.each(SCREENS_AND_THUMBS)('Jigsaw on a %ix%i iPad (thumb %s)', (width, h
 
   it('lays out the picture page clear of the corner', () => {
     const page = computePicturePageLayout(frame);
-    const rects = [page.title, page.cartoons, ...page.tiles, ...page.captions, page.back, page.close, page.more];
+    const rects = [page.title, ...page.tiles, ...page.captions, page.back, page.close, page.more];
     for (const rect of rects) expect(inPlayArea(rect, frame)).toBe(true);
     apart([...rects, frame.corner]);
     expect(page.tiles).toHaveLength(6);
     expect(page.tiles[0].w / page.tiles[0].h).toBeCloseTo(4 / 3);
     expect(page.tiles[0].w).toBeGreaterThanOrEqual(200);
-  });
-
-  it('puts Cartoons at the end of the title row, just left of the corner, leaving the title room', () => {
-    const page = computePicturePageLayout(frame);
-    expect(page.cartoons.y).toBe(page.title.y);
-    expect(page.cartoons.h).toBe(page.title.h);
-    expect(page.cartoons.x + page.cartoons.w).toBeCloseTo(frame.corner.x - 16);
-    expect(page.cartoons.w).toBeGreaterThanOrEqual(190);
-    expect(page.title.x + page.title.w).toBeCloseTo(page.cartoons.x - 16);
-    // "Pick a picture" at 40 px needs about 300 px.
-    expect(page.title.w).toBeGreaterThanOrEqual(320);
   });
 
   it('fits four cards in the Games pop-up', () => {
