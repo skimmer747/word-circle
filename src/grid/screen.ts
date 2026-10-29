@@ -14,8 +14,6 @@ import { GRID_LEVELS, type GridLevel, type GridPuzzleSet, type GridWords } from 
 import { GridView, type GridViewState } from './view';
 import { wordChecker } from './words';
 
-/** The Hint button starts to pulse after this long without a letter placed or moved. */
-const IDLE_HINT_MS = 120_000;
 /** The "Well done!" card moves on by itself after this long. */
 const CELEBRATION_MS = 15_000;
 
@@ -52,7 +50,6 @@ export class GridScreen implements GameScreen {
   private shown = false;
   private view: GridView | null = null;
   private layout: GridLayout | null = null;
-  private idleTimer = 0;
   private timer = new PlayTimer();
   private readonly isWord: (word: string) => boolean;
   private readonly startLevel: GridLevel;
@@ -167,8 +164,6 @@ export class GridScreen implements GameScreen {
   pause(): void {
     this.shown = false;
     this.timer.pause();
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
     if (this.held) this.dragCancelled();
     this.save();
   }
@@ -178,11 +173,19 @@ export class GridScreen implements GameScreen {
     this.timer.resume(performance.now());
     // A puzzle she finished with a tile while a hint star flew, just before switching away, is celebrated when she's back.
     if (this.game.solved && !this.busy && !this.hintFlying) void this.finish();
-    else if (!this.busy) this.resetIdle();
   }
 
   activity(): void {
     this.timer.activity(performance.now());
+  }
+
+  /** For the frame's help bubble after a quiet minute. */
+  help(): string | null {
+    return this.busy ? null : 'Fill in the words.';
+  }
+
+  setHintPulse(on: boolean): void {
+    this.view?.setHintPulse(on);
   }
 
   summary(): GameSummary {
@@ -275,7 +278,6 @@ export class GridScreen implements GameScreen {
   /** Something on the grid changed: save it, show it, and see if she's finished. */
   private changed(): void {
     this.save();
-    this.resetIdle();
     this.refresh();
     // If the hint star is still flying, it finishes the puzzle when it lands.
     if (this.game.solved && !this.hintFlying && !this.busy) void this.finish();
@@ -307,7 +309,6 @@ export class GridScreen implements GameScreen {
     // A hint that finishes the puzzle: nothing more to do until "Well done!".
     if (this.game.solved) this.busy = true;
     this.save();
-    this.resetIdle();
     this.refresh();
     await this.view?.flyStar(square);
     this.hintFlying = false;
@@ -330,15 +331,12 @@ export class GridScreen implements GameScreen {
     this.loadPuzzle();
     this.save();
     this.host.redraw(true);
-    this.resetIdle();
   }
 
   private async finish(): Promise<void> {
     // A tile she's still holding (picked up while a hint star flew) is let go: the puzzle is done.
     if (this.held) this.dragCancelled();
     this.busy = true;
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
     await this.view?.finish(this.game.shape.runs);
     const hinted = this.game.hinted.length > 0;
     this.timer.activity(performance.now());
@@ -372,12 +370,5 @@ export class GridScreen implements GameScreen {
     this.timer.resume(performance.now());
     this.busy = false;
     this.host.redraw(true);
-    this.resetIdle();
-  }
-
-  private resetIdle(): void {
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
-    this.idleTimer = window.setTimeout(() => this.view?.setHintPulse(true), IDLE_HINT_MS);
   }
 }

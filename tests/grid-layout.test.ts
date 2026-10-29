@@ -61,7 +61,7 @@ describe.each(SCREENS_AND_THUMBS)('Word Grid layout on a %i×%i screen, thumb %s
     it('sizes the letters to the squares and tiles', () => {
       expect(layout.squareFont).toBe(Math.round(layout.squareSize * 0.62));
       expect(layout.tileFont).toBe(Math.round(layout.tileSize * 0.62));
-      expect(layout.cornerFont).toBeGreaterThanOrEqual(18);
+      expect(layout.cornerFont).toBeGreaterThanOrEqual(24);
     });
   });
 });

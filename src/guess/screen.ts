@@ -16,8 +16,6 @@ import { HINT_ICON } from '../ui/icons';
 import { GuessView, type DailyMode, type SquareView } from './view';
 import { acceptedChecker, type GuessWords } from './words';
 
-/** The Hint button starts to pulse after this long without a guess. */
-const IDLE_HINT_MS = 120_000;
 /** The "Well done!" card moves on by itself after this long... */
 const CELEBRATION_MS = 15_000;
 /** ...or this long on today's Wordle, to leave time for sharing. */
@@ -64,7 +62,6 @@ export class GuessScreen implements GameScreen {
   /** While the hint star flies: the word and square it's flying to (hidden until it lands), and how many guesses she had. */
   private hiddenHint: { game: GuessGame; guesses: number; position: number } | null = null;
   private shown = false;
-  private idleTimer = 0;
   private timer = new PlayTimer();
   private readonly isAccepted: (word: string) => boolean;
   private readonly avoided: AvoidCheck;
@@ -128,19 +125,25 @@ export class GuessScreen implements GameScreen {
   pause(): void {
     this.timer.pause();
     this.shown = false;
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
     this.save();
   }
 
   resume(): void {
     this.timer.resume(performance.now());
     this.shown = true;
-    if (!this.busy) this.resetIdle();
   }
 
   activity(): void {
     this.timer.activity(performance.now());
+  }
+
+  /** For the frame's help bubble after a quiet minute. */
+  help(): string | null {
+    return this.busy || this.todaysWordle() ? null : 'Guess the word.';
+  }
+
+  setHintPulse(on: boolean): void {
+    this.view?.setHintPulse(on);
   }
 
   summary(): GameSummary {
@@ -267,7 +270,6 @@ export class GuessScreen implements GameScreen {
     }
     this.busy = true;
     this.save();
-    this.resetIdle();
     const guess = this.game.guesses[this.game.guesses.length - 1];
     await this.view?.reveal(row, this.guessRow(guess));
     this.refreshKeys();
@@ -290,7 +292,6 @@ export class GuessScreen implements GameScreen {
     const result = this.game.hint();
     if (!result) return;
     this.save();
-    this.resetIdle();
     // A hint that finishes the word: nothing more to do until "Well done!".
     if (result.solved) this.busy = true;
     const game = this.game;
@@ -329,8 +330,6 @@ export class GuessScreen implements GameScreen {
 
   private async finish(): Promise<void> {
     this.busy = true;
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
     this.timer.activity(performance.now());
     const day = dayKey(this.now());
     const { answer, guesses, solvedByGuess } = this.game;
@@ -373,14 +372,5 @@ export class GuessScreen implements GameScreen {
     this.timer.resume(performance.now());
     this.busy = false;
     this.host.redraw(true);
-    this.resetIdle();
-  }
-
-  private resetIdle(): void {
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
-    // No nudge toward a hint she can't have.
-    if (this.todaysWordle()) return;
-    this.idleTimer = window.setTimeout(() => this.view?.setHintPulse(true), IDLE_HINT_MS);
   }
 }

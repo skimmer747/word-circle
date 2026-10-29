@@ -112,6 +112,17 @@ describe.each(SCREENS_AND_THUMBS)('frame layout on a %i×%i screen, thumb %s', (
     expect(frame.hintButton).toEqual({ x: frame.play.x, y: frame.play.y, w: 130, h: 96 });
   });
 
+  it('puts the help bubble just under Hint, big, in the play area and clear of the corner', () => {
+    const { helpBubble: bubble, hintButton: hint, corner } = frame;
+    expect(inPlayArea(bubble, frame)).toBe(true);
+    expect(bubble.x).toBe(hint.x);
+    expect(bubble.y).toBeGreaterThan(hint.y + hint.h);
+    expect(bubble.y - (hint.y + hint.h)).toBeLessThanOrEqual(24);
+    expect(bubble.w).toBeGreaterThanOrEqual(400);
+    expect(bubble.h).toBeGreaterThanOrEqual(110);
+    expect(bubble.x + bubble.w <= corner.x || bubble.y >= corner.y + corner.h).toBe(true);
+  });
+
   it("puts every game's level buttons in a row at the bottom left, big enough to tap", () => {
     const { levelButtons, play } = frame;
     expect(levelButtons).toHaveLength(3);

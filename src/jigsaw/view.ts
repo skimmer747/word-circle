@@ -6,7 +6,7 @@ import { piecePath, tabFor, type PieceShape } from './cut';
 import type { JigsawLayout } from './layout';
 import { EDGE_ROOM, drawPieces } from './pieces';
 import type { Guide } from './storage';
-import { JIGSAW_STYLES, PIECE_COUNTS, type JigsawStyle, type Picture, type PieceCount } from './types';
+import { COUNT_LABELS, JIGSAW_STYLES, PIECE_COUNTS, type JigsawStyle, type Picture, type PieceCount } from './types';
 
 const STYLE_LABELS: Record<JigsawStyle, string> = { tray: 'Tray', board: 'Board', table: 'Table' };
 /** At the end the seams fade into the whole photo (matches the CSS)... */
@@ -85,7 +85,7 @@ export class JigsawView {
     this.hintButton = this.button(board, 'button hint', `${HINT_ICON}<span>Hint</span>`, layout.hintButton);
     this.button(board, 'button pictures', `${PICTURES_ICON}<span>Pictures</span>`, layout.picturesButton);
     JIGSAW_STYLES.forEach((style, i) => this.choice(board, STYLE_LABELS[style], style === state.style, layout.styleButtons[i]));
-    PIECE_COUNTS.forEach((count, i) => this.choice(board, String(count), count === state.count, layout.countButtons[i]));
+    PIECE_COUNTS.forEach((count, i) => this.choice(board, COUNT_LABELS[count], count === state.count, layout.countButtons[i]));
     if (state.style === 'tray') place(el('div', 'tray', board), layout.tray);
     if (state.style !== 'table') {
       this.drawBoard(board, state);

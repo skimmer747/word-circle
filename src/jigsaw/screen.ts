@@ -31,8 +31,6 @@ import {
 import { GRID_SIZES, JIGSAW_STYLES, PIECE_COUNTS, type JigsawStyle, type Picture, type PieceCount, type Point } from './types';
 import { JigsawView, type JigsawViewState, type PieceSpot } from './view';
 
-/** The Hint button starts to pulse after this long without a piece moved. */
-const IDLE_HINT_MS = 120_000;
 /** The "Well done!" card moves on by itself after this long. */
 const CELEBRATION_MS = 15_000;
 /** She sees the finished picture and its caption this long before "Well done!". */
@@ -127,7 +125,6 @@ export class JigsawScreen implements GameScreen {
   private stale = false;
   private view: JigsawView | null = null;
   private layout: JigsawLayout | null = null;
-  private idleTimer = 0;
   private timer = new PlayTimer();
   private readonly now: () => Date;
 
@@ -250,8 +247,6 @@ export class JigsawScreen implements GameScreen {
   pause(): void {
     this.shown = false;
     this.timer.pause();
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
     if (this.held) this.dragCancelled();
     this.save();
   }
@@ -262,7 +257,6 @@ export class JigsawScreen implements GameScreen {
     // A puzzle finished just before she switched away (by a piece while a hint star flew) is celebrated when she's back.
     if (this.game?.solved && !this.busy && !this.hintFlying) return void this.finish();
     if (this.busy) return;
-    this.resetIdle();
     if (this.stale) this.host.redraw(false);
     // A hint star that landed while she was away couldn't set the touch targets then.
     else if (this.mode === 'puzzle' && this.game && !this.hintFlying) this.host.updateTargets(this.targets());
@@ -270,6 +264,15 @@ export class JigsawScreen implements GameScreen {
 
   activity(): void {
     if (this.mode === 'puzzle') this.timer.activity(performance.now());
+  }
+
+  /** For the frame's help bubble after a quiet minute. */
+  help(): string | null {
+    return this.mode === 'puzzle' && this.game && !this.busy ? 'Put the pieces in the picture.' : null;
+  }
+
+  setHintPulse(on: boolean): void {
+    this.view?.setHintPulse(on);
   }
 
   summary(): GameSummary {
@@ -551,7 +554,6 @@ export class JigsawScreen implements GameScreen {
   /** Something moved: save it, show it, and see if she's finished. */
   private changed(): void {
     this.save();
-    this.resetIdle();
     this.refresh();
     // If the hint star is still flying, it finishes the puzzle when it lands.
     if (this.game?.solved && !this.hintFlying && !this.busy) void this.finish();
@@ -593,7 +595,6 @@ export class JigsawScreen implements GameScreen {
     // A hint that finishes the puzzle: nothing more to do until "Well done!".
     if (game.solved) this.busy = true;
     this.save();
-    this.resetIdle();
     this.refresh();
     try {
       await this.view?.flyStar(target);
@@ -624,7 +625,6 @@ export class JigsawScreen implements GameScreen {
     this.lifted = null;
     saveSavedJigsaw(this.store, this.saved);
     this.host.redraw(true);
-    this.resetIdle();
   }
 
   private openPicture(index: number): void {
@@ -643,7 +643,6 @@ export class JigsawScreen implements GameScreen {
     this.mode = 'puzzle';
     this.host.redraw(true);
     this.timer.resume(performance.now());
-    this.resetIdle();
   }
 
   /** Only the picture on screen is kept decoded: a 1600 × 1200 photo takes several MB. */
@@ -727,8 +726,6 @@ export class JigsawScreen implements GameScreen {
     this.save();
     this.lifted = null;
     this.timer.pause();
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
     this.mode = 'pictures';
     this.page = 0;
     this.host.redraw(true);
@@ -739,7 +736,6 @@ export class JigsawScreen implements GameScreen {
     this.mode = 'puzzle';
     this.host.redraw(true);
     this.timer.resume(performance.now());
-    this.resetIdle();
   }
 
   /** Hide edges on or off: the pieces change straight away; a new Tray puzzle deals mixed. Remembered. */
@@ -775,8 +771,6 @@ export class JigsawScreen implements GameScreen {
     if (this.held) this.dragCancelled();
     this.busy = true;
     this.lifted = null;
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
     // Whatever happens, she ends up on the picture page, never stuck with the Games button waiting on "busy".
     try {
       if (this.shown) await this.view?.finish(picture, this.assembled(layout));
@@ -844,12 +838,5 @@ export class JigsawScreen implements GameScreen {
       saveSavedJigsaw(this.store, this.saved);
       this.view?.setFinishedCartoon(!on);
     });
-  }
-
-  private resetIdle(): void {
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
-    if (this.mode !== 'puzzle') return;
-    this.idleTimer = window.setTimeout(() => this.view?.setHintPulse(true), IDLE_HINT_MS);
   }
 }

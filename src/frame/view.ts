@@ -115,6 +115,7 @@ export class FrameView {
   /** Her stats pop-up draws itself in here. */
   readonly statsLayer: HTMLElement;
   private readonly corner: HTMLElement;
+  private readonly help: HTMLElement;
   private readonly celebrate: HTMLElement;
   private readonly clockPopup: HTMLElement;
   private readonly gamesPopup: HTMLElement;
@@ -125,6 +126,7 @@ export class FrameView {
   constructor(root: HTMLElement) {
     this.gameLayer = el('div', 'game-layer', root);
     this.corner = el('div', 'corner', root);
+    this.help = el('div', 'help-bubble', root);
     this.celebrate = el('div', 'celebrate', root);
     this.clockPopup = el('div', 'clock-popup', root);
     this.gamesPopup = el('div', 'games-popup', root);
@@ -132,6 +134,25 @@ export class FrameView {
     this.statsLayer = el('div', 'stats-layer', root);
     this.rotate = el('div', 'rotate', root);
     this.rotate.innerHTML = `${SIDEWAYS_IPAD}<div>Please turn the iPad sideways</div>`;
+  }
+
+  /** The help bubble under Hint: what to do, and to tap Hint. Its arrow points at Hint. */
+  showHelp(line: string, tap: string, layout: FrameLayout): void {
+    this.help.replaceChildren();
+    el('div', 'help-line', this.help).textContent = line;
+    el('div', 'help-tap', this.help).textContent = tap;
+    this.placeHelp(layout);
+    this.help.classList.add('visible');
+  }
+
+  placeHelp(layout: FrameLayout): void {
+    const { hintButton: hint, helpBubble: bubble } = layout;
+    place(this.help, bubble);
+    this.help.style.setProperty('--arrow-x', `${hint.x + hint.w / 2 - bubble.x}px`);
+  }
+
+  hideHelp(): void {
+    this.help.classList.remove('visible');
   }
 
   /** The Games button (or, with one game, a Stats button) and the Clock button in the top-right corner. */
@@ -143,8 +164,7 @@ export class FrameView {
     place(left, layout.gamesButton);
     const clock = el('button', 'clock-button', this.corner);
     clock.type = 'button';
-    clock.setAttribute('aria-label', 'Clock');
-    clock.innerHTML = CLOCK_ICON;
+    clock.innerHTML = `${CLOCK_ICON}<span>Time</span>`;
     place(clock, layout.clockButton);
   }
 

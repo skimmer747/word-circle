@@ -33,6 +33,9 @@ const NOTICE_OPEN_MS = 30_000;
 const STATS_OPEN_MS = 120_000;
 /** Looking back at a finished puzzle moves on to the next one by itself after this long. */
 const REVIEW_MS = 60_000;
+/** After this long without a touch, Hint pulses and the help bubble says what to do, in every game. */
+export const HELP_MS = 60_000;
+const TAP_HINT = 'Tap Hint for help.';
 
 /** What this iPad's settings tell the frame. */
 export interface FrameOptions {
@@ -73,6 +76,10 @@ export class Frame implements FrameHost {
   private celebration: Celebrating | null = null;
   /** The game's own buttons while she looks back at a finished puzzle. */
   private reviewButtons: ButtonGeometry[] = [];
+  private helpTimer = 0;
+  private helpShown = false;
+  /** Fingers that came down on the help bubble: they only close it. */
+  private readonly helpTaps = new Set<number>();
   private sharing = false;
   private schedule: ScheduledEvent[] = [];
   private clockOpen = false;
@@ -146,6 +153,7 @@ export class Frame implements FrameHost {
     this.relayout(false);
     this.listen();
     this.game.resume();
+    this.restartHelp();
     void this.refreshSchedule();
     window.setInterval(() => {
       if (!document.hidden) void this.refreshSchedule();
@@ -162,8 +170,10 @@ export class Frame implements FrameHost {
         this.view.hideCelebration();
         // A waiting update reloads the page now; the game saved its next puzzle before the card appeared.
         if (this.updates.applyIfPending()) return;
+        this.restartHelp();
         resolve();
       };
+      this.stopHelp();
       this.celebration = { card, done, timeout: window.setTimeout(done, card.timeoutMs), reviewing: false };
       if (this.layout) this.view.showCelebration(card, this.layout, wellDoneTitle(this.options.name));
       this.updateTouchTargets();
@@ -172,6 +182,7 @@ export class Frame implements FrameHost {
 
   notice(card: NoticeCard): void {
     if (this.blocked() || !this.layout) return;
+    this.hideHelp();
     this.noticeOpen = true;
     this.view.showNotice(card, this.layout);
     this.noticeAutoClose = window.setTimeout(() => this.closeNotice(), NOTICE_OPEN_MS);
@@ -323,6 +334,7 @@ export class Frame implements FrameHost {
     this.closeGames();
     const next = this.games.find((game) => game.id === id);
     if (!next || next === this.game) return;
+    this.stopHelp();
     this.game.pause();
     this.game = next;
     this.saved = { ...this.saved, current: id };
@@ -330,6 +342,7 @@ export class Frame implements FrameHost {
     saveSavedFrame(this.store, this.saved);
     this.relayout(true);
     this.game.resume();
+    this.restartHelp();
   }
 
   private openStatsFromGames(): void {
@@ -471,6 +484,7 @@ export class Frame implements FrameHost {
     this.settingsOpen = true;
     track('settings_opened');
     this.tracer.setEnabled(false);
+    this.stopHelp();
     this.game.pause();
     this.options.openSettings(() => this.settingsClosed());
   }
@@ -479,11 +493,63 @@ export class Frame implements FrameHost {
     this.settingsOpen = false;
     this.game.resume();
     this.updateTouchTargets();
+    this.restartHelp();
+  }
+
+  /** The quiet minute starts again (after every touch, and whenever play picks up again); any help showing goes. */
+  private restartHelp(): void {
+    this.hideHelp();
+    window.clearTimeout(this.helpTimer);
+    this.helpTimer = window.setTimeout(() => this.offerHelp(), HELP_MS);
+  }
+
+  private stopHelp(): void {
+    window.clearTimeout(this.helpTimer);
+    this.hideHelp();
+  }
+
+  /**
+   * A quiet minute is up: Hint pulses and the bubble says what to do. Not while something is in the way, or when the
+   * game has nothing to help with (Jigsaw's picture page): then another minute.
+   */
+  private offerHelp(): void {
+    const layout = this.layout;
+    const line = layout && !document.hidden && !this.blocked() ? (this.game.help?.() ?? null) : null;
+    if (!layout || !line) {
+      this.helpTimer = window.setTimeout(() => this.offerHelp(), HELP_MS);
+      return;
+    }
+    this.helpShown = true;
+    this.game.setHintPulse?.(true);
+    this.view.showHelp(line, TAP_HINT, layout);
+  }
+
+  private hideHelp(): void {
+    if (!this.helpShown) return;
+    this.helpShown = false;
+    this.game.setHintPulse?.(false);
+    this.view.hideHelp();
+  }
+
+  /** A finger on the help bubble only closes it, so it never presses whatever is underneath. */
+  private onHelpBubble(x: number, y: number): boolean {
+    const bubble = this.layout?.helpBubble;
+    return this.helpShown && !!bubble && x >= bubble.x && x <= bubble.x + bubble.w && y >= bubble.y && y <= bubble.y + bubble.h;
   }
 
   private listen(): void {
     const forward = (type: PointerInput['type']) => (event: PointerEvent) => {
       if (this.settingsOpen || this.covered > 0) return;
+      if (this.helpTaps.has(event.pointerId)) {
+        if (type === 'up' || type === 'cancel') this.helpTaps.delete(event.pointerId);
+        return;
+      }
+      if (type === 'down' && this.onHelpBubble(event.clientX, event.clientY)) {
+        this.helpTaps.add(event.pointerId);
+        this.restartHelp();
+        return;
+      }
+      if (type !== 'move') this.restartHelp();
       if (type === 'down') this.interacted = true;
       if (type !== 'move') this.game.activity?.();
       this.tracer.handle({ type, id: event.pointerId, x: event.clientX, y: event.clientY, time: event.timeStamp });
@@ -509,9 +575,11 @@ export class Frame implements FrameHost {
     // Timers stop while the iPad sleeps or the app is closed.
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
+        this.stopHelp();
         this.game.pause();
       } else {
         if (!this.settingsOpen && !this.statsOpen) this.game.resume();
+        this.restartHelp();
         void this.refreshSchedule();
       }
     });
@@ -538,6 +606,11 @@ export class Frame implements FrameHost {
     this.layout = layout;
     this.view.renderCorner(layout, this.games.length > 1 ? 'games' : 'stats');
     this.targets = this.game.render(this.view.gameLayer, layout, animateIn);
+    // A redraw keeps the help showing: Hint is drawn afresh, so it pulses again.
+    if (this.helpShown) {
+      this.game.setHintPulse?.(true);
+      this.view.placeHelp(layout);
+    }
     this.updateTouchTargets();
   }
 

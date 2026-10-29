@@ -95,6 +95,7 @@ export class GridView {
       letter.style.fontSize = `${layout.squareFont}px`;
       let corner: HTMLElement | null = null;
       if (firsts.has(square)) {
+        cell.classList.add('has-corner');
         corner = el('span', 'cell-corner', cell);
         corner.style.fontSize = `${layout.cornerFont}px`;
       }

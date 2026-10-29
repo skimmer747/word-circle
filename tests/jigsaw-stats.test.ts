@@ -4,10 +4,18 @@ import { familyStats } from '../src/stats/family-stats';
 import { herStats, type HerStatsInput, type StatsGame } from '../src/stats/her-stats';
 import { LOG_KEY, addPlay, emptyLifetime, loadLog } from '../src/stats/log';
 import { jigsawRecord } from '../src/stats/records';
+import { COUNT_LABELS, COUNT_LEVELS, PIECE_COUNTS } from '../src/jigsaw/types';
 import { MemoryStore } from './memory-store';
 
 const NOW = new Date(2026, 9, 28, 10, 30);
 const record = jigsawRecord({ count: 16, style: 'board', hints: 2, ms: 95_000.4, now: NOW });
+
+describe("Jigsaw's piece counts as levels", () => {
+  it('labels 9, 16 and 30 pieces Easy, Medium and Hard, the levels they count as', () => {
+    expect(PIECE_COUNTS.map((count) => COUNT_LABELS[count])).toEqual(['Easy', 'Medium', 'Hard']);
+    expect(PIECE_COUNTS.map((count) => COUNT_LEVELS[count])).toEqual(['easy', 'medium', 'hard']);
+  });
+});
 
 describe('Jigsaw in the play log', () => {
   it('logs a finished jigsaw with its piece count as a level, and its style', () => {

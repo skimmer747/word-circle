@@ -90,6 +90,13 @@ export interface GameScreen {
   /** A finger touched down or lifted (for play time). */
   activity?(): void;
   /**
+   * What to do, in a few words, for the help bubble the frame shows after a quiet minute ("Make words from these
+   * letters."), or null when there's nothing to help with right now.
+   */
+  help?(): string | null;
+  /** Hint pulses while the help bubble shows, and stops when it goes. */
+  setHintPulse?(on: boolean): void;
+  /**
    * She tapped Back to puzzle and is looking at what she finished: the game may show buttons of its own beside Next
    * (Jigsaw's Cartoon) and returns where they are. It must change the screen itself, as a redraw ends the looking back.
    */

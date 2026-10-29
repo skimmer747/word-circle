@@ -23,7 +23,6 @@ import { circleRecord } from '../stats/records';
 import { LEVELS, type Level, type PuzzleSet } from './types';
 import { View, type RowState } from './view';
 
-const IDLE_HINT_MS = 120_000;
 const GOOD_MS = 1200;
 /** The celebration moves on by itself after this long if she doesn't tap Next puzzle. */
 const CELEBRATION_MS = 15_000;
@@ -48,7 +47,6 @@ export class CircleScreen implements GameScreen {
   private game!: Game;
   private timer = new PlayTimer();
   private ringOrder: number[] = [];
-  private idleTimer = 0;
   /** True while the hint star flies; Hint taps are ignored until it lands. */
   private hintFlying = false;
   /** The letter the hint star is flying to: hidden until it lands. */
@@ -130,12 +128,19 @@ export class CircleScreen implements GameScreen {
     this.timer.activity(performance.now());
   }
 
+  /** For the frame's help bubble after a quiet minute. */
+  help(): string | null {
+    return this.busy || this.hintFlying ? null : 'Make words from these letters.';
+  }
+
+  setHintPulse(on: boolean): void {
+    this.view?.setHintPulse(on);
+  }
+
   /** Play time stops while she's away. */
   pause(): void {
     this.shown = false;
     this.timer.pause();
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
     this.save();
   }
 
@@ -144,7 +149,6 @@ export class CircleScreen implements GameScreen {
     this.timer.resume(performance.now());
     // A puzzle completed while something flew, just before she switched away, is celebrated when she's back.
     this.finishIfComplete();
-    if (!this.busy) this.resetIdle();
   }
 
   summary(): GameSummary {
@@ -179,7 +183,6 @@ export class CircleScreen implements GameScreen {
     if (this.busy || this.host.isTracing || this.hintFlying || level === this.level) return;
     this.openLevel(level);
     this.host.redraw(true);
-    this.resetIdle();
     // A level saved complete but never celebrated (e.g. the app closed mid-flight) is celebrated now.
     this.finishIfComplete();
   }
@@ -211,7 +214,6 @@ export class CircleScreen implements GameScreen {
     switch (result.kind) {
       case 'answer':
         this.save();
-        this.resetIdle();
         const game = this.game;
         this.wordsFlying++;
         try {
@@ -265,8 +267,6 @@ export class CircleScreen implements GameScreen {
     if (this.busy) return;
     this.busy = true;
     this.view.showSelection([]);
-    window.clearTimeout(this.idleTimer);
-    this.view.setHintPulse(false);
     this.timer.activity(performance.now());
     const { stats, celebration } = recordSolve(this.saved.stats, this.level, this.timer.elapsedMs, dayKey(new Date()));
     this.saved.stats = stats;
@@ -299,7 +299,6 @@ export class CircleScreen implements GameScreen {
     this.timer.resume(performance.now());
     this.busy = false;
     this.host.redraw(true);
-    this.resetIdle();
   }
 
   private async hint(): Promise<void> {
@@ -308,7 +307,6 @@ export class CircleScreen implements GameScreen {
     const result = this.game.hint();
     if (!result) return;
     this.save();
-    this.resetIdle();
     const row = this.game.puzzle.words.indexOf(result.word);
     this.hintFlying = true;
     this.hiddenHint = { word: result.word, index: result.index };
@@ -334,12 +332,6 @@ export class CircleScreen implements GameScreen {
     if (this.busy || this.host.isTracing) return;
     this.ringOrder = shuffleRing(this.ringOrder, this.game.puzzle.letters, Math.random);
     this.view.setRingOrder(this.ringOrder);
-  }
-
-  private resetIdle(): void {
-    window.clearTimeout(this.idleTimer);
-    this.view?.setHintPulse(false);
-    this.idleTimer = window.setTimeout(() => this.view?.setHintPulse(true), IDLE_HINT_MS);
   }
 
   private save(): void {

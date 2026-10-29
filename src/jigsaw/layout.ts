@@ -24,7 +24,7 @@ const FINISHED_CARTOON_WIDTH = 170;
 const TITLE_HEIGHT = 72;
 const TILE_GAP = 24;
 /** A picture's caption under it: up to two lines (matches the CSS). */
-const TILE_CAPTION = 56;
+const TILE_CAPTION = 64;
 const PAGE_BUTTON_HEIGHT = 96;
 const BACK_WIDTH = 200;
 const CLOSE_WIDTH = 180;

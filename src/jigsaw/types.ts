@@ -16,6 +16,8 @@ export const GRID_SIZES: Record<PieceCount, { cols: number; rows: number }> = {
 
 /** The play log keeps piece counts as levels, so her stats treat 9, 16 and 30 like Easy, Medium and Hard. */
 export const COUNT_LEVELS: Record<PieceCount, PlayLevel> = { 9: 'easy', 16: 'medium', 30: 'hard' };
+/** The piece counts' buttons say Easy, Medium and Hard, like every game's levels. */
+export const COUNT_LABELS: Record<PieceCount, string> = { 9: 'Easy', 16: 'Medium', 30: 'Hard' };
 export const LEVEL_COUNTS: Record<PlayLevel, PieceCount> = { easy: 9, medium: 16, hard: 30 };
 
 /** Every puzzle is a landscape picture this shape. */

@@ -11,8 +11,8 @@ const TILE_GAP = 12;
 const SQUARE_MAX = 150;
 const LETTER_SCALE = 0.62;
 /** A section's letters, printed small in its first square. */
-const CORNER_SCALE = 0.18;
-const CORNER_MIN = 18;
+const CORNER_SCALE = 0.24;
+const CORNER_MIN = 24;
 
 export interface GridLayout {
   frame: FrameLayout;
