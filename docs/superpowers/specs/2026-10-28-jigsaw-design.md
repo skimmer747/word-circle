@@ -128,6 +128,15 @@ Active play time is measured as in the other games (`src/shared/timer.ts`); she 
 
 ### Adding a photo in the game
 
+**Switched off 2026-10-29** (`ADDING_PHOTOS` in `src/photos/adding.ts`). The owner adds pictures by sending them to
+Claude, who adds each as a starter for every family, with a hand-drawn cartoon. Without adding:
+- there's no Add a photo tile, and no Add photos or starter tick box in settings;
+- the starters are always shown;
+- photos added before stay, and can still be captioned, re-framed and removed in settings;
+- the settings section is hidden when there are none.
+
+Setting the flag back to true restores everything below.
+
 1. **Add a photo** opens the iPad's own picker through a hidden `<input type="file" accept="image/*">`. iPadOS first shows its own menu (Photo Library / Take Photo / Choose File); a web page can't skip it. Cancelling adds nothing.
 2. The **"Your new puzzle"** screen is an ordinary page layer above the game (the game pauses the frame's touch tracker with `FrameHost.cover()` while it's open), because it needs a real text box and the on-screen keyboard. So the keyboard never hides what she needs, the photo is on the left, and the caption box and buttons are on the right, top-aligned.
    - The photo is shown under a fixed 4:3 white frame; the rest of the photo is dimmed (four plain panels: iPad Safari doesn't draw a frame-sized hole in one big shadow). Dragging the photo moves it under the frame, which always stays inside the photo.

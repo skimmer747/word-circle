@@ -16,6 +16,7 @@ import { loadStarters } from './jigsaw/pictures';
 import { JigsawScreen } from './jigsaw/screen';
 import type { GuessWords } from './guess/words';
 import { photoAdder } from './photos/adder';
+import { ADDING_PHOTOS } from './photos/adding';
 import { loadPictureList } from './photos/family';
 import { openPhotoStore, trackChanges, type PhotoStore } from './photos/store';
 import { startAnalytics } from './analytics';
@@ -92,10 +93,10 @@ function startApp(settings: Settings): void {
     grid: () => new GridScreen(gridPuzzles as GridPuzzleSet, gridWords as GridWords, store, { startLevel: settings.startLevel, avoided }),
     jigsaw: () =>
       new JigsawScreen(store, {
-        // Where photos can't be kept, the starters are always shown: hidden, Jigsaw would have nothing.
+        // Where photos can't be kept or added, the starters are always shown: hidden, Jigsaw could have nothing.
         loadPictures: () =>
-          loadPictureList(photoStore, settings.jigsawStarters || !photoStore ? () => loadStarters(import.meta.env.BASE_URL) : async () => []),
-        photos: photoStore && photoAdder(root!, photoStore),
+          loadPictureList(photoStore, settings.jigsawStarters || !photoStore || !ADDING_PHOTOS ? () => loadStarters(import.meta.env.BASE_URL) : async () => []),
+        photos: ADDING_PHOTOS && photoStore ? photoAdder(root!, photoStore) : null,
       }),
   };
   frame = new Frame(root!, store, updates, settings.games.map((id) => makers[id]()), loadSavedGame(store).stats, {

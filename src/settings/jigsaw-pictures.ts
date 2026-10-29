@@ -1,6 +1,7 @@
 import { START_CROP } from '../jigsaw/crop';
 import { openNewPhoto } from '../jigsaw/new-photo';
 import { MAX_CAPTION, cleanCaption, newPhotoId } from '../photos/framing';
+import { ADDING_PHOTOS } from '../photos/adding';
 import { pickPhotos } from '../photos/picker';
 import { framedCopies, readPhoto, wholeCopy, type OpenPhoto } from '../photos/shrink';
 import type { FamilyPhoto, PhotoStore } from '../photos/store';
@@ -38,11 +39,17 @@ export function renderJigsawPictures(sheet: HTMLElement, cover: HTMLElement, pho
   el('summary', '', box).textContent = 'Jigsaw pictures';
   if (!photos) {
     // No tick box here: with the starters hidden and no photos, Jigsaw would have nothing to show.
-    el('p', 'settings-note', box).textContent = "Photos can't be kept in this browser. Open Word Circle from the Home Screen to add them.";
+    if (ADDING_PHOTOS) el('p', 'settings-note', box).textContent = "Photos can't be kept in this browser. Open Word Circle from the Home Screen to add them.";
+    // While photos can't be added, the section is only for photos added before, and none can be kept here.
+    else box.hidden = true;
     return { settle: async () => {} };
   }
-  checkbox(box, 'Show the starter pictures', draft.jigsawStarters, (input) => (draft.jigsawStarters = input.checked));
-  el('p', 'settings-note', box).textContent = 'Photos from this iPad become puzzles. They stay on this iPad and are never sent anywhere.';
+  // While photos can't be added, the section is only for photos added before (hidden when there are none), with no
+  // tick box: the starters could be hidden with no photos to take their place.
+  if (ADDING_PHOTOS) checkbox(box, 'Show the starter pictures', draft.jigsawStarters, (input) => (draft.jigsawStarters = input.checked));
+  el('p', 'settings-note', box).textContent = ADDING_PHOTOS
+    ? 'Photos from this iPad become puzzles. They stay on this iPad and are never sent anywhere.'
+    : 'Photos added on this iPad earlier. They stay on this iPad and are never sent anywhere.';
   const status = el('p', 'settings-note', box);
   const list = el('ul', 'settings-photo-list', box);
   let urls: string[] = [];
@@ -74,6 +81,7 @@ export function renderJigsawPictures(sheet: HTMLElement, cover: HTMLElement, pho
     urls = [];
     list.replaceChildren();
     if (saved.length === 0) el('li', 'settings-empty', list).textContent = 'No photos yet';
+    box.hidden = saved.length === 0 && !ADDING_PHOTOS;
     for (const photo of saved) row(photo);
   };
 
@@ -191,15 +199,17 @@ export function renderJigsawPictures(sheet: HTMLElement, cover: HTMLElement, pho
     adding = false;
     await render();
   };
-  const add = button(box, 'Add photos', () => {
-    if (adding) return;
-    // Straight from the tap, so the iPad opens its picker.
-    void pickPhotos(true).then((files) => {
-      if (files.length > 0 && !adding) void track(addAll(files));
+  if (ADDING_PHOTOS) {
+    const add = button(box, 'Add photos', () => {
+      if (adding) return;
+      // Straight from the tap, so the iPad opens its picker.
+      void pickPhotos(true).then((files) => {
+        if (files.length > 0 && !adding) void track(addAll(files));
+      });
     });
-  });
-  // Add photos sits above the list.
-  box.insertBefore(add, status);
+    // Add photos sits above the list.
+    box.insertBefore(add, status);
+  }
   void render();
 
   return {
