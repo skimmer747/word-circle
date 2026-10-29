@@ -54,5 +54,21 @@
     "caption": "Mount Hood",
     "cartoon": "mount-hood.cartoon.png",
     "cartoonThumb": "mount-hood.cartoon.thumb.png"
+  },
+  {
+    "id": "athena",
+    "file": "athena.jpg",
+    "thumb": "athena.thumb.jpg",
+    "caption": "Athena",
+    "cartoon": "athena.cartoon.png",
+    "cartoonThumb": "athena.cartoon.thumb.png"
+  },
+  {
+    "id": "todds-md-11",
+    "file": "todds-md-11.jpg",
+    "thumb": "todds-md-11.thumb.jpg",
+    "caption": "Todd's MD-11",
+    "cartoon": "todds-md-11.cartoon.png",
+    "cartoonThumb": "todds-md-11.cartoon.thumb.png"
   }
 ]
