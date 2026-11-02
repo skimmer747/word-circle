@@ -6,7 +6,7 @@ import { SCREENS_AND_THUMBS, inPlayArea, overlaps } from './screens';
 describe.each(SCREENS_AND_THUMBS)('Word Guess layout on a %i×%i screen, thumb %s', (width, height, thumb) => {
   const layout = computeGuessLayout(computeFrameLayout(width, height, 3, thumb));
   const { frame, rows, keys } = layout;
-  const left = [layout.hintButton, layout.allLettersButton, layout.dailyButton];
+  const left = [layout.hintButton, layout.allLettersButton, layout.yellowHelpButton, layout.dailyButton];
   const keyRects = keys.map((key) => key.rect);
   const key = (id: string) => keys.find((k) => k.id === id)!.rect;
 
@@ -66,7 +66,7 @@ describe.each(SCREENS_AND_THUMBS)('Word Guess layout on a %i×%i screen, thumb %
     expect(board.y + board.h).toBeLessThanOrEqual(Math.min(...keyRects.map((r) => r.y)) - 16);
   });
 
-  it('stacks Hint, All letters and the daily button in a left column at least 110 px wide', () => {
+  it('stacks Hint, All letters, Yellow help and the daily button in a left column at least 110 px wide', () => {
     for (const button of left) {
       expect(button.w).toBeGreaterThanOrEqual(110);
       expect(button.h).toBeGreaterThanOrEqual(90);
@@ -74,12 +74,14 @@ describe.each(SCREENS_AND_THUMBS)('Word Guess layout on a %i×%i screen, thumb %
       for (const k of keyRects) expect(overlaps(button, k)).toBe(false);
     }
     expect(layout.allLettersButton.y).toBeGreaterThanOrEqual(layout.hintButton.y + layout.hintButton.h);
-    expect(layout.dailyButton.y).toBeGreaterThanOrEqual(layout.allLettersButton.y + layout.allLettersButton.h);
+    expect(layout.yellowHelpButton.y).toBeGreaterThanOrEqual(layout.allLettersButton.y + layout.allLettersButton.h);
+    expect(layout.dailyButton.y).toBeGreaterThanOrEqual(layout.yellowHelpButton.y + layout.yellowHelpButton.h);
   });
 
   it('puts Hint in the same top-left place as every game, with the other buttons the same width below it', () => {
     expect(layout.hintButton).toEqual(frame.hintButton);
-    for (const button of [layout.allLettersButton, layout.dailyButton]) expect(button.w).toBe(frame.hintButton.w);
+    for (const button of [layout.allLettersButton, layout.yellowHelpButton, layout.dailyButton]) expect(button.w).toBe(frame.hintButton.w);
     expect(layout.allLettersButton.h).toBe(frame.hintButton.h);
+    expect(layout.yellowHelpButton.h).toBe(frame.hintButton.h);
   });
 });

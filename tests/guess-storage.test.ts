@@ -117,6 +117,15 @@ describe('words she should never see', () => {
   });
 });
 
+describe('Yellow help', () => {
+  it('is on unless she turned it off, and stays off from word to word', () => {
+    expect(loadSavedGuess(stored(SAVED), WORDS).yellowHelp).toBeUndefined();
+    expect(loadSavedGuess(stored({ ...SAVED, yellowHelp: false }), WORDS).yellowHelp).toBe(false);
+    expect(loadSavedGuess(stored({ ...SAVED, yellowHelp: 'no' }), WORDS).yellowHelp).toBeUndefined();
+    expect(listWord({ ...SAVED, yellowHelp: false }, WORDS, 0).yellowHelp).toBe(false);
+  });
+});
+
 describe('play time on a word', () => {
   it('keeps the time so far, and older saves load without it', () => {
     expect(loadSavedGuess(stored({ ...SAVED, elapsedMs: 42_000 }), WORDS).elapsedMs).toBe(42_000);

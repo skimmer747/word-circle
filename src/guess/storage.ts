@@ -30,6 +30,8 @@ export interface SavedGuess {
   hinted: number[];
   /** Active play time on this word so far (older saves don't have it). */
   elapsedMs?: number;
+  /** She turned Yellow help off: no yellow letters in the corners (it's on unless this is false). */
+  yellowHelp?: false;
   /** The last daily word she finished, with its text for sharing, and whether she has sent it (Share is offered once). */
   dailyDone: { date: string; share: string; shared?: true } | null;
   stats: GuessStats;
@@ -106,6 +108,7 @@ function readSavedGuess(value: unknown): SavedGuess | null {
     dailyDone: dailyDone === null ? null : readDailyDone(dailyDone as { date: string; share: string; shared?: unknown }),
     stats: readStats(value.stats),
     ...(isTime(value.elapsedMs) ? { elapsedMs: value.elapsedMs as number } : {}),
+    ...(value.yellowHelp === false ? { yellowHelp: false as const } : {}),
   };
 }
 

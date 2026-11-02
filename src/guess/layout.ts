@@ -19,7 +19,7 @@ const CORNER_MIN_FONT = 24;
 const CORNER_FONT_SCALE = 0.35;
 const CORNER_TILE_SCALE = 1.15;
 const CORNER_INSET = 2;
-/** Space between the left column (Hint, All letters, Today's Wordle) and the board. */
+/** Space between the left column (Hint, All letters, Yellow help, Today's Wordle) and the board. */
 const COLUMN_GAP = 24;
 /** Space between the board and the top-right buttons. */
 const CORNER_CLEARANCE = 16;
@@ -47,6 +47,8 @@ export interface GuessLayout {
   keyFont: number;
   hintButton: Rect;
   allLettersButton: Rect;
+  /** Turns the yellow letters in the corners on and off. */
+  yellowHelpButton: Rect;
   /** Today's Wordle label, or Share today's Wordle. */
   dailyButton: Rect;
   /** Next, over the keyboard, while she looks back at a finished word. */
@@ -91,7 +93,8 @@ export function computeGuessLayout(frame: FrameLayout): GuessLayout {
   }));
 
   const allLettersButton: Rect = { ...hintButton, y: hintButton.y + hintButton.h + BUTTON_GAP };
-  const dailyY = allLettersButton.y + allLettersButton.h + BUTTON_GAP;
+  const yellowHelpButton: Rect = { ...hintButton, y: allLettersButton.y + allLettersButton.h + BUTTON_GAP };
+  const dailyY = yellowHelpButton.y + yellowHelpButton.h + BUTTON_GAP;
   const dailyButton: Rect = { x: hintButton.x, y: dailyY, w: hintButton.w, h: Math.min(DAILY_MAX_HEIGHT, boardBottom - dailyY) };
 
   return {
@@ -107,6 +110,7 @@ export function computeGuessLayout(frame: FrameLayout): GuessLayout {
     keyFont: Math.round(keyH * KEY_LETTER_SCALE),
     hintButton,
     allLettersButton,
+    yellowHelpButton,
     dailyButton,
     reviewButton: reviewButtonIn({ x: play.x, y: keyboardTop, w: play.w, h: bottomY + keyH - keyboardTop }),
   };

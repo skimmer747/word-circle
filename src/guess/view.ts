@@ -1,6 +1,6 @@
 import type { Rect } from '../frame/layout';
 import { el, place, restartAnimation, wait } from '../ui/dom';
-import { BACK_ICON, CHECK_ICON, ENTER_ICON, HINT_ICON, KEYBOARD_ICON, NEWS_ICON, SHARE_ICON } from '../ui/icons';
+import { BACK_ICON, CHECK_ICON, CORNERS_ICON, ENTER_ICON, HINT_ICON, KEYBOARD_ICON, NEWS_ICON, SHARE_ICON } from '../ui/icons';
 import { flyHintStar, landHintLetter } from '../ui/hint-star';
 import type { GuessLayout } from './layout';
 import type { KeyState, Mark } from './rules';
@@ -23,6 +23,7 @@ export interface GuessScreenState {
   rows: SquareView[][];
   keys: ReadonlyMap<string, KeyState>;
   allLetters: boolean;
+  yellowHelp: boolean;
   daily: DailyMode;
 }
 
@@ -40,6 +41,7 @@ export class GuessView {
   private readonly keys = new Map<string, HTMLElement>();
   private hintButton: HTMLElement | null = null;
   private allButton: HTMLElement | null = null;
+  private yellowButton: HTMLElement | null = null;
   private dailyButton: HTMLElement | null = null;
 
   /** Draws into `layer`. Buttons are drawn here but tapped through the touch tracker, which works with a resting thumb. */
@@ -92,8 +94,10 @@ export class GuessView {
 
     this.hintButton = this.buildButton(board, 'hint', HINT_ICON, 'Hint', layout.hintButton);
     this.allButton = this.buildButton(board, 'all-letters', KEYBOARD_ICON, 'All letters', layout.allLettersButton);
+    this.yellowButton = this.buildButton(board, 'yellow-help', CORNERS_ICON, 'Yellow help', layout.yellowHelpButton);
     this.dailyButton = this.buildButton(board, 'daily', NEWS_ICON, "Today's Wordle", layout.dailyButton);
     this.setAllLetters(state.allLetters);
+    this.setYellowHelp(state.yellowHelp);
     this.setDaily(state.daily);
 
     if (animateIn) {
@@ -207,6 +211,12 @@ export class GuessView {
     if (!this.allButton) return;
     this.allButton.classList.toggle('on', on);
     this.allButton.innerHTML = `${on ? CHECK_ICON : KEYBOARD_ICON}<span>All letters</span>`;
+  }
+
+  setYellowHelp(on: boolean): void {
+    if (!this.yellowButton) return;
+    this.yellowButton.classList.toggle('on', on);
+    this.yellowButton.innerHTML = `${on ? CHECK_ICON : CORNERS_ICON}<span>Yellow help</span>`;
   }
 
   setDaily(mode: DailyMode): void {

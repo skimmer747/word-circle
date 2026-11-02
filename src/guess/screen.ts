@@ -100,7 +100,13 @@ export class GuessScreen implements GameScreen {
     this.layout = computeGuessLayout(frame);
     this.view.render(
       this.layout,
-      { rows: this.boardRows(), keys: this.game.keyStates(), allLetters: this.allLetters, daily: this.dailyMode() },
+      {
+        rows: this.boardRows(),
+        keys: this.game.keyStates(),
+        allLetters: this.allLetters,
+        yellowHelp: this.yellowHelp,
+        daily: this.dailyMode(),
+      },
       animateIn,
     );
     return this.targets();
@@ -111,6 +117,7 @@ export class GuessScreen implements GameScreen {
     if (id.startsWith('key:')) this.key(id.slice('key:'.length));
     else if (id === 'hint') void this.hint();
     else if (id === 'all-letters') this.toggleAllLetters();
+    else if (id === 'yellow-help') this.toggleYellowHelp();
     else if (id === 'share-today') this.shareToday();
   }
 
@@ -209,6 +216,7 @@ export class GuessScreen implements GameScreen {
       ...keys.map(({ id, rect }) => ({ id, ...rect })),
       { id: 'hint', ...layout.hintButton },
       { id: 'all-letters', ...layout.allLettersButton },
+      { id: 'yellow-help', ...layout.yellowHelpButton },
     ];
     if (this.dailyMode() === 'share') buttons.push({ id: 'share-today', ...layout.dailyButton });
     return { tiles: [], buttons, reviewButton: layout.reviewButton };
@@ -228,12 +236,12 @@ export class GuessScreen implements GameScreen {
     return [...guess].map((letter, i) => ({ letter, look: marks[i] }));
   }
 
-  /** The row she's typing. Squares she hasn't filled show the yellow letters that could go there in their corners. */
+  /** The row she's typing. With Yellow help on, squares she hasn't filled show the yellow letters that could go there in their corners. */
   private currentRow(): SquareView[] {
     const next = this.game.nextSquare();
     const hidden =
       this.hiddenHint?.game === this.game && this.hiddenHint.guesses === this.game.guesses.length ? this.hiddenHint.position : -1;
-    const corners = yellowCorners(this.game.yellowLetters());
+    const corners = this.yellowHelp ? yellowCorners(this.game.yellowLetters()) : [];
     return this.game.row.map((square, i) => {
       if (i === hidden) return { letter: '', look: 'empty' };
       if (square.letter) return { letter: square.letter, look: square.locked ? 'right' : 'typed' };
@@ -310,6 +318,19 @@ export class GuessScreen implements GameScreen {
     this.view?.setRow(row, this.currentRow());
     this.view?.landSquare(row, result.position);
     if (result.solved) void this.finish();
+  }
+
+  /** Yellow help shows the yellow letters in the corners of the squares they can go in. On unless she turned it off. */
+  private get yellowHelp(): boolean {
+    return this.saved.yellowHelp !== false;
+  }
+
+  /** Her choice is kept from word to word. */
+  private toggleYellowHelp(): void {
+    this.saved = { ...this.saved, yellowHelp: this.yellowHelp ? false : undefined };
+    this.save();
+    this.view?.setYellowHelp(this.yellowHelp);
+    if (!this.game.solved) this.view?.setRow(this.currentRowIndex(), this.currentRow());
   }
 
   private toggleAllLetters(): void {

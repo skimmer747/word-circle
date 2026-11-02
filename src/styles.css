@@ -1163,15 +1163,18 @@ body {
   height: 0.8em;
 }
 
-.button.all-letters {
+.button.all-letters,
+.button.yellow-help {
   border-color: var(--shuffle);
 }
 
-.button.all-letters svg {
+.button.all-letters svg,
+.button.yellow-help svg {
   color: var(--shuffle);
 }
 
-.button.all-letters.on {
+.button.all-letters.on,
+.button.yellow-help.on {
   border-width: 7px;
 }
 
