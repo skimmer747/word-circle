@@ -14,11 +14,18 @@ export interface Square {
   locked: boolean;
 }
 
-/** A letter she found in the wrong spot and hasn't placed yet, with the squares it could still go in. */
+/**
+ * A letter she found in the wrong spot and hasn't placed yet, with the squares it could still go in. Sure when it has
+ * no square to spare: it must go in every one of them.
+ */
 export interface YellowLetter {
   letter: string;
   spots: number[];
+  sure: boolean;
 }
+
+/** A yellow letter in a square's corner, or null for an empty corner. */
+export type Corner = { letter: string; sure: boolean } | null;
 
 export type EnterResult = 'incomplete' | 'notAWord' | 'guessed' | 'solved';
 
@@ -48,17 +55,18 @@ export function markGuess(guess: string, answer: string): Mark[] {
 const CORNERS = 4;
 
 /**
- * The yellow letters in each square's corners (top left, top right, bottom left, bottom right; '' for none). Each
- * letter keeps one corner across the row; with more than four letters, each square fills its corners in turn.
+ * The yellow letters in each square's corners (top left, top right, bottom left, bottom right). Each letter keeps one
+ * corner across the row; with more than four letters, each square fills its corners in turn.
  */
-export function yellowCorners(yellow: readonly YellowLetter[]): string[][] {
+export function yellowCorners(yellow: readonly YellowLetter[]): Corner[][] {
   return Array.from({ length: WORD_LENGTH }, (_, i) => {
-    const corners: string[] = Array.from({ length: CORNERS }, () => '');
+    const corners: Corner[] = Array.from({ length: CORNERS }, () => null);
     const here = yellow.filter(({ spots }) => spots.includes(i));
+    const corner = ({ letter, sure }: YellowLetter): Corner => ({ letter, sure });
     if (yellow.length <= CORNERS) {
-      for (const item of here) corners[yellow.indexOf(item)] = item.letter;
+      for (const item of here) corners[yellow.indexOf(item)] = corner(item);
     } else {
-      here.slice(0, CORNERS).forEach(({ letter }, c) => (corners[c] = letter));
+      here.slice(0, CORNERS).forEach((item, c) => (corners[c] = corner(item)));
     }
     return corners;
   });
@@ -139,7 +147,8 @@ export class GuessGame {
 
   /**
    * Letters she found in the wrong spot and hasn't placed yet, in the order she found them, each with the squares
-   * it could still go in: not a square she knows, and not one where she already tried it.
+   * it could still go in: not a square she knows, not one where she already tried it, and not one a sure letter must
+   * go in (which can make another letter sure).
    */
   yellowLetters(): YellowLetter[] {
     const known = new Set(this.known());
@@ -158,12 +167,28 @@ export class GuessGame {
       for (const [letter, count] of inWord) copies.set(letter, Math.max(copies.get(letter) ?? 0, count));
     }
     const placed = (letter: string) => [...known].filter((i) => this.answer[i] === letter).length;
-    return found
-      .filter((letter) => placed(letter) < (copies.get(letter) ?? 0))
-      .map((letter) => ({
+    const yellow = found
+      .map((letter) => ({ letter, needed: (copies.get(letter) ?? 0) - placed(letter) }))
+      .filter(({ needed }) => needed > 0)
+      .map(({ letter, needed }) => ({
         letter,
+        needed,
         spots: Array.from({ length: WORD_LENGTH }, (_, i) => i).filter((i) => !known.has(i) && !tried.get(letter)?.has(i)),
       }));
+    const isSure = ({ spots, needed }: { spots: number[]; needed: number }) => spots.length <= needed;
+    for (let changed = true; changed; ) {
+      changed = false;
+      const taken = new Set(yellow.filter(isSure).flatMap(({ spots }) => spots));
+      for (const item of yellow) {
+        if (isSure(item)) continue;
+        const spots = item.spots.filter((i) => !taken.has(i));
+        // Never down to nothing: her guesses always leave each letter somewhere to go.
+        if (spots.length === item.spots.length || spots.length === 0) continue;
+        item.spots = spots;
+        changed = true;
+      }
+    }
+    return yellow.map((item) => ({ letter: item.letter, spots: item.spots, sure: isSure(item) }));
   }
 
   /** The square her next letter goes in, or -1 if the row is full. */

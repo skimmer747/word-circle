@@ -1101,6 +1101,12 @@ body {
   line-height: 1;
 }
 
+/* The only square left for that letter: green, as it must go here. */
+.square .maybe.sure {
+  background: var(--right-fill);
+  border-color: var(--found);
+}
+
 .square.pop {
   animation: pop-letter 150ms ease-out;
 }
