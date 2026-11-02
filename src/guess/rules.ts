@@ -14,6 +14,12 @@ export interface Square {
   locked: boolean;
 }
 
+/** A letter she found in the wrong spot and hasn't placed yet, with the squares it could still go in. */
+export interface YellowLetter {
+  letter: string;
+  spots: number[];
+}
+
 export type EnterResult = 'incomplete' | 'notAWord' | 'guessed' | 'solved';
 
 const RANK: Record<KeyState, number> = { unused: 0, absent: 1, present: 2, right: 3 };
@@ -36,6 +42,26 @@ export function markGuess(guess: string, answer: string): Mark[] {
     unmatched.set(guess[i], left - 1);
   }
   return marks;
+}
+
+/** A square has four corners for yellow letters. */
+const CORNERS = 4;
+
+/**
+ * The yellow letters in each square's corners (top left, top right, bottom left, bottom right; '' for none). Each
+ * letter keeps one corner across the row; with more than four letters, each square fills its corners in turn.
+ */
+export function yellowCorners(yellow: readonly YellowLetter[]): string[][] {
+  return Array.from({ length: WORD_LENGTH }, (_, i) => {
+    const corners: string[] = Array.from({ length: CORNERS }, () => '');
+    const here = yellow.filter(({ spots }) => spots.includes(i));
+    if (yellow.length <= CORNERS) {
+      for (const item of here) corners[yellow.indexOf(item)] = item.letter;
+    } else {
+      here.slice(0, CORNERS).forEach(({ letter }, c) => (corners[c] = letter));
+    }
+    return corners;
+  });
 }
 
 /** The first checked guess the board shows: it shows the last five guesses and the row she's typing. */
@@ -109,6 +135,35 @@ export class GuessGame {
     for (const guess of this.checked) markGuess(guess, this.answer).forEach((mark, i) => raise(guess[i], mark));
     for (const i of this.hints) raise(this.answer[i], 'right');
     return states;
+  }
+
+  /**
+   * Letters she found in the wrong spot and hasn't placed yet, in the order she found them, each with the squares
+   * it could still go in: not a square she knows, and not one where she already tried it.
+   */
+  yellowLetters(): YellowLetter[] {
+    const known = new Set(this.known());
+    const found: string[] = [];
+    /** The fewest copies of each letter the answer has, from her best guess. */
+    const copies = new Map<string, number>();
+    const tried = new Map<string, Set<number>>();
+    for (const guess of this.checked) {
+      const inWord = new Map<string, number>();
+      markGuess(guess, this.answer).forEach((mark, i) => {
+        const letter = guess[i];
+        if (mark === 'present' && !found.includes(letter)) found.push(letter);
+        if (mark !== 'absent') inWord.set(letter, (inWord.get(letter) ?? 0) + 1);
+        if (mark !== 'right') tried.set(letter, (tried.get(letter) ?? new Set()).add(i));
+      });
+      for (const [letter, count] of inWord) copies.set(letter, Math.max(copies.get(letter) ?? 0, count));
+    }
+    const placed = (letter: string) => [...known].filter((i) => this.answer[i] === letter).length;
+    return found
+      .filter((letter) => placed(letter) < (copies.get(letter) ?? 0))
+      .map((letter) => ({
+        letter,
+        spots: Array.from({ length: WORD_LENGTH }, (_, i) => i).filter((i) => !known.has(i) && !tried.get(letter)?.has(i)),
+      }));
   }
 
   /** The square her next letter goes in, or -1 if the row is full. */

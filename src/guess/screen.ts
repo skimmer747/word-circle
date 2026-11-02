@@ -9,7 +9,7 @@ import { guessRecord } from '../stats/records';
 import { guessLines } from './celebration';
 import { canShareToday, cachedDailyWords, dailyFor, finishWord, isTodaysWordle, markShared, refreshDailyWords, swapInDaily, type DailyWord } from './daily';
 import { computeGuessLayout, type GuessLayout } from './layout';
-import { firstVisibleGuess, GuessGame, VISIBLE_ROWS } from './rules';
+import { firstVisibleGuess, GuessGame, VISIBLE_ROWS, yellowCorners } from './rules';
 import { shareText } from './share';
 import { loadSavedGuess, recordGuessSolve, saveSavedGuess, type SavedGuess } from './storage';
 import { HINT_ICON } from '../ui/icons';
@@ -228,15 +228,17 @@ export class GuessScreen implements GameScreen {
     return [...guess].map((letter, i) => ({ letter, look: marks[i] }));
   }
 
+  /** The row she's typing. Squares she hasn't filled show the yellow letters that could go there in their corners. */
   private currentRow(): SquareView[] {
     const next = this.game.nextSquare();
     const hidden =
       this.hiddenHint?.game === this.game && this.hiddenHint.guesses === this.game.guesses.length ? this.hiddenHint.position : -1;
-    return this.game.row.map((square, i) =>
-      i === hidden
-        ? { letter: '', look: 'empty' }
-        : { letter: square.letter, look: square.locked ? 'right' : square.letter ? 'typed' : i === next ? 'cursor' : 'empty' },
-    );
+    const corners = yellowCorners(this.game.yellowLetters());
+    return this.game.row.map((square, i) => {
+      if (i === hidden) return { letter: '', look: 'empty' };
+      if (square.letter) return { letter: square.letter, look: square.locked ? 'right' : 'typed' };
+      return { letter: '', look: i === next ? 'cursor' : 'empty', corners: corners[i] };
+    });
   }
 
   /** Where the row she's typing sits on the board. */

@@ -14,6 +14,11 @@ const SQUARE_GAP = 8;
 const SQUARE_MAX = 110;
 const SQUARE_LETTER_SCALE = 0.62;
 const KEY_LETTER_SCALE = 0.55;
+/** Yellow letters in a square's corners: at least 24 px, on a little yellow square a bit bigger than the letter. */
+const CORNER_MIN_FONT = 24;
+const CORNER_FONT_SCALE = 0.35;
+const CORNER_TILE_SCALE = 1.15;
+const CORNER_INSET = 2;
 /** Space between the left column (Hint, All letters, Today's Wordle) and the board. */
 const COLUMN_GAP = 24;
 /** Space between the board and the top-right buttons. */
@@ -34,6 +39,10 @@ export interface GuessLayout {
   squareSize: number;
   squareGap: number;
   squareFont: number;
+  /** The yellow letters in the corners of the row she's typing: their size, their little squares, and the space around them. */
+  cornerFont: number;
+  cornerSize: number;
+  cornerInset: number;
   keys: Key[];
   keyFont: number;
   hintButton: Rect;
@@ -68,6 +77,7 @@ export function computeGuessLayout(frame: FrameLayout): GuessLayout {
   const byHeight = (boardBottom - play.y - 5 * SQUARE_GAP) / 6;
   const byWidth = (regionRight - regionLeft - 4 * SQUARE_GAP) / 5;
   const squareSize = Math.floor(Math.min(SQUARE_MAX, byHeight, byWidth));
+  const cornerFont = Math.max(CORNER_MIN_FONT, Math.round(squareSize * CORNER_FONT_SCALE));
   const boardW = 5 * squareSize + 4 * SQUARE_GAP;
   const boardH = 6 * squareSize + 5 * SQUARE_GAP;
   const centered = play.x + play.w / 2 - boardW / 2;
@@ -90,6 +100,9 @@ export function computeGuessLayout(frame: FrameLayout): GuessLayout {
     squareSize,
     squareGap: SQUARE_GAP,
     squareFont: Math.round(squareSize * SQUARE_LETTER_SCALE),
+    cornerFont,
+    cornerSize: Math.floor(cornerFont * CORNER_TILE_SCALE),
+    cornerInset: CORNER_INSET,
     keys,
     keyFont: Math.round(keyH * KEY_LETTER_SCALE),
     hintButton,

@@ -53,6 +53,13 @@ describe.each(SCREENS_AND_THUMBS)('Word Guess layout on a %i×%i screen, thumb %
     }
   });
 
+  it('makes the yellow corner letters at least 24 px, with four fitting inside a square', () => {
+    expect(layout.cornerFont).toBeGreaterThanOrEqual(24);
+    expect(layout.cornerSize).toBeGreaterThan(layout.cornerFont);
+    // Two across, with the inset either side and a gap between, inside the orange border of her next square.
+    expect(2 * layout.cornerSize + 3 * layout.cornerInset).toBeLessThanOrEqual(layout.squareSize - 2 * 4);
+  });
+
   it('keeps the board above the keyboard and clear of the left buttons and the top-right buttons', () => {
     const board = { x: rows[0].x, y: rows[0].y, w: rows[0].w, h: rows[5].y + rows[5].h - rows[0].y };
     for (const rect of [...keyRects, ...left, frame.corner]) expect(overlaps(board, rect), JSON.stringify(rect)).toBe(false);

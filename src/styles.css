@@ -1051,6 +1051,7 @@ body {
 }
 
 .square {
+  position: relative;
   box-sizing: border-box;
   flex: none;
   display: flex;
@@ -1084,6 +1085,20 @@ body {
 .square.absent {
   border: 5px solid var(--wrong);
   background: var(--absent-fill);
+}
+
+/* A letter she found in the wrong spot that could go in this square: a little yellow square in a corner. */
+.square .maybe {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--present-fill);
+  border: 2px solid var(--present);
+  color: var(--ink);
+  line-height: 1;
 }
 
 .square.pop {

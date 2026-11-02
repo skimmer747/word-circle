@@ -11,6 +11,8 @@ export type SquareLook = 'empty' | 'cursor' | 'typed' | Mark;
 export interface SquareView {
   letter: string;
   look: SquareLook;
+  /** In the row she's typing: the yellow letters that could go here, one per corner ('' for none). */
+  corners?: readonly string[];
 }
 
 /** The left column's third button: nothing, the Today's Wordle label, or Share today's Wordle. */
@@ -105,6 +107,17 @@ export class GuessView {
     this.squares[row]?.forEach((square, i) => {
       square.textContent = squares[i].letter.toUpperCase();
       square.className = `square ${squares[i].look}`;
+      squares[i].corners?.forEach((letter, corner) => {
+        if (!letter) return;
+        const tile = el('span', 'maybe', square);
+        tile.textContent = letter.toUpperCase();
+        const { cornerFont, cornerSize, cornerInset } = this.layout;
+        tile.style.fontSize = `${cornerFont}px`;
+        tile.style.width = tile.style.height = `${cornerSize}px`;
+        // Corners in order: top left, top right, bottom left, bottom right.
+        tile.style[corner % 2 === 0 ? 'left' : 'right'] = `${cornerInset}px`;
+        tile.style[corner < 2 ? 'top' : 'bottom'] = `${cornerInset}px`;
+      });
     });
   }
 

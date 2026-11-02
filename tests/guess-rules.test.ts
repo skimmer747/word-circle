@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GuessGame, firstVisibleGuess, markGuess } from '../src/guess/rules';
+import { GuessGame, firstVisibleGuess, markGuess, yellowCorners } from '../src/guess/rules';
 
 const ACCEPTED = new Set(['stare', 'crane', 'pious', 'eerie', 'slate', 'slave', 'tales', 'house']);
 const game = (answer = 'slate', guesses: string[] = [], hinted: number[] = []) =>
@@ -128,6 +128,79 @@ describe('what she knows', () => {
     expect(typed.untouched).toBe(false);
     expect(game('slate', ['stare']).untouched).toBe(false);
     expect(game('slate', [], [0]).untouched).toBe(false);
+  });
+});
+
+describe('where her yellow letters can go', () => {
+  it('lists each wrong-spot letter with the squares she does not know and has not tried it in', () => {
+    expect(game('slate', ['stare']).yellowLetters()).toEqual([{ letter: 't', spots: [3] }]);
+  });
+
+  it('keeps the order she found them in', () => {
+    expect(game('house', ['pious']).yellowLetters()).toEqual([
+      { letter: 'o', spots: [0, 1, 3, 4] },
+      { letter: 'u', spots: [0, 1, 2, 4] },
+      { letter: 's', spots: [0, 1, 2, 3] },
+    ]);
+  });
+
+  it('drops a letter once she knows its square, and keeps the others out of that square', () => {
+    expect(game('house', ['pious'], [1]).yellowLetters()).toEqual([
+      { letter: 'u', spots: [0, 2, 4] },
+      { letter: 's', spots: [0, 2, 3] },
+    ]);
+    expect(game('slate', ['stare', 'tales']).yellowLetters()).toEqual([
+      { letter: 't', spots: [3] },
+      { letter: 'l', spots: [1, 3] },
+    ]);
+  });
+
+  it('leaves out squares where a copy was not in the word', () => {
+    expect(game('abide', ['speed']).yellowLetters()).toEqual([
+      { letter: 'e', spots: [0, 1, 4] },
+      { letter: 'd', spots: [0, 1, 2, 3] },
+    ]);
+  });
+
+  it('keeps a letter with a second copy to place after she finds the first', () => {
+    expect(game('eerie', ['heeds']).yellowLetters()).toEqual([{ letter: 'e', spots: [0, 3, 4] }]);
+  });
+
+  it('has none before she finds a wrong-spot letter', () => {
+    expect(game().yellowLetters()).toEqual([]);
+    expect(game('slate', ['crane']).yellowLetters()).toEqual([]);
+  });
+});
+
+describe("the yellow letters in each square's corners", () => {
+  const blank = ['', '', '', ''];
+
+  it('gives each letter the same corner in every square it can go in', () => {
+    expect(yellowCorners(game('house', ['pious']).yellowLetters())).toEqual([
+      ['o', 'u', 's', ''],
+      ['o', 'u', 's', ''],
+      ['', 'u', 's', ''],
+      ['o', '', 's', ''],
+      ['o', 'u', '', ''],
+    ]);
+  });
+
+  it('leaves every corner empty with no yellow letters', () => {
+    expect(yellowCorners([])).toEqual([blank, blank, blank, blank, blank]);
+  });
+
+  it('fills the corners in turn when there are more than four letters', () => {
+    const yellow = [
+      { letter: 'a', spots: [0, 1] },
+      { letter: 'b', spots: [1] },
+      { letter: 'c', spots: [0, 1] },
+      { letter: 'd', spots: [1] },
+      { letter: 'e', spots: [0, 1] },
+    ];
+    expect(yellowCorners(yellow).slice(0, 2)).toEqual([
+      ['a', 'c', 'e', ''],
+      ['a', 'b', 'c', 'd'],
+    ]);
   });
 });
 
