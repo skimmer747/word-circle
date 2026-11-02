@@ -17,8 +17,8 @@
   /* Word Guess: right letter in the wrong spot, not in the word, and the Today's Wordle label. */
   --present: #b8860b;
   --absent: #9aa6b2;
-  /* The red line through a letter that isn't in the word, so it can't be mistaken for green. */
-  --strike: #d32f2f;
+  /* The red border around a letter that isn't in the word, so it can't be mistaken for green. */
+  --wrong: #d32f2f;
   --daily-fill: #fff4d6;
   /* Light fills behind the colored borders, so right / wrong spot / not in the word are easy to tell apart. */
   --right-fill: #cdeccf;
@@ -941,8 +941,7 @@ body {
 }
 
 .pic-guess .absent {
-  position: relative;
-  border-color: var(--absent);
+  border-color: var(--wrong);
   background: var(--absent-fill);
 }
 
@@ -1081,36 +1080,10 @@ body {
   background: var(--present-fill);
 }
 
+/* Not in the word: gray with a red border, on the board, the keys and the Games picture. */
 .square.absent {
-  position: relative;
-  border: 5px solid var(--absent);
+  border: 5px solid var(--wrong);
   background: var(--absent-fill);
-}
-
-/*
- * Not in the word: a red line through the square as well as gray, on the board, the keys and the Games picture.
- * It's drawn behind the letter, so the letter stays easy to read.
- */
-.square.absent,
-.key.absent,
-.pic-guess .absent {
-  isolation: isolate;
-}
-
-.square.absent::after,
-.key.absent::after,
-.pic-guess .absent::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  left: 50%;
-  top: 50%;
-  width: 110%;
-  height: max(3px, 12%);
-  border-radius: 999px;
-  background: var(--strike);
-  transform: translate(-50%, -50%) rotate(-45deg);
-  pointer-events: none;
 }
 
 .square.pop {
@@ -1152,7 +1125,7 @@ body {
 }
 
 .key.absent {
-  border: 3px solid var(--absent);
+  border: 5px solid var(--wrong);
   background: var(--absent-fill);
 }
 
