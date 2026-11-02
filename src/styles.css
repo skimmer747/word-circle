@@ -1087,12 +1087,22 @@ body {
   background: var(--absent-fill);
 }
 
-/* Not in the word: a red line through the letter as well as gray, on the board, the keys and the Games picture. */
+/*
+ * Not in the word: a red line through the square as well as gray, on the board, the keys and the Games picture.
+ * It's drawn behind the letter, so the letter stays easy to read.
+ */
+.square.absent,
+.key.absent,
+.pic-guess .absent {
+  isolation: isolate;
+}
+
 .square.absent::after,
 .key.absent::after,
 .pic-guess .absent::after {
   content: '';
   position: absolute;
+  z-index: -1;
   left: 50%;
   top: 50%;
   width: 110%;
